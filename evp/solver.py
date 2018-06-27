@@ -78,7 +78,7 @@ class Solver():
                   mats[i] += (res*d2.T).T
       return mats
 
-    def _get_matrix(self):
+    def _get_matrix1(self):
         import numpy as np
         dim = self.system.dim
         NN = self.grid.NN
@@ -88,12 +88,6 @@ class Solver():
 
         # Construct matrix mat1
         mat1 = np.zeros((dim*NN,dim*NN), dtype="complex128")
-        if boundaries is not None:
-            self.mat2 = np.eye(dim*NN)
-            for j, equation in enumerate(equations):
-                if boundaries[j]:
-                  self._set_boundary(j+1)
-
 
         for j, equation in enumerate(equations):
             mats = self._find_submatrices(equation)
@@ -104,6 +98,30 @@ class Solver():
                   self._set_submatrix(mat1, mats[i], j+1, i+1, False)
 
         self.mat1 = mat1
+
+    def _get_matrix2(self):
+      import numpy as np
+      dim = self.system.dim
+      NN = self.grid.NN
+      equations = self.system.equations
+      variables = self.system.variables
+      boundaries = self.system.boundaries
+      try:
+        # Construct matrix mat2
+        rhs_equations = self.system.rhs_equations
+        mat2 = np.zeros((dim*NN,dim*NN), dtype="complex128")
+        for j, equation in enumerate(rhs_equations):
+            mats = self._find_submatrices(equation)
+            for i, variable in enumerate(variables):
+                  self._set_submatrix(mat2, mats[i], j+1, i+1, False)
+        self.mat2 = mat2
+      except AttributeError:
+        self.mat2 = np.eye(dim*NN)
+
+      if boundaries is not None:
+          for j, equation in enumerate(equations):
+              if boundaries[j]:
+                self._set_boundary(j+1)
 
     def keep_result(self, omega, vec):
 
@@ -120,7 +138,8 @@ class Solver():
         boundaries = self.system.boundaries
 
         # Calculate matrix
-        self._get_matrix()
+        self._get_matrix1()
+        self._get_matrix2()
 
         if guess is None:
             if boundaries is None:

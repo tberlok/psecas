@@ -25,6 +25,27 @@ def test_mti_solution(show=False, verbose=False):
 
     return err
 
+def test_kh_uniform_solution(show=False, verbose=False):
+    import numpy as np
+    from evp import Solver, FourierGrid
+    from evp.systems.kh_uniform import KelvinHelmholtzUniform
+
+    grid = FourierGrid(N=64, zmin=0, zmax=2)
+
+    system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2)
+
+    kh = Solver(grid, system, 3.52615254237)
+
+    Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
+    omega, v, err = kh.iterate_solver2(Ns, tol=1e-8, verbose=verbose)
+
+    if show:
+        from evp import plot_solution
+        plot_solution(kh, smooth=True)
+
+    np.testing.assert_allclose(1.66548246011, omega, atol=1e-8)
+    return err
 
 if __name__ == '__main__':
     err = test_mti_solution(show=True, verbose=True)
+    err = test_kh_uniform_solution(show=True, verbose=True)

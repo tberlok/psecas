@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/nbia-astro/skeletor.svg?token=SrP7KstmwUSGLQustYFw&branch=master)](https://travis-ci.com/nbia-astro/skeletor)
+[![CircleCI](https://circleci.com/gh/tberlok/evp/tree/master.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/evp/tree/master)
 
 # Introduction
 

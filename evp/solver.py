@@ -131,7 +131,7 @@ class Solver():
       self.result.update({'omega':omega, 'kx':self.kx, 'zg':self.grid.zg,
                           'variables':self.system.variables, 'm':0})
 
-    def solver(self, guess=None, useOPinv=False, verbose=False, mode=0):
+    def solver(self, guess=None, useOPinv=True, verbose=False, mode=0):
         import numpy as np
         from scipy.linalg import eig
 
@@ -163,7 +163,7 @@ class Solver():
             from scipy.sparse.linalg import eigs
             from scipy import sparse
             smat = sparse.csr_matrix(self.mat1)
-            if useOPinv: # TODO: Get rid of this?
+            if useOPinv:
               # from numpy.linalg import pinv as inv
               from numpy.linalg import inv
               if boundaries is None:

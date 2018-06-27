@@ -112,9 +112,8 @@ class Solver():
                      var in enumerate(self.system.variables)}
       self.result.update({'omega':omega, 'kx':self.kx, 'zg':self.grid.zg,
                           'variables':self.system.variables, 'm':0})
-      # IPython.embed()
 
-    def solver(self, guess=None, useOPinv=False, verbose=False, i=0):
+    def solver(self, guess=None, useOPinv=False, verbose=False, mode=0):
         import numpy as np
         from scipy.linalg import eig
 
@@ -127,33 +126,30 @@ class Solver():
             if boundaries is None:
               E, V = eig(self.mat1)
             else:
-              # IPython.embed()
               E, V = eig(self.mat1, self.mat2)
 
             # Zero out large values which are most likely numerical
+            #TODO: Don't have this hardcoded
             E[np.abs(E.real) > 10.] = 0
             E[np.abs(E.imag) > 10.] = 0
 
             # Sort from largest to smallest eigenvalue
             index = np.argsort(np.real(E))[::-1]
 
-            # Choose the largest value only
-            # i = range(10)
-            # Construct dictionary of perturbation variables
-            omega = E[index[i]]
-            v = V[:, index[i]]
+            # Choose the eigenvalue mode value only
+            omega = E[index[mode]]
+            v = V[:, index[mode]]
             if verbose:
                 print("N: {}, all eigenvalues: {}".format(self.grid.N, omega))
         else:
             from scipy.sparse.linalg import eigs
             from scipy import sparse
             smat = sparse.csr_matrix(self.mat1)
-            if useOPinv:
-              from numpy.linalg import pinv as inv
+            if useOPinv: # TODO: Get rid of this?
+              # from numpy.linalg import pinv as inv
+              from numpy.linalg import inv
               if boundaries is None:
-                # IPython.embed()
                 OPinv = inv(self.mat1 - guess*np.eye(self.mat1.shape[0]))
-
               else:
                 OPinv = inv(self.mat1 - guess*self.mat2)
               omega, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
@@ -162,10 +158,11 @@ class Solver():
                 omega, v = eigs(self.mat1, k=1, sigma=guess)
               else:
                 omega, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
+            # Convert result from eigs to have same format as result from eig
             omega = omega[0]
             v = np.squeeze(v)
             if verbose:
-                print("N: {}, only 1 eigenvalue: {}".format(self.grid.N, omega))
+                print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, omega))
 
         self.keep_result(omega, v)
 
@@ -192,23 +189,23 @@ class Solver():
           print(omega)
         return omega
 
-    def iterate_solver(self, Ns, i=0, tol=1e-6, verbose=False):
+    def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False):
         import numpy as np
 
         self.grid.N = Ns[0]
-        (a_old, v) = self.solver(i=i, verbose=verbose)
+        (a_old, v) = self.solver(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
-        (a_new, v) = self.solver(i=i, verbose=verbose)
+        (a_new, v) = self.solver(mode=mode, verbose=verbose)
         err = np.abs(a_old - a_new)/np.abs(a_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
-            if err > 0.5:
-                (a_new, v) = self.solver(i=i, verbose=verbose)
+            if err > 0.1:
+                (a_new, v) = self.solver(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (a_new, v) = self.solver(a_old, i=i, verbose=verbose)
+                (a_new, v) = self.solver(a_old, mode=mode, verbose=verbose)
 
             err = np.abs(a_old - a_new)/np.abs(a_old)
             # Converged

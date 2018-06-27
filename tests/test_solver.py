@@ -12,7 +12,7 @@ def test_mti_solution(show=False, verbose=False):
     mti = Solver(grid, system, kx=4*np.pi)
 
     Ns = np.hstack(np.arange(1, 10)*16)
-    omega, vec, err = mti.iterate_solver(Ns, i=0, tol=1e-8, verbose=verbose)
+    omega, vec, err = mti.iterate_solver(Ns, mode=0, tol=1e-8, verbose=verbose)
 
     if show:
         from evp import plot_solution

@@ -1,6 +1,6 @@
 
 def test_mti_solution(show=False, verbose=False):
-    """Test the solver by comparing the eigenvalue with old result"""
+    """Test eigenvalue solver using ChebyshevExtremaGrid"""
     import numpy as np
     from evp import Solver, ChebyshevExtremaGrid
     from evp.systems.mti import MagnetoThermalInstability
@@ -27,7 +27,7 @@ def test_mti_solution(show=False, verbose=False):
 
 
 def test_kh_uniform_solution(show=False, verbose=False):
-    """Test the solver by comparing the eigenvalue with old result"""
+    """Test eigenvalue solver using FourierGrid"""
     import numpy as np
     from evp import Solver, FourierGrid
     from evp.systems.kh_uniform import KelvinHelmholtzUniform
@@ -49,6 +49,56 @@ def test_kh_uniform_solution(show=False, verbose=False):
     return err
 
 
+def test_channel(show=False, verbose=False):
+    """Test eigenvalue solver using ChebyshevRationalGrid"""
+    import numpy as np
+    from evp import Solver, ChebyshevRationalGrid
+    from evp.systems.channel import Channel
+
+    grid = ChebyshevRationalGrid(N=199, L=1)
+    system = Channel(grid)
+
+    # kx is weird to have as a parameter here TODO: fix that
+    ch = Solver(grid, system, kx=0)
+
+    # Number of modes to test
+    modes = 3
+    results = np.zeros(modes, dtype=np.complex128)
+    checks = np.array([85.08037778, 69.4741069099, 55.4410282999])
+
+    def sorting_strategy(E):
+        """Sorting strategy for channel modes"""
+        E[E.real > 100.] = 0
+        E[E.real < -10.] = 0
+        return E
+
+    ch.sorting_strategy = sorting_strategy
+
+    if show:
+        import matplotlib.pyplot as plt
+        plt.figure(1)
+        plt.clf()
+        fig, axes = plt.subplots(num=1, ncols=modes, sharey=True)
+    for mode in range(modes):
+        Ns = np.arange(1, 6)*32
+        omega, vec, err = ch.iterate_solver(Ns, mode=mode, verbose=True)
+        results[mode] = omega
+        if show:
+            phi = np.arctan(vec[2].imag/vec[2].real)
+            ch.keep_result(omega, vec*np.exp(-1j*phi))
+            axes[mode].set_title(r"$\sigma = ${:1.4f}".format(omega.real),
+                                 fontsize=10)
+            axes[mode].plot(grid.zg, ch.result['f'].real)
+            axes[mode].plot(grid.zg, ch.result['f'].imag)
+            axes[mode].set_xlim(-4, 4)
+
+    if show:
+        plt.show()
+
+    np.testing.assert_allclose(results, checks, atol=1e-6)
+
+
 if __name__ == '__main__':
     err = test_mti_solution(show=True, verbose=True)
     err = test_kh_uniform_solution(show=True, verbose=True)
+    test_channel(show=True, verbose=True)

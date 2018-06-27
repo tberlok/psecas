@@ -1,11 +1,10 @@
 class MagnetoThermalInstability():
-    """Linearized equations for the MTI with ansitropic viscosity and heat 
+    """Linearized equations for the MTI with ansitropic viscosity and heat
        conduction for a constant magnetic field in the x-direction.
     """
     def __init__(self, grid, beta, Kn0, only_interior=True):
-        import numpy as np
         # Problem parameters
-        
+
         self._beta = beta
         self._Kn0 = Kn0
 
@@ -24,7 +23,7 @@ class MagnetoThermalInstability():
         self.grid.bind_to(self.make_background)
 
         # Variables to solve for
-        self.variables = ['drho', 'dA', 'dvx','dvz', 'dT']
+        self.variables = ['drho', 'dA', 'dvx', 'dvz', 'dT']
 
         self.labels = [r'$\delta \rho$', r'$\delta A$', r'$\delta v_x$',
                        r'$\delta v_z$', r'$\delta T$']
@@ -39,7 +38,7 @@ class MagnetoThermalInstability():
         # Number of equations in system
         self.dim = len(self.variables)
 
-        # Equations (Careful! No space between minus and the term is belongs to)
+        # Equations (Careful! No space behind minus)
         eq1 = "-1j*kx*dvx -dlnrhodz*dvz -1.0*dz(dvz)"
         eq2 = "1.0*dvz"
         eq3 = "-1j*kx*p/rho*drho -1j*kx*p/rho*dT -nu*4/3*kx**2*dvx -nu*1j*kx*2/3*dz(dvz)"
@@ -82,7 +81,8 @@ class MagnetoThermalInstability():
         Returns symbolic expressions (as a function of z) """
         import sympy as sym
         import numpy as np
-        z   = sym.symbols("z")
+        from sympy import exp
+        z = sym.symbols("z")
 
         zg = self.grid.zg
 
@@ -97,29 +97,29 @@ class MagnetoThermalInstability():
 
         # Define Background Functions
         for z1 in zg:
-          if self.only_interior:
-            rho_sym = rho0*(1 - z/(3*H0))**2
-            p_sym = p0*(1 - z/(3*H0))**3
-          else:
-            if (z1 <= Lz/4):
-              rho_sym = rho0*exp(-(z-Lz/4)/H0)
-              p_sym = p0*exp(-(z-Lz/4)/H0)
-            elif (z1 > (Lz/4) and z1 < (3/4*Lz)):
-              rho_sym = rho0*(1 - (z-Lz/4)/(3*H0))**2
-              p_sym = p0*(1 - (z-Lz/4)/(3*H0))**3
+            if self.only_interior:
+                rho_sym = rho0*(1 - z/(3*H0))**2
+                p_sym = p0*(1 - z/(3*H0))**3
             else:
-              rho_sym = rho0*(1 - Lz/(6*H0))**2*exp(-(z-3*Lz/4)/H0)
-              p_sym = p0*(1 - Lz/(6*H0))**3*exp(-(z-3*Lz/4)/H0)
+                if (z1 <= Lz/4):
+                    rho_sym = rho0*exp(-(z-Lz/4)/H0)
+                    p_sym = p0*exp(-(z-Lz/4)/H0)
+                elif (z1 > (Lz/4) and z1 < (3/4*Lz)):
+                    rho_sym = rho0*(1 - (z-Lz/4)/(3*H0))**2
+                    p_sym = p0*(1 - (z-Lz/4)/(3*H0))**3
+                else:
+                    rho_sym = rho0*(1 - Lz/(6*H0))**2*exp(-(z-3*Lz/4)/H0)
+                    p_sym = p0*(1 - Lz/(6*H0))**3*exp(-(z-3*Lz/4)/H0)
 
-          T_sym = p_sym/rho_sym
-          nu_sym = nu0*T_sym**(5/2)
-          
-          p.append(p_sym.subs(z, z1))
-          rho.append(rho_sym.subs(z, z1))
-          dpdz.append((sym.diff(p_sym, z)).subs(z, z1))
-          dlnrhodz.append((sym.diff(rho_sym, z)/rho_sym).subs(z, z1))
-          dlnTdz.append((sym.diff(T_sym, z)/T_sym).subs(z, z1))
-          drhonudz.append((sym.diff(rho_sym*nu_sym, z)).subs(z, z1))
+            T_sym = p_sym/rho_sym
+            nu_sym = nu0*T_sym**(5/2)
+
+            p.append(p_sym.subs(z, z1))
+            rho.append(rho_sym.subs(z, z1))
+            dpdz.append((sym.diff(p_sym, z)).subs(z, z1))
+            dlnrhodz.append((sym.diff(rho_sym, z)/rho_sym).subs(z, z1))
+            dlnTdz.append((sym.diff(T_sym, z)/T_sym).subs(z, z1))
+            drhonudz.append((sym.diff(rho_sym*nu_sym, z)).subs(z, z1))
 
         self.p = np.array(p, dtype=np.complex128)
         self.rho = np.array(rho, dtype=np.complex128)

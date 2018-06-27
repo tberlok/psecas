@@ -2,7 +2,6 @@ class Channel():
     """Linearized equations for channel mode."""
 
     def __init__(self, grid):
-        import numpy as np
         # Problem parameters
 
         self.grid = grid
@@ -22,9 +21,9 @@ class Channel():
         # Number of equations in system
         self.dim = len(self.variables)
 
-        # Equations (Careful! No space between minus and the term it belongs to)
+        # Equations (Careful! No space between minus and the term it
+        # belongs to)
         eq1 = "1*dz(dz(f)) +z*dz(f)"
-
 
         self.equations = [eq1]
 

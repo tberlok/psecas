@@ -10,7 +10,7 @@ def test_fourier_differentation(show=False):
 
     z = grid.zg
     y = np.tanh((z-1.5)/0.05) - np.tanh((z-0.5)/0.05) + 1.0
-    yp_exac = -np.tanh((z-1.5)/0.05)**2/0.05  + np.tanh((z-0.5)/0.05)**2/0.05
+    yp_exac = -np.tanh((z-1.5)/0.05)**2/0.05 + np.tanh((z-0.5)/0.05)**2/0.05
     yp_num = np.matmul(grid.d1, y)
 
     if show:
@@ -55,6 +55,7 @@ def test_chebyshev_differentation(show=False):
 
     return (yp_num, yp_exac)
 
+
 def test_rational_chebyshev_interpolation(show=False):
     """Test the differentation routine of ChebyshevRationalGrid"""
     import numpy as np
@@ -90,6 +91,7 @@ def test_rational_chebyshev_interpolation(show=False):
     np.testing.assert_allclose(yp_num, yp_exac, atol=1e-12)
 
     return (yp_num, yp_exac)
+
 
 if __name__ == '__main__':
     (yp_num, yp_exac) = test_fourier_differentation(show=True)

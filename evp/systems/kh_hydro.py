@@ -1,11 +1,10 @@
 class KelvinHelmholtzHydroOnly():
     """Linearized equations for KH with ansitoropic viscosity for a constant
-       magnetic field in the x-direction. The equilibrium is also assumed to 
+       magnetic field in the x-direction. The equilibrium is also assumed to
        have constant density, temperature and pressure.
     """
     def __init__(self, grid, u0, delta, z1=0.5, z2=1.5, a=0.05):
-        import numpy as np
-        
+
         self._u0 = u0
         self._delta = delta
 
@@ -18,7 +17,7 @@ class KelvinHelmholtzHydroOnly():
 
         self.z1 = z1
         self.z2 = z2
-        self.a  = a
+        self.a = a
 
         # Create initial background
         self.make_background()
@@ -32,7 +31,7 @@ class KelvinHelmholtzHydroOnly():
         # Boundary conditions
         self.boundaries = None
 
-        # Equations (Careful! No space between minus and the term is belongs to)
+        # Equations (Careful! No space behind the minus
         eq1 = "-1j*kx*v*drho -1j*kx*dvx -dlnrhodz*dvz -1.0*dz(dvz)"
         eq2 = "-1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT"
         eq3 = "-1j*kx*v*dvz -1/rho*dpdz*drho -1/rho*p*dz(drho) -1/rho*dpdz*dT -1/rho*p*dz(dT)"
@@ -68,8 +67,8 @@ class KelvinHelmholtzHydroOnly():
     def make_background(self):
         import sympy as sym
         import numpy as np
-        from sympy import sqrt, exp, tanh, diff, lambdify, symbols
-        z   = symbols("z")
+        from sympy import tanh, diff, lambdify, symbols
+        z = symbols("z")
 
         u0 = self.u0
         delta = self.delta
@@ -78,7 +77,7 @@ class KelvinHelmholtzHydroOnly():
         globals().update(self.__dict__)
 
         # Define Background Functions
-        v_sym    = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
+        v_sym = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
         rho_sym = rho0*(1 + delta/2*(tanh((z-z1)/a) - tanh((z-z2)/a)))
 
         dvdz_sym = diff(v_sym, z)
@@ -92,12 +91,13 @@ class KelvinHelmholtzHydroOnly():
         dvdz_sym = sym.diff(v_sym, z)
         d2vdz_sym = sym.diff(dvdz_sym, z)
 
-        self.T   = np.ones_like(zg)*lambdify(z, T_sym)(zg)
-        self.rho = np.ones_like(zg)*lambdify(z, rho_sym)(zg)
-        self.p = np.ones_like(zg)*lambdify(z, p_sym)(zg)
-        self.dpdz = np.ones_like(zg)*lambdify(z, sym.diff(p_sym, z))(zg)
-        self.dlnTdz = np.ones_like(zg)*lambdify(z, sym.diff(T_sym, z)/T_sym)(zg)
-        self.dlnrhodz = np.ones_like(zg)*lambdify(z, sym.diff(rho_sym, z)/rho_sym)(zg)
-        self.v    = np.ones_like(zg)*lambdify(z, v_sym)(zg)
-        self.dvdz = np.ones_like(zg)*lambdify(z, dvdz_sym)(zg)
-        self.d2vdz = np.ones_like(zg)*lambdify(z, d2vdz_sym)(zg)
+        ones = np.ones_like(zg)
+        self.T = ones*lambdify(z, T_sym)(zg)
+        self.rho = ones*lambdify(z, rho_sym)(zg)
+        self.p = ones*lambdify(z, p_sym)(zg)
+        self.dpdz = ones*lambdify(z, sym.diff(p_sym, z))(zg)
+        self.dlnTdz = ones*lambdify(z, sym.diff(T_sym, z)/T_sym)(zg)
+        self.dlnrhodz = ones*lambdify(z, sym.diff(rho_sym, z)/rho_sym)(zg)
+        self.v = ones*lambdify(z, v_sym)(zg)
+        self.dvdz = ones*lambdify(z, dvdz_sym)(zg)
+        self.d2vdz = ones*lambdify(z, d2vdz_sym)(zg)

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from evp import Solver, ChebyshevExtremaGrid
 from evp.systems.mti import MagnetoThermalInstability
 from evp import plot_solution
@@ -13,17 +12,17 @@ beta = 1e5
 Kn0 = 200
 
 system = MagnetoThermalInstability(grid, beta, Kn0, only_interior=True)
-system.boundaries = [True, False, False, False, False]
+system.boundaries = [True, True, False, True, False]
 
 kx = 2*np.pi*2
 mti = Solver(grid, system, kx)
 
-Ns = np.hstack((np.arange(1, 6)*32, np.arange(2, 12)*64))
-omega, vec, err = mti.iterate_solver(Ns, mode=5, verbose=True)
+Ns = np.hstack((np.arange(1, 5)*32, np.arange(3, 12)*64))
+omega, vec, err = mti.iterate_solver(Ns, mode=0, verbose=True, tol=1e-5)
 phi = np.arctan(vec[2].imag/vec[2].real)
-mti.keep_result(omega, vec*np.exp(-1j*phi))
+mti.keep_result(omega, vec*np.exp(-1j*phi), mode=0)
 
-plot_solution(mti, smooth=True)
+plot_solution(mti, smooth=False)
 
 # import time
 # betas = np.logspace(4, 7, 4)

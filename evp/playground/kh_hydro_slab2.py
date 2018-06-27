@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from evp import Solver, ChebyshevRationalGrid
 from evp.systems.kh_hydro import KelvinHelmholtzHydroOnly
+import pickle
 
 N = 88
 
@@ -17,22 +17,22 @@ kx = 2.
 kh = Solver(grid, system, kx)
 
 omega, v = kh.solver()
-result = {var:v[j*grid.NN:(j+1)*grid.NN] for j,
+result = {var: v[j*grid.NN: (j+1)*grid.NN] for j,
           var in enumerate(system.variables)}
-result.update({'omega':omega, 'kx':kx, 'zg':grid.zg,
-               'variables':system.variables, 'm':0})
+result.update({'omega': omega, 'kx': kx, 'zg': grid.zg,
+               'variables': system.variables, 'mode': 0})
 
 # Save with numpy npz
 np.savez('test.npz', **result)
 sol = np.load('test.npz')
 
 # Save with pickle (better!)
-import pickle
 pickle.dump(result, open('test.p', 'wb'))
 sol = pickle.load(open('test.p', 'rb'))
 
 pickle.dump(system, open('system.p', 'wb'))
 pickle.dump(grid, open('grid.p', 'wb'))
+
 
 def plot_solution(sol, filename=None, n=1, smooth=True):
     from evp import setup
@@ -46,8 +46,10 @@ def plot_solution(sol, filename=None, n=1, smooth=True):
     for j, var in enumerate(sol['variables']):
         if smooth:
             z = np.linspace(grid.zmin, grid.zmax, 2000)
-            axes[j].plot(z, grid.interpolate(z, sol[var].real), 'C0', label='Real')
-            axes[j].plot(z, grid.interpolate(z, sol[var].imag), 'C1', label='Imag')
+            axes[j].plot(z, grid.interpolate(z, sol[var].real),
+                         'C0', label='Real')
+            axes[j].plot(z, grid.interpolate(z, sol[var].imag),
+                         'C1', label='Imag')
         else:
             axes[j].plot(sol['zg'], sol[var].real, 'C0+', label='Real')
             axes[j].plot(sol['zg'], sol[var].imag, 'C1+', label='Imag')
@@ -57,7 +59,7 @@ def plot_solution(sol, filename=None, n=1, smooth=True):
     axes[0].legend(frameon=False)
 
     if not pylab and filename is not None:
-        fig.savefig('../figures/' + filename +'.eps')
+        fig.savefig('../figures/' + filename + '.eps')
     else:
         plt.show()
 

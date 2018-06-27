@@ -102,7 +102,8 @@ def test_rational_chebyshev_interpolation(show=False):
     np.testing.assert_allclose(y_fine, y_interpolated, atol=1e-12)
     return (y_fine, y_interpolated)
 
+
 if __name__ == '__main__':
-   (y_fine, y_interpolated) = test_rational_chebyshev_interpolation(show=True)
-   (y_fine, y_interpolated) = test_fourier_interpolation(show=True)
-   (y_fine, y_interpolated) = test_chebyshev_interpolation(show=True)
+    (y_fine, y_interpolated) = test_rational_chebyshev_interpolation(show=True)
+    (y_fine, y_interpolated) = test_fourier_interpolation(show=True)
+    (y_fine, y_interpolated) = test_chebyshev_interpolation(show=True)

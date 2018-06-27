@@ -15,17 +15,19 @@ def plot_solution(solver, filename=None, n=1, smooth=True):
     for j, var in enumerate(sol['variables']):
         if smooth:
             z = np.linspace(grid.zmin, grid.zmax, 2000)
-            axes[j].plot(z, grid.interpolate(z, sol[var].real), 'C0', label='Real')
-            axes[j].plot(z, grid.interpolate(z, sol[var].imag), 'C1', label='Imag')
+            axes[j].plot(z, grid.interpolate(z, sol[var].real),
+                         'C0', label='Real')
+            axes[j].plot(z, grid.interpolate(z, sol[var].imag),
+                         'C1', label='Imag')
         else:
             axes[j].plot(sol['zg'], sol[var].real, 'C0+', label='Real')
             axes[j].plot(sol['zg'], sol[var].imag, 'C1+', label='Imag')
         axes[j].set_ylabel(system.labels[j])
     axes[system.dim-1].set_xlabel(r"$z$")
-    axes[0].set_title(title.format(sol['omega'], sol['kx'], sol['m']))
+    axes[0].set_title(title.format(sol['omega'], sol['kx'], sol['mode']))
     axes[0].legend(frameon=False)
 
     if not pylab and filename is not None:
-        fig.savefig('../figures/' + filename +'.eps')
+        fig.savefig('../figures/' + filename + '.eps')
     else:
         plt.show()

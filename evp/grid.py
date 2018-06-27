@@ -60,21 +60,19 @@ class FourierGrid(Grid):
         N = self._N
         self.NN = N
         zmin = self.zmin
-        zmax = self.zmax
         L = self.L
 
         factor = L/(2.0*np.pi)
 
         dz = 2.0*pi/N
         zg = dz*np.arange(1, N + 1) - dz/2
-        # zg = dz*np.arange(N)
 
-        column = np.hstack([0.0,
-                .5*(-1.0)**np.arange(1, N)/tan(np.arange(1, N)*dz/2.0)])
+        column = np.hstack([0.0, .5*(-1.0)**np.arange(1, N) /
+                           tan(np.arange(1, N)*dz/2.0)])
         d1 = toeplitz(column, column[np.hstack([0, range(N-1, 0, -1)])])
 
-        y = np.hstack([-pi**2/(3*dz**2) - 1/6,
-                    -0.5*(-1)**arange(1, N)/sin(dz*arange(1, N)/2)**2])
+        y = np.hstack([-pi**2/(3*dz**2) - 1/6, -0.5*(-1)**arange(1, N) /
+                      sin(dz*arange(1, N)/2)**2])
         d2 = toeplitz(y)
         self.zg = zg*L/(2*pi) - zmin
         self.d0 = np.eye(N)
@@ -95,10 +93,12 @@ class FourierGrid(Grid):
         # n[self.N:] = 0
 
         def to_grid(z):
-          cos = np.sum(ak[1:].real*np.cos(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))
-          sin = -np.sum(ak[1:].imag*np.sin(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))
-          y = ak[0].real/2.0 + cos + sin
-          return y
+            cos = np.sum(ak[1:].real *
+                         np.cos(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))
+            sin = -np.sum(ak[1:].imag *
+                          np.sin(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))
+            y = ak[0].real/2.0 + cos + sin
+            return y
 
         # y = np.zeros(self.N)
         # for i in range(self.N):
@@ -118,32 +118,30 @@ class ChebyshevExtremaGrid(Grid):
 
         N = self._N
         self.NN = N + 1
-        zmin = self._zmin
-        zmax = self._zmax
         L = self.L
 
         factor = L/2
 
-        zg    = np.zeros(N+1)
-        d1    = np.zeros((N+1,N+1))
+        zg = np.zeros(N+1)
+        d1 = np.zeros((N+1, N+1))
         for ii in range(N+1):
-          zg[ii]= np.cos(np.pi*ii/N)
+            zg[ii] = np.cos(np.pi*ii/N)
 
-        p    = np.ones(N+1)
+        p = np.ones(N+1)
         p[0] = 2
         p[N] = 2
 
         for ii in range(N+1):
-          for jj in range(N+1):
-            if ii==jj:
-              if ii==0:
-                d1[ii,jj]= (1+2*N**2)/6
-              elif ii==N:
-                d1[ii,jj] = -(1+2*N**2)/6
-              else:
-                d1[ii,jj]= -zg[jj]/(2*(1-zg[jj]**2))
-            else:
-              d1[ii,jj]= (-1)**(ii+jj)*p[ii]/(p[jj]*(zg[ii]-zg[jj]))
+            for jj in range(N+1):
+                if ii == jj:
+                    if ii == 0:
+                        d1[ii, jj] = (1+2*N**2)/6
+                    elif ii == N:
+                        d1[ii, jj] = -(1+2*N**2)/6
+                    else:
+                        d1[ii, jj] = -zg[jj]/(2*(1-zg[jj]**2))
+                else:
+                    d1[ii, jj] = (-1)**(ii+jj)*p[ii]/(p[jj]*(zg[ii]-zg[jj]))
 
         d2 = np.dot(d1, d1)
         self.zg = -(zg - 1)*L/2 + self.zmin
@@ -160,6 +158,7 @@ class ChebyshevExtremaGrid(Grid):
         c, res = chebfit(self.zg, f, deg=self.N, full=True)
         # c = chebfit(grid.zg, f, deg=grid.N, full=False)
         return chebval(z, c)
+
 
 class ChebyshevRationalGrid():
     def __init__(self, N, L):
@@ -199,47 +198,47 @@ class ChebyshevRationalGrid():
         self.make_grid()
 
     def cheb_roots(self, N):
-      import numpy as np
-      d1    = np.zeros((N, N))
-      zg = np.cos(np.pi*(2*np.arange(1, N+1)-1)/(2*N))
-      Q = 1 - zg**2
+        import numpy as np
+        d1 = np.zeros((N, N))
+        zg = np.cos(np.pi*(2*np.arange(1, N+1)-1)/(2*N))
+        Q = 1 - zg**2
 
-      for ii in range(1, N+1):
-        for jj in range(1, N+1):
-          if ii == jj:
-            d1[ii-1, jj-1] = 0.5*zg[jj-1]/Q[jj-1]
-          else:
-            d1[ii-1, jj-1] = (-1)**(ii+jj)*np.sqrt(Q[jj-1]/Q[ii-1])/ \
-                             (zg[ii-1] - zg[jj-1])
+        for ii in range(1, N+1):
+            for jj in range(1, N+1):
+                if ii == jj:
+                    d1[ii-1, jj-1] = 0.5*zg[jj-1]/Q[jj-1]
+                else:
+                    d1[ii-1, jj-1] = (-1)**(ii+jj)*np.sqrt(Q[jj-1]/Q[ii-1]) / \
+                                   (zg[ii-1] - zg[jj-1])
 
-      return (zg, d1)
+        return (zg, d1)
 
     def make_grid(self):
-      import numpy as np
-      L = self.L
-      self.NN = self.N + 1
-      N = self.NN
+        import numpy as np
+        L = self.L
+        self.NN = self.N + 1
+        N = self.NN
 
-      d1    = np.zeros((N, N))
-      [zg_int, d1_int] = self.cheb_roots(N)
+        d1 = np.zeros((N, N))
+        [zg_int, d1_int] = self.cheb_roots(N)
 
-      Q = 1 - zg_int**2.0
+        Q = 1 - zg_int**2.0
 
-      zg = L*zg_int/np.sqrt(Q)
+        zg = L*zg_int/np.sqrt(Q)
 
-      for ii in range(N):
-          for jj in range(N):
-              d1[ii, jj] = np.sqrt(Q[ii])*Q[ii]*d1_int[ii, jj]/L
+        for ii in range(N):
+            for jj in range(N):
+                d1[ii, jj] = np.sqrt(Q[ii])*Q[ii]*d1_int[ii, jj]/L
 
-      d2 = np.dot(d1, d1)
-      self.zg = zg
-      self.d0 = np.eye(N)
-      self.d1 = d1
-      self.d2 = d2
+        d2 = np.dot(d1, d1)
+        self.zg = zg
+        self.d0 = np.eye(N)
+        self.d1 = d1
+        self.d2 = d2
 
-      # Call other objects that depend on the grid
-      for callback in self._observers:
-          callback()
+        # Call other objects that depend on the grid
+        for callback in self._observers:
+            callback()
 
     def interpolate(self, z, f):
         """See equations 17.37 and 17.38 in Boyd"""

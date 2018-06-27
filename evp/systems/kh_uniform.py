@@ -1,6 +1,6 @@
 class KelvinHelmholtzUniform():
     """Linearized equations for KH with ansitoropic viscosity for a constant
-       magnetic field in the x-direction. The equilibrium is also assumed to 
+       magnetic field in the x-direction. The equilibrium is also assumed to
        have constant density, temperature and pressure.
     """
     def __init__(self, grid, beta, nu, u0=1, z1=0.5, z2=1.5, a=0.05):
@@ -23,13 +23,13 @@ class KelvinHelmholtzUniform():
 
         self.z1 = z1
         self.z2 = z2
-        self.a  = a
+        self.a = a
 
         # Create initial background
         self.make_background()
 
         # Variables to solve for
-        self.variables = ['drho', 'dA', 'dvx','dvz', 'dT']
+        self.variables = ['drho', 'dA', 'dvx', 'dvz', 'dT']
         self.labels = [r'$\delta \rho$', r'$\delta A$', r'$\delta v_x$',
                        r'$\delta v_z$', r'$\delta T$']
 
@@ -39,7 +39,7 @@ class KelvinHelmholtzUniform():
         # Number of equations in system
         self.dim = len(self.variables)
 
-        # Equations (Careful! No space between minus and the term is belongs to)
+        # Equations (Careful! No space behind minus
         eq1 = "-1j*kx*v*drho -1j*kx*dvx -1.0*dz(dvz)"
         eq2 = "-1j*kx*v*dA +1.0*dvz"
         eq3 = "-1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT -nu*4/3*kx**2*dvx -nu*2*kx**2*dvdz*dA -nu*1j*kx*2/3*dz(dvz)"
@@ -58,22 +58,22 @@ class KelvinHelmholtzUniform():
         self.make_background()
 
     def make_background(self):
-        from sympy import sqrt, exp, tanh, diff, lambdify, symbols
-        z   = symbols("z")
+        from sympy import tanh, diff, lambdify, symbols
+        z = symbols("z")
 
         zg = self.grid.zg
-        
+
         u0 = self._u0
         z1 = self.z1
         z2 = self.z2
         a = self.a
 
         # Define Background Functions
-        v_sym    = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
+        v_sym = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
 
         dvdz_sym = diff(v_sym, z)
         d2vdz_sym = diff(dvdz_sym, z)
 
-        self.v    = lambdify(z, v_sym)(zg)
+        self.v = lambdify(z, v_sym)(zg)
         self.dvdz = lambdify(z, dvdz_sym)(zg)
         self.d2vdz = lambdify(z, d2vdz_sym)(zg)

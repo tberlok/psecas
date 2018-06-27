@@ -21,11 +21,13 @@ Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
 omega, v, err = mti.iterate_solver2(Ns, i=2, tol=1e-8)
 # mti.solver(i=5)
 
+
 def interpolate(z, f):
     from numpy.polynomial.chebyshev import chebfit, chebval
     c, res = chebfit(grid.zg, f, deg=grid.N, full=True)
     # c = chebfit(grid.zg, f, deg=grid.N, full=False)
     return chebval(z, c)
+
 
 y = mti.result['drho'].real
 

@@ -12,10 +12,9 @@ def setup(backend="pdf"):
         from matplotlib import use
         use(backend)
         from matplotlib import rc
-        from numpy import sqrt
-        columnwidth = 510.0 # Get this from \showthe\columnwidth
+        columnwidth = 510.0  # Get this from \showthe\columnwidth
         dpi = 72
-        aspect = 0.5#(sqrt(5) - 1)/2
+        aspect = 0.5  # (sqrt(5) - 1)/2
         figwidth = columnwidth/dpi
         fontsize = 10
 

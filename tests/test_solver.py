@@ -25,6 +25,7 @@ def test_mti_solution(show=False, verbose=False):
 
     return err
 
+
 def test_kh_uniform_solution(show=False, verbose=False):
     """Test the solver by comparing the eigenvalue with old result"""
     import numpy as np
@@ -46,6 +47,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
 
     np.testing.assert_allclose(1.66548246011, omega, atol=1e-8)
     return err
+
 
 if __name__ == '__main__':
     err = test_mti_solution(show=True, verbose=True)

@@ -9,11 +9,13 @@ system = Channel(grid)
 # kx is weird to have as a parameter here TODO: fix that
 ch = Solver(grid, system, kx=0)
 
+
 def sorting_strategy(E):
     """Sorting strategy for channel modes"""
     E[E.real > 100.] = 0
     E[E.real < -10.] = 0
     return E
+
 
 ch.sorting_strategy = sorting_strategy
 

@@ -12,7 +12,7 @@ def test_mti_solution(show=False, verbose=False):
     mti = Solver(grid, system, kx=4*np.pi)
 
     Ns = np.hstack(np.arange(1, 10)*16)
-    omega, vec, err = mti.iterate_solver2(Ns, i=0, tol=1e-8, verbose=verbose)
+    omega, vec, err = mti.iterate_solver(Ns, i=0, tol=1e-8, verbose=verbose)
 
     if show:
         from evp import plot_solution
@@ -26,6 +26,7 @@ def test_mti_solution(show=False, verbose=False):
     return err
 
 def test_kh_uniform_solution(show=False, verbose=False):
+    """Test the solver by comparing the eigenvalue with old result"""
     import numpy as np
     from evp import Solver, FourierGrid
     from evp.systems.kh_uniform import KelvinHelmholtzUniform
@@ -37,7 +38,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
     kh = Solver(grid, system, 3.52615254237)
 
     Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
-    omega, v, err = kh.iterate_solver2(Ns, tol=1e-8, verbose=verbose)
+    omega, v, err = kh.iterate_solver(Ns, tol=1e-8, verbose=verbose)
 
     if show:
         from evp import plot_solution

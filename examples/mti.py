@@ -19,7 +19,7 @@ kx = 2*np.pi*2
 mti = Solver(grid, system, kx)
 
 Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
-omega, vec, err = mti.iterate_solver2(Ns, i=0)
+omega, vec, err = mti.iterate_solver(Ns, i=0)
 phi = np.arctan(vec[2].imag/vec[2].real)
 mti.keep_result(omega, vec*np.exp(-1j*phi))
 

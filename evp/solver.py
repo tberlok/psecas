@@ -192,35 +192,7 @@ class Solver():
           print(omega)
         return omega
 
-    def iterate_solver(self, min=6, max=11, tol=1e-6, verbose=False):
-        import numpy as np
-        from numpy import arange
-        N = 2**min
-        self.grid.N = N
-        (a_old, v) = self.solver(verbose=verbose)
-        self.grid.N = 2*N
-        (a_new, v) = self.solver(verbose=verbose)
-        err = np.abs(a_old - a_new)/np.abs(a_old)
-
-        for N in 2**arange(min+1, max):
-            self.grid.N = int(N)
-            # Not a good guess yet
-            if err > 0.5:
-                (a_new, v) = self.solver(verbose=verbose)
-            # Use guess from previous iteration
-            else:
-                (a_new, v) = self.solver(a_old, verbose=verbose)
-
-            err = np.abs(a_old - a_new)/np.abs(a_old)
-            # Converged
-            if err < tol:
-                return (a_new, v, err)
-            # Overwrite old with new
-            a_old = np.copy(a_new)
-
-        raise RuntimeError("Did not converge!")
-
-    def iterate_solver2(self, Ns, i=0, tol=1e-6, verbose=False):
+    def iterate_solver(self, Ns, i=0, tol=1e-6, verbose=False):
         import numpy as np
 
         self.grid.N = Ns[0]

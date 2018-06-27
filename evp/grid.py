@@ -27,7 +27,7 @@ class Grid():
     @property
     def zmax(self):
         return self._zmax
-    
+
     @N.setter
     def N(self, value):
         self._N = value
@@ -69,12 +69,12 @@ class FourierGrid(Grid):
         zg = dz*np.arange(1, N + 1) - dz/2
         # zg = dz*np.arange(N)
 
-        column = np.hstack([0.0, 
+        column = np.hstack([0.0,
                 .5*(-1.0)**np.arange(1, N)/tan(np.arange(1, N)*dz/2.0)])
         d1 = toeplitz(column, column[np.hstack([0, range(N-1, 0, -1)])])
 
-        y = np.hstack([-pi**2/(3*dz**2) - 1/6, 
-                    -0.5*(-1)**arange(1, N)/sin(dz*arange(1, N)/2)**2]) 
+        y = np.hstack([-pi**2/(3*dz**2) - 1/6,
+                    -0.5*(-1)**arange(1, N)/sin(dz*arange(1, N)/2)**2])
         d2 = toeplitz(y)
         self.zg = zg*L/(2*pi) - zmin
         self.d0 = np.eye(N)
@@ -93,7 +93,7 @@ class FourierGrid(Grid):
         ak = 2*np.fft.rfft(f)/self.N
         n = np.arange(self.N//2 + 1)
         # n[self.N:] = 0
-  
+
         def to_grid(z):
           cos = np.sum(ak[1:].real*np.cos(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))
           sin = -np.sum(ak[1:].imag*np.sin(2.0*np.pi*n[1:]*(z-self.dz/2)/self.L))

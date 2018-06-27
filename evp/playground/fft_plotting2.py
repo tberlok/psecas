@@ -18,9 +18,9 @@ kx = 3.52615254237
 kh = Solver(grid, system, kx)
 
 omega, v = kh.solver()
-result = {var:v[j*grid.NN:(j+1)*grid.NN] for j, 
+result = {var:v[j*grid.NN:(j+1)*grid.NN] for j,
           var in enumerate(system.variables)}
-result.update({'omega':omega, 'kx':kx, 'zg':grid.zg, 
+result.update({'omega':omega, 'kx':kx, 'zg':grid.zg,
                'variables':system.variables, 'm':0})
 
 def interpolate(z, f):

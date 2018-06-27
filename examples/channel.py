@@ -17,14 +17,15 @@ def sorting_strategy(E):
 
 ch.sorting_strategy = sorting_strategy
 
-# omega, vec = ch.solver(verbose=True)
-
 plt.figure(1)
 plt.clf()
 modes = 3
 fig, axes = plt.subplots(num=1, ncols=modes, sharey=True)
 for mode in range(modes):
-    omega, vec = ch.solver(mode=mode, verbose=True)
+    Ns = np.hstack((np.arange(1, 6)*32, np.arange(2, 12)*64))
+    omega, vec, err = ch.iterate_solver(Ns, mode=mode, verbose=True)
+    phi = np.arctan(vec[2].imag/vec[2].real)
+    ch.keep_result(omega, vec*np.exp(-1j*phi))
     axes[mode].set_title(r"$\sigma = ${:1.4f}".format(omega.real), fontsize=10)
     axes[mode].plot(grid.zg, ch.result['f'].real)
     axes[mode].plot(grid.zg, ch.result['f'].imag)

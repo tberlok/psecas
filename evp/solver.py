@@ -1,4 +1,4 @@
-import IPython
+# import IPython
 class Solver():
     """docstring for Solver"""
     def __init__(self, grid, system, kx):

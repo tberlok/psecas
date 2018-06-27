@@ -49,6 +49,7 @@ jobs:
           command: |
             . venv/bin/activate
             mkdir test-reports
+            export PYTHONPATH=/home/circleci/repo
             pytest --junitxml=test-reports/junit.xml
 
       - store_test_results:

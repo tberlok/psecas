@@ -149,8 +149,7 @@ class Solver():
 
             # Zero out large values which are most likely numerical
             #TODO: Don't have this hardcoded
-            E[np.abs(E.real) > 10.] = 0
-            E[np.abs(E.imag) > 10.] = 0
+            E = self.sorting_strategy(E)
 
             # Sort from largest to smallest eigenvalue
             index = np.argsort(np.real(E))[::-1]
@@ -186,6 +185,13 @@ class Solver():
         self.keep_result(omega, v)
 
         return (omega, v)
+
+    def sorting_strategy(self, E):
+      """A default sorting strategy"""
+      import numpy as np
+      E[np.abs(E.real) > 10.] = 0
+      E[np.abs(E.imag) > 10.] = 0
+      return E
 
     def solver_only_eigenvalues(self, verbose=False):
         import numpy as np

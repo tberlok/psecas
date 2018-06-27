@@ -24,8 +24,8 @@ class Solver():
             submat[0, :] = 0
             submat[N, :] = 0
             if eq_n == var_n:
-                submat[0, N] = 1
-                submat[N, 0] = 1
+                submat[0, 0] = 1
+                submat[N, N] = 1
         mat1[(eq_n-1)*NN:eq_n*NN, (var_n-1)*NN:var_n*NN] = submat
 
     def _set_boundary(self, var_n):

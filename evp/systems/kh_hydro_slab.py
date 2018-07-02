@@ -3,7 +3,7 @@ class KelvinHelmholtzHydroOnlySlab():
        magnetic field in the x-direction. The equilibrium is also assumed to
        have constant density, temperature and pressure.
     """
-    def __init__(self, grid, u0, delta, z1=0.5, z2=1.5, a=0.05):
+    def __init__(self, grid, u0, delta, a=0.147):
 
         self._u0 = u0
         self._delta = delta
@@ -15,8 +15,6 @@ class KelvinHelmholtzHydroOnlySlab():
         self.grid = grid
         self.grid.bind_to(self.make_background)
 
-        self.z1 = z1
-        self.z2 = z2
         self.a = a
 
         # Create initial background
@@ -73,8 +71,8 @@ class KelvinHelmholtzHydroOnlySlab():
         globals().update(self.__dict__)
 
         # Define Background Functions
-        v_sym = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
-        rho_sym = rho0*(1 + delta/2*(tanh((z-z1)/a) - tanh((z-z2)/a)))
+        v_sym = u0*(1.0 + tanh(z/a))/2.0
+        rho_sym = rho0*(1.0 + tanh(-z/a))*(delta-1)/2 + 1
 
         dvdz_sym = diff(v_sym, z)
         d2vdz_sym = diff(dvdz_sym, z)

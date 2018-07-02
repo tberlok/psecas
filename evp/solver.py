@@ -13,7 +13,8 @@ class Solver():
     @kx.setter
     def kx(self, value):
         self._kx = value
-        self._get_matrix()
+        self._get_matrix1()
+        self._get_matrix2()
 
     def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
         """Set submatrix corresponding to the term proportional to var_n

@@ -1,4 +1,4 @@
-def plot_solution(solver, filename=None, n=1, smooth=True):
+def plot_solution(solver, filename=None, n=1, smooth=True, limits=None):
     import numpy as np
     from evp import setup
     pylab = setup('ps')
@@ -14,14 +14,16 @@ def plot_solution(solver, filename=None, n=1, smooth=True):
     fig, axes = plt.subplots(num=n, nrows=system.dim, sharex=True)
     for j, var in enumerate(sol['variables']):
         if smooth:
-            z = np.linspace(grid.zmin, grid.zmax, 2000)
+            if limits is None:
+                z = np.linspace(grid.zmin, grid.zmax, 2000)
+            else:
+                z = np.linspace(limits[0], limits[1], 2000)
             axes[j].plot(z, grid.interpolate(z, sol[var].real),
                          'C0', label='Real')
             axes[j].plot(z, grid.interpolate(z, sol[var].imag),
                          'C1', label='Imag')
-        else:
-            axes[j].plot(sol['zg'], sol[var].real, 'C0+', label='Real')
-            axes[j].plot(sol['zg'], sol[var].imag, 'C1+', label='Imag')
+        axes[j].plot(sol['zg'], sol[var].real, 'C0.', label='Real')
+        axes[j].plot(sol['zg'], sol[var].imag, 'C1.', label='Imag')
         axes[j].set_ylabel(system.labels[j])
     axes[system.dim-1].set_xlabel(r"$z$")
     axes[0].set_title(title.format(sol['omega'], sol['kx'], sol['mode']))

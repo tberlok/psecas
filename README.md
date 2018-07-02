@@ -31,7 +31,11 @@ $ pytest tests/
 
 # TODO
 
-1. Set up Kelvin-Helmholtz instability in a slab
-2. Consider improving the automatic setup of the eigenvalue problem
+1. Set up Kelvin-Helmholtz instability in a slab.
+2. Consider improving the automatic setup of the eigenvalue problem.
 3. Set up a problem with MPI, writing data to file and reloading it again
    should work in (almost) the same way as running the code interactively.
+4. Add method for outputting txt files for use in Athena.
+5. Add method for creating hdf5-files for use in Arepo.
+6. Set up MTI simulation with input from evp.
+

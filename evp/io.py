@@ -1,5 +1,5 @@
 class IO:
-    def __init__(self, solver, data_folder, experiment, steps, tag=''):
+    def __init__(self, system, data_folder, experiment, steps, tag=''):
         """
         Initialisation creates the output directory and saves the path to the
         io object.
@@ -10,12 +10,16 @@ class IO:
         from mpi4py.MPI import Wtime
         from numpy import arange
 
-        self.solver = solver
+        self.system = system
 
         self.steps = steps
         self.index_global = arange(steps)
         self.index_local = self.index_global[comm.rank::comm.size]
         self.steps_local = len(self.index_local)
+
+        # Folder where data is stored
+        assert data_folder[-1] == '/', "data_folder should end with /"
+        self.data_folder = data_folder
 
         if comm.rank == 0:
             import subprocess
@@ -23,9 +27,7 @@ class IO:
             from numpy import float64
 
             # Create datafolder
-            if data_folder[-1] != '/':
-                data_folder += '/'
-            subprocess.call('mkdir ' + data_folder, shell=True)
+            subprocess.call('mkdir ' + self.data_folder, shell=True)
 
             # Copy the experiment to the data folder
             # experiment = path.basename(experiment)
@@ -77,20 +79,18 @@ class IO:
                 f.write(key + ' = {} \n'.format(info[key]))
 
             f.write('\nContents of system is printed below \n')
-            for key in solver.system.__dict__.keys():
-                if type(solver.system.__dict__[key]) in (float, int, list):
-                    f.write(key+' = {}\n'.format(solver.system.__dict__[key]))
+            for key in self.system.__dict__.keys():
+                if type(self.system.__dict__[key]) in (float, int, list):
+                    f.write(key+' = {}\n'.format(self.system.__dict__[key]))
 
-            f.write('\nUsing {} with\n'.format(type(solver.grid)))
-            for key in solver.grid.__dict__.keys():
-                if type(solver.grid.__dict__[key]) in (float, float64, int):
-                    f.write(key+' = {} \n'.format(solver.grid.__dict__[key]))
+            grid = self.system.grid
+            f.write('\nUsing {} with\n'.format(type(grid)))
+            for key in grid.__dict__.keys():
+                if type(grid.__dict__[key]) in (float, float64, int):
+                    f.write(key+' = {} \n'.format(grid.__dict__[key]))
 
             f.write('\n\nEntering main calculation loop \n')
             f.close()
-
-        # Folder where data is stored
-        self.data_folder = data_folder
 
         # Used for computing total runtime
         self.wt = Wtime()
@@ -98,7 +98,7 @@ class IO:
     def log(self, i, time, custum_str):
         from mpi4py.MPI import COMM_WORLD as comm
         f = open('evp.log', 'a')
-        msg = "Solved EVP with" + custum_str + "in {:1.2f} seconds. \
+        msg = "Solved EVP with " + custum_str + " in {:1.2f} seconds. \
                Rank {} is {:2.0f}% done.\n"
         f.write(msg.format(time, comm.rank, (i+1)/self.steps_local*100))
         f.close()
@@ -106,8 +106,7 @@ class IO:
     def save_system(self, i):
         import pickle
         file = self.data_folder + 'globalid-{}.p'.format(self.index_local[i])
-        self.solver.system.result = self.solver.result
-        pickle.dump(self.solver.system, open(file, 'wb'))
+        pickle.dump(self.system, open(file, 'wb'))
         # Delete d0, d1 and d2 for storage effieciency
         system = pickle.load(open(file, 'rb'))
         del system.grid.d0
@@ -130,7 +129,7 @@ class IO:
             endtime = i.strftime('%d/%m/%Y at %H:%M:%S')
 
             f = open('evp.log', 'a')
-            f.write('Calculation ended on '+endtime+'\n')
+            f.write('\nCalculation ended on '+endtime+'\n')
             m, s = divmod(seconds, 60)
             h, m = divmod(m, 60)
             d, h = divmod(h, 24)

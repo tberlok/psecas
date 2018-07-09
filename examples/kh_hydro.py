@@ -15,8 +15,7 @@ kx = 5.
 system = KelvinHelmholtzHydroOnly(grid, u0, delta, kx)
 
 kh = Solver(grid, system)
-# (omega, vec, err) = kh.iterate_solver(tol=1e-4)
-# omega_bar = omega/(kx*u0)
+
 omega_vec = []
 kx_vec = np.logspace(0, 2, 10)
 for kx in kx_vec:

@@ -18,5 +18,5 @@ kh = Solver(grid, system)
 omega, v, err = kh.iterate_solver(np.arange(1, 32)*32, mode=0, verbose=True)
 
 limits = [-2, 2]
-plot_solution(kh, limits=limits)
+plot_solution(system, limits=limits)
 plt.xlim(limits[0], limits[1])

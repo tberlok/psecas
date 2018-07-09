@@ -1,4 +1,3 @@
-# import IPython
 class Solver():
     """docstring for Solver"""
     def __init__(self, grid, system):
@@ -32,8 +31,6 @@ class Solver():
 
         NN = self.grid.NN
         dim = self.system.dim
-
-        # globals().update(self.grid.__dict__)
 
         mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
 
@@ -119,9 +116,9 @@ class Solver():
     def keep_result(self, omega, vec, mode):
 
         # Store result
-        self.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN] for j,
-                       var in enumerate(self.system.variables)}
-        self.result.update({'omega': omega, 'mode': mode})
+        self.system.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN]
+                              for j, var in enumerate(self.system.variables)}
+        self.system.result.update({'omega': omega, 'mode': mode})
 
     def solver(self, guess=None, useOPinv=True, verbose=False, mode=0):
         import numpy as np
@@ -227,11 +224,16 @@ class Solver():
             err = np.abs(a_old - a_new)/np.abs(a_old)
             # Converged
             if err < tol:
+                self.system.result.update({'converged': True})
+                self.system.result.update({'err': err})
                 return (a_new, v, err)
             # Overwrite old with new
             a_old = np.copy(a_new)
 
-        raise RuntimeError("Did not converge!")
+        self.system.result.update({'converged': False})
+        self.system.result.update({'err': err})
+
+        # raise RuntimeError("Did not converge!")
 
     def iterate_solver_simple(self, min=6, max=11, tol=1e-6):
         import numpy as np

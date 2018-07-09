@@ -22,7 +22,7 @@ omega, vec, err = mti.iterate_solver(Ns, mode=0, verbose=True, tol=1e-5)
 phi = np.arctan(vec[2].imag/vec[2].real)
 mti.keep_result(omega, vec*np.exp(-1j*phi), mode=0)
 
-plot_solution(mti, smooth=False)
+plot_solution(system, smooth=False)
 
 # import time
 # betas = np.logspace(4, 7, 4)

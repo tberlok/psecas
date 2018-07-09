@@ -12,14 +12,16 @@ def test_mti_solution(show=False, verbose=False):
     mti = Solver(grid, system)
 
     Ns = np.hstack(np.arange(1, 10)*16)
-    omega, vec, err = mti.iterate_solver(Ns, mode=0, tol=1e-8, verbose=verbose)
+    mode = 0
+    omega, vec, err = mti.iterate_solver(Ns, mode=mode, tol=1e-8,
+                                         verbose=verbose)
 
     if show:
         from evp import plot_solution
         phi = np.arctan(vec[2].imag/vec[2].real)
-        mti.keep_result(omega, vec*np.exp(-1j*phi))
+        mti.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
 
-        plot_solution(mti, smooth=True)
+        plot_solution(system, smooth=True, num=1)
 
     np.testing.assert_allclose(1.7814514515967603, omega, atol=1e-8)
 
@@ -43,7 +45,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
 
     if show:
         from evp import plot_solution
-        plot_solution(kh, smooth=True)
+        plot_solution(system, smooth=True, num=2)
 
     np.testing.assert_allclose(1.66548246011, omega, atol=1e-8)
     return err
@@ -76,20 +78,20 @@ def test_channel(show=False, verbose=False):
 
     if show:
         import matplotlib.pyplot as plt
-        plt.figure(1)
+        plt.figure(3)
         plt.clf()
-        fig, axes = plt.subplots(num=1, ncols=modes, sharey=True)
+        fig, axes = plt.subplots(num=3, ncols=modes, sharey=True)
     for mode in range(modes):
         Ns = np.arange(1, 6)*32
         omega, vec, err = ch.iterate_solver(Ns, mode=mode, verbose=True)
         results[mode] = omega
         if show:
             phi = np.arctan(vec[2].imag/vec[2].real)
-            ch.keep_result(omega, vec*np.exp(-1j*phi))
+            ch.keep_result(omega, vec*np.exp(-1j*phi), mode)
             axes[mode].set_title(r"$\sigma = ${:1.4f}".format(omega.real),
                                  fontsize=10)
-            axes[mode].plot(grid.zg, ch.result['f'].real)
-            axes[mode].plot(grid.zg, ch.result['f'].imag)
+            axes[mode].plot(grid.zg, ch.system.result['f'].real)
+            axes[mode].plot(grid.zg, ch.system.result['f'].imag)
             axes[mode].set_xlim(-4, 4)
 
     if show:

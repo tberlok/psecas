@@ -2,11 +2,13 @@ class MagnetoThermalInstability():
     """Linearized equations for the MTI with ansitropic viscosity and heat
        conduction for a constant magnetic field in the x-direction.
     """
-    def __init__(self, grid, beta, Kn0, only_interior=True):
+    def __init__(self, grid, beta, Kn0, kx, only_interior=True):
         # Problem parameters
 
         self._beta = beta
         self._Kn0 = Kn0
+
+        self.kx = kx
 
         self.mu0 = 1.0
         self.p0 = 1.0

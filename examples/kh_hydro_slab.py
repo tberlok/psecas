@@ -8,12 +8,12 @@ grid = ChebyshevRationalGrid(N=32, L=0.2)
 
 u0 = 1.
 delta = 1.
+kx = 4.
 
-system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta)
+system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta, kx)
 system.boundaries = [True, True, True, True]
 
-kx = 4.
-kh = Solver(grid, system, kx)
+kh = Solver(grid, system)
 
 omega, v, err = kh.iterate_solver(np.arange(1, 32)*32, mode=0, verbose=True)
 

@@ -3,12 +3,14 @@ class KelvinHelmholtzUniform():
        magnetic field in the x-direction. The equilibrium is also assumed to
        have constant density, temperature and pressure.
     """
-    def __init__(self, grid, beta, nu, u0=1, z1=0.5, z2=1.5, a=0.05):
+    def __init__(self, grid, beta, nu, kx, u0=1, z1=0.5, z2=1.5, a=0.05):
         import numpy as np
         # Parameters that change (TODO: make nu, beta, and chi0 part of this)
         self._u0 = u0
         self.nu = nu
         self.beta = beta
+
+        self.kx = kx
 
         self.gamma = 5.0/3
         self.p = 1.0

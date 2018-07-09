@@ -7,9 +7,9 @@ def test_mti_solution(show=False, verbose=False):
 
     grid = ChebyshevExtremaGrid(N=64, zmin=0, zmax=1)
 
-    system = MagnetoThermalInstability(grid, beta=1e5, Kn0=200)
+    system = MagnetoThermalInstability(grid, beta=1e5, Kn0=200, kx=4*np.pi)
 
-    mti = Solver(grid, system, kx=4*np.pi)
+    mti = Solver(grid, system)
 
     Ns = np.hstack(np.arange(1, 10)*16)
     omega, vec, err = mti.iterate_solver(Ns, mode=0, tol=1e-8, verbose=verbose)
@@ -34,9 +34,9 @@ def test_kh_uniform_solution(show=False, verbose=False):
 
     grid = FourierGrid(N=64, zmin=0, zmax=2)
 
-    system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2)
+    system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2, kx=3.52615254237)
 
-    kh = Solver(grid, system, 3.52615254237)
+    kh = Solver(grid, system)
 
     Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
     omega, v, err = kh.iterate_solver(Ns, tol=1e-8, verbose=verbose)
@@ -59,7 +59,7 @@ def test_channel(show=False, verbose=False):
     system = Channel(grid)
 
     # kx is weird to have as a parameter here TODO: fix that
-    ch = Solver(grid, system, kx=0)
+    ch = Solver(grid, system)
 
     # Number of modes to test
     modes = 3

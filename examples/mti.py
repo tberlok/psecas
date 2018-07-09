@@ -10,12 +10,12 @@ grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
 beta = 1e5
 Kn0 = 200
+kx = 2*np.pi*2
 
-system = MagnetoThermalInstability(grid, beta, Kn0, only_interior=True)
+system = MagnetoThermalInstability(grid, beta, Kn0, kx, only_interior=True)
 system.boundaries = [True, True, False, True, False]
 
-kx = 2*np.pi*2
-mti = Solver(grid, system, kx)
+mti = Solver(grid, system)
 
 Ns = np.hstack((np.arange(1, 5)*32, np.arange(3, 12)*64))
 omega, vec, err = mti.iterate_solver(Ns, mode=0, verbose=True, tol=1e-5)

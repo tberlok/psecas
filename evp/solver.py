@@ -1,20 +1,9 @@
 # import IPython
 class Solver():
     """docstring for Solver"""
-    def __init__(self, grid, system, kx):
+    def __init__(self, grid, system):
         self.grid = grid
         self.system = system
-        self._kx = kx
-
-    @property
-    def kx(self):
-        return self._kx
-
-    @kx.setter
-    def kx(self, value):
-        self._kx = value
-        self._get_matrix1()
-        self._get_matrix2()
 
     def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
         """Set submatrix corresponding to the term proportional to var_n
@@ -41,8 +30,6 @@ class Solver():
         # This nasty trick gives some linting errors below
         globals().update(self.grid.__dict__)
         globals().update(self.system.__dict__)
-
-        kx = self.kx
 
         mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
 
@@ -125,13 +112,12 @@ class Solver():
                 if boundaries[j]:
                     self._set_boundary(j+1)
 
-    def keep_result(self, omega, vec, mode=0):
+    def keep_result(self, omega, vec, mode):
 
         # Store result
         self.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN] for j,
                        var in enumerate(self.system.variables)}
-        self.result.update({'omega': omega, 'kx': self.kx, 'zg': self.grid.zg,
-                            'variables': self.system.variables, 'mode': mode})
+        self.result.update({'omega': omega, 'mode': mode})
 
     def solver(self, guess=None, useOPinv=True, verbose=False, mode=0):
         import numpy as np

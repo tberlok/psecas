@@ -3,10 +3,12 @@ class KelvinHelmholtzHydroOnlySlab():
        magnetic field in the x-direction. The equilibrium is also assumed to
        have constant density, temperature and pressure.
     """
-    def __init__(self, grid, u0, delta, a=0.147):
+    def __init__(self, grid, u0, delta, kx, a=0.147):
 
         self._u0 = u0
         self._delta = delta
+
+        self.kx = kx
 
         self.gamma = 5.0/3
         self.p0 = 1.0

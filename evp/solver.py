@@ -27,9 +27,13 @@ class Solver():
         import numpy as np
         import re
 
-        # This nasty trick gives some linting errors below
-        globals().update(self.grid.__dict__)
+        # This is a nasty trick
         globals().update(self.system.__dict__)
+
+        NN = self.grid.NN
+        dim = self.system.dim
+
+        # globals().update(self.grid.__dict__)
 
         mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
 
@@ -43,7 +47,7 @@ class Solver():
         for term in s:
             if verbose:
                 print('\tParsing term:', term)
-            for i, var in enumerate(variables):
+            for i, var in enumerate(self.system.variables):
                 # No derivative
                 s0 = "*" + var
                 s1 = "*dz(" + var + ")"
@@ -52,19 +56,19 @@ class Solver():
                     if verbose:
                         print('\t\tFound ', s0)
                     res = eval(term[:-len(s0)])
-                    mats[i] += (res*d0.T).T
+                    mats[i] += (res*self.grid.d0.T).T
                 # 1st derivative
                 if term.endswith(s1):
                     if verbose:
                         print('\t\tFound ', s1)
                     res = eval(term[:-len(s1)])
-                    mats[i] += (res*d1.T).T
+                    mats[i] += (res*self.grid.d1.T).T
                 # 2nd derivative
                 if term.endswith(s2):
                     if verbose:
                         print('\t\tFound ', s2)
                     res = eval(term[:-len(s2)])
-                    mats[i] += (res*d2.T).T
+                    mats[i] += (res*self.grid.d2.T).T
         return mats
 
     def _get_matrix1(self):

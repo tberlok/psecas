@@ -21,6 +21,6 @@ for i in range(len(kx_local)):
     kh.system.kx = kx_local[i]
     omega, v = kh.solver()
     io.save_system(i)
-    io.log(i, time.time()-t1, 'kx = {:1.4e}'.format(kh.kx))
+    io.log(i, time.time()-t1, 'kx = {:1.4e}'.format(kh.system.kx))
 
 io.finished()

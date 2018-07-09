@@ -1,7 +1,8 @@
 class KelvinHelmholtzHydroOnly():
-    """Linearized equations for KH with ansitoropic viscosity for a constant
-       magnetic field in the x-direction. The equilibrium is also assumed to
-       have constant density, temperature and pressure.
+    """
+    The pure hydro version of the Kelvin-Helmholtz instability.
+    The equilibrium is periodic with the velocity profile changing sign at
+    z1 and z2.
     """
     def __init__(self, grid, u0, delta, kx, z1=0.5, z2=1.5, a=0.05):
 

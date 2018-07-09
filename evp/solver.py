@@ -120,7 +120,28 @@ class Solver():
                               for j, var in enumerate(self.system.variables)}
         self.system.result.update({'omega': omega, 'mode': mode})
 
-    def solver(self, guess=None, useOPinv=True, verbose=False, mode=0):
+    def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
+        """
+        Solve the EVP generated with the grid and parameters contained in the
+        system object.
+
+        Stores a dictionary with the result in self.system.result.
+
+        Returns: One eigenvalue and its eigenvector.
+
+        Optional parameters
+
+        guess: If a guess is passed scipy's eigs method is used to find a
+        single eigenvalue in the proximity of the guess.
+
+        useOPinv (default True): If true, manually calculate OPinv instead of
+        letting eigs do it.
+
+        verbose (default False): print out information about the calculation.
+
+        mode (default 0): mode=0 is the fastest growing, mode=1 the second
+        fastest and so on.
+        """
         import numpy as np
         from scipy.linalg import eig
 
@@ -182,7 +203,7 @@ class Solver():
         E[np.abs(E.imag) > 10.] = 0
         return E
 
-    def solver_only_eigenvalues(self, verbose=False):
+    def solve_only_eigenvalues(self, verbose=False):
         import numpy as np
         from scipy.linalg import eigvals
 
@@ -207,19 +228,19 @@ class Solver():
         import numpy as np
 
         self.grid.N = Ns[0]
-        (a_old, v) = self.solver(mode=mode, verbose=verbose)
+        (a_old, v) = self.solve(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
-        (a_new, v) = self.solver(mode=mode, verbose=verbose)
+        (a_new, v) = self.solve(mode=mode, verbose=verbose)
         err = np.abs(a_old - a_new)/np.abs(a_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
             if err > 0.1:
-                (a_new, v) = self.solver(mode=mode, verbose=verbose)
+                (a_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (a_new, v) = self.solver(a_old, mode=mode, verbose=verbose)
+                (a_new, v) = self.solve(a_old, mode=mode, verbose=verbose)
 
             err = np.abs(a_old - a_new)/np.abs(a_old)
             # Converged
@@ -240,11 +261,11 @@ class Solver():
         from numpy import arange
         N = 2**min
         self.grid.N = N
-        a_old = self.solver_only_eigenvalues()
+        a_old = self.solve_only_eigenvalues()
 
         for N in 2**arange(min+1, max):
             self.grid.N = int(N)
-            a_new = self.solver_only_eigenvalues()
+            a_new = self.solve_only_eigenvalues()
             err = abs(a_old - a_new)/abs(a_old)
             if err < tol:
                 return (a_new, err)

@@ -18,7 +18,7 @@ kh = Solver(grid, system)
 for i in range(len(kx_local)):
     t1 = time.time()
     system.kx = kx_local[i]
-    omega, v = kh.solver()
+    omega, v = kh.solve()
     io.save_system(i)
     io.log(i, time.time()-t1, 'kx = {:1.4e}'.format(system.kx))
 

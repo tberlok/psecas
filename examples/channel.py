@@ -7,7 +7,7 @@ grid = ChebyshevRationalGrid(N=199, L=1)
 system = Channel(grid)
 
 # kx is weird to have as a parameter here TODO: fix that
-ch = Solver(grid, system, kx=0)
+ch = Solver(grid, system)
 
 
 def sorting_strategy(E):
@@ -17,6 +17,7 @@ def sorting_strategy(E):
     return E
 
 
+# Overwrite the default sorting strategy in the Solver class
 ch.sorting_strategy = sorting_strategy
 
 plt.figure(1)
@@ -27,9 +28,9 @@ for mode in range(modes):
     Ns = np.hstack((np.arange(1, 6)*32, np.arange(2, 12)*64))
     omega, vec, err = ch.iterate_solver(Ns, mode=mode, verbose=True)
     phi = np.arctan(vec[2].imag/vec[2].real)
-    ch.keep_result(omega, vec*np.exp(-1j*phi))
+    ch.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
     axes[mode].set_title(r"$\sigma = ${:1.4f}".format(omega.real), fontsize=10)
-    axes[mode].plot(grid.zg, ch.result['f'].real)
-    axes[mode].plot(grid.zg, ch.result['f'].imag)
+    axes[mode].plot(grid.zg, system.result['f'].real)
+    axes[mode].plot(grid.zg, system.result['f'].imag)
     axes[mode].set_xlim(-4, 4)
 plt.show()

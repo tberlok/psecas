@@ -11,18 +11,17 @@ grid = FourierGrid(N, zmin, zmax)
 
 u0 = 1.5
 delta = 0.0
-kx = 5.
 
-system = KelvinHelmholtzHydroOnly(grid, u0, delta, kx)
+system = KelvinHelmholtzHydroOnly(grid, u0, delta, kx=0)
 
-kh = Solver(grid, system)
+solver = Solver(grid, system)
 
 omega_vec = []
 kx_vec = np.linspace(0, 3.5, 20)
 for kx in kx_vec:
     t1 = time.time()
-    kh.system.kx = kx
-    (omega, v) = kh.solve()
+    system.kx = kx
+    (omega, v) = solver.solve()
     omega_vec.append(omega)
     print(kx, omega)
     t2 = time.time()

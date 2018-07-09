@@ -13,9 +13,10 @@ kx = 4.
 system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta, kx)
 system.boundaries = [True, True, True, True]
 
-kh = Solver(grid, system)
+solver = Solver(grid, system)
 
-omega, v, err = kh.iterate_solver(np.arange(1, 32)*32, mode=0, verbose=True)
+Ns = np.arange(1, 32)*32
+omega, v, err = solver.iterate_solver(Ns, mode=0, verbose=True)
 
 limits = [-2, 2]
 plot_solution(system, limits=limits)

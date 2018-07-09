@@ -15,13 +15,13 @@ kx = 2*np.pi*2
 system = MagnetoThermalInstability(grid, beta, Kn0, kx, only_interior=True)
 system.boundaries = [True, True, False, True, False]
 
-mti = Solver(grid, system)
+solver = Solver(grid, system)
 
 mode = 0
 Ns = np.hstack((np.arange(1, 5)*32, np.arange(3, 12)*64))
-omega, vec, err = mti.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
+omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
 phi = np.arctan(vec[2].imag/vec[2].real)
-mti.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
+solver.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
 
 plot_solution(system, smooth=False)
 

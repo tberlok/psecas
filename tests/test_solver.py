@@ -9,17 +9,17 @@ def test_mti_solution(show=False, verbose=False):
 
     system = MagnetoThermalInstability(grid, beta=1e5, Kn0=200, kx=4*np.pi)
 
-    mti = Solver(grid, system)
+    solver = Solver(grid, system)
 
     Ns = np.hstack(np.arange(1, 10)*16)
     mode = 0
-    omega, vec, err = mti.iterate_solver(Ns, mode=mode, tol=1e-8,
-                                         verbose=verbose)
+    omega, vec, err = solver.iterate_solver(Ns, mode=mode, tol=1e-8,
+                                            verbose=verbose)
 
     if show:
         from evp import plot_solution
         phi = np.arctan(vec[2].imag/vec[2].real)
-        mti.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
+        solver.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
 
         plot_solution(system, smooth=True, num=1)
 
@@ -38,10 +38,10 @@ def test_kh_uniform_solution(show=False, verbose=False):
 
     system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2, kx=3.52615254237)
 
-    kh = Solver(grid, system)
+    solver = Solver(grid, system)
 
     Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
-    omega, v, err = kh.iterate_solver(Ns, tol=1e-8, verbose=verbose)
+    omega, v, err = solver.iterate_solver(Ns, tol=1e-8, verbose=verbose)
 
     if show:
         from evp import plot_solution
@@ -61,7 +61,7 @@ def test_channel(show=False, verbose=False):
     system = Channel(grid)
 
     # kx is weird to have as a parameter here TODO: fix that
-    ch = Solver(grid, system)
+    solver = Solver(grid, system)
 
     # Number of modes to test
     modes = 3
@@ -74,7 +74,7 @@ def test_channel(show=False, verbose=False):
         E[E.real < -10.] = 0
         return E
 
-    ch.sorting_strategy = sorting_strategy
+    solver.sorting_strategy = sorting_strategy
 
     if show:
         import matplotlib.pyplot as plt
@@ -83,15 +83,15 @@ def test_channel(show=False, verbose=False):
         fig, axes = plt.subplots(num=3, ncols=modes, sharey=True)
     for mode in range(modes):
         Ns = np.arange(1, 6)*32
-        omega, vec, err = ch.iterate_solver(Ns, mode=mode, verbose=True)
+        omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True)
         results[mode] = omega
         if show:
             phi = np.arctan(vec[2].imag/vec[2].real)
-            ch.keep_result(omega, vec*np.exp(-1j*phi), mode)
+            solver.keep_result(omega, vec*np.exp(-1j*phi), mode)
             axes[mode].set_title(r"$\sigma = ${:1.4f}".format(omega.real),
                                  fontsize=10)
-            axes[mode].plot(grid.zg, ch.system.result['f'].real)
-            axes[mode].plot(grid.zg, ch.system.result['f'].imag)
+            axes[mode].plot(grid.zg, system.result['f'].real)
+            axes[mode].plot(grid.zg, system.result['f'].imag)
             axes[mode].set_xlim(-4, 4)
 
     if show:

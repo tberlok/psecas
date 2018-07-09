@@ -13,12 +13,12 @@ grid = FourierGrid(N=64, zmin=0, zmax=2)
 system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2, kx=0)
 io = IO(system, directory, __file__, len(kx_global))
 
-kh = Solver(grid, system)
+solver = Solver(grid, system)
 
 for i in range(len(kx_local)):
     t1 = time.time()
     system.kx = kx_local[i]
-    omega, v = kh.solve()
+    omega, v = solver.solve()
     io.save_system(i)
     io.log(i, time.time()-t1, 'kx = {:1.4e}'.format(system.kx))
 

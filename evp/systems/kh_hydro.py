@@ -38,10 +38,6 @@ class KelvinHelmholtzHydroOnly():
         eq2 = "-1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT"
         eq3 = "-1j*kx*v*dvz -1/rho*dpdz*drho -1/rho*p*dz(drho) -1/rho*dpdz*dT -1/rho*p*dz(dT)"
         eq4 = "-1j*kx*v*dT -1j*kx*2/3*dvx -dlnTdz*dvz -2/3*dz(dvz)"
-        # eq1 = "-1j*v*drho -1j*dvx -dlnrhodz/kx*dvz -1.0/kx*dz(dvz)"
-        # eq2 = "-1j*v*dvx -dvdz/kx*dvz -1j*p/rho*drho -1j*p/rho*dT"
-        # eq3 = "-1j*v*dvz -1/rho*dpdz/kx*drho -1/rho*p/kx*dz(drho) -1/rho*dpdz/kx*dT -1/rho*p/kx*dz(dT)"
-        # eq4 = "-1j*v*dT -1j*2/3*dvx -dlnTdz/kx*dvz -2/3/kx*dz(dvz)"
 
         self.equations = [eq1, eq2, eq3, eq4]
 

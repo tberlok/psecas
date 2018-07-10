@@ -35,9 +35,22 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
 
 
 def load_system(filename):
+    """Load object containing solution.
+    Input: filename, eg 'system.p'
+    Output: system object
+    """
     import pickle
     system = pickle.load(open(filename, 'rb'))
     return system
+
+
+def save_system(system, filename):
+    import pickle
+    # Delete d0, d1 and d2 for storage effieciency
+    del system.grid.d0
+    del system.grid.d1
+    del system.grid.d2
+    pickle.dump(system, open(filename, 'wb'))
 
 
 def write_athena(system, Nz, Lz, path=None):

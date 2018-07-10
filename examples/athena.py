@@ -8,7 +8,7 @@ grid = FourierGrid(N=64, zmin=0, zmax=2)
 # Set up the system of equations
 kx = 4.627762711864407
 # kx = 2*np.pi
-system = KelvinHelmholtzUniform(grid, beta=1e5, nu=1e-2, kx=kx)
+system = KelvinHelmholtzUniform(grid, beta=1e3, nu=1e-2, kx=kx)
 
 # Set up a solver
 solver = Solver(grid, system)

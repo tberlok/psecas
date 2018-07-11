@@ -3,6 +3,7 @@ from evp import Solver, FourierGrid
 from evp.systems.kh_uniform import KelvinHelmholtzUniform
 from evp import golden_section
 
+
 def f(kx):
 
     # Set up a grid

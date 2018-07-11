@@ -3,10 +3,6 @@ from evp import Solver, FourierGrid
 from evp.systems.kh_uniform import KelvinHelmholtzUniform
 from evp import golden_section
 
-# Maybe just use scipy.optimize.golden instead
-# No, it seems slower?
-
-
 def f(kx):
 
     # Set up a grid

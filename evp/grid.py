@@ -262,3 +262,17 @@ class ChebyshevRationalGrid():
         c, res = chebfit(xg, f, deg=self.N, full=True)
         x = z/np.sqrt(self.L**2 + z**2)
         return chebval(x, c)
+
+    def dz(self, vec):
+        """First derivative of vec defined at zg"""
+        import numpy as np
+        assert type(vec) is np.ndarray
+        assert vec.shape == self.NN
+        return np.matmul(self.d1, vec)
+
+    def dz2(self, vec):
+        """Second derivative of vec defined at zg"""
+        import numpy as np
+        assert type(vec) is np.ndarray
+        assert vec.shape == self.NN
+        return np.matmul(self.d2, vec)

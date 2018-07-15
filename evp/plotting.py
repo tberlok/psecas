@@ -7,7 +7,7 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     sol = system.result
     grid = system.grid
 
-    title = r'$\omega = {:1.2f}, k_x = {:1.2f}, m={}$'
+    title = r'$\omega = {:1.4f}, k_x = {:1.2f}, m={}$'
     plt.figure(num)
     plt.clf()
     fig, axes = plt.subplots(num=num, nrows=system.dim, sharex=True)

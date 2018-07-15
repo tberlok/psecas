@@ -26,7 +26,7 @@ class System():
     def dim(self):
         return len(self.equations)
 
-    def add_equation(self, eq, boundary=None):
+    def add_equation(self, eq, boundary=False):
         self.equations.append(eq)
         self.boundaries.append(boundary)
 

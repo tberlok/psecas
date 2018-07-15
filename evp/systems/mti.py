@@ -40,12 +40,20 @@ class MagnetoThermalInstability():
         # Number of equations in system
         self.dim = len(self.variables)
 
-        # Equations (Careful! No space behind minus)
-        eq1 = "-1j*kx*dvx -dlnrhodz*dvz -1.0*dz(dvz)"
-        eq2 = "1.0*dvz"
-        eq3 = "-1j*kx*p/rho*drho -1j*kx*p/rho*dT -nu*4/3*kx**2*dvx -nu*1j*kx*2/3*dz(dvz)"
-        eq4 = "-T*dz(drho) -T*dz(dT) -T*dlnpdz*dT +va**2*dz(dz(dA)) -va**2*kx**2*dA -1/rho*1j*kx*drhonudz*2/3*dvx -1j*kx*nu*2/3*dz(dvx) +1/rho*drhonudz*1/3*dz(dvz) +nu*1/3*dz(dz(dvz))"
-        eq5 = "-1j*kx*2/3*dvx -2/3*dz(dvz) -dlnTdz*dvz -2/3*kx**2*kappa*dT -2/3*kx**2*kappa*dlnTdz*dA"
+        # String used for eigenvalue (do not use lambda!)
+        self.eigenvalue = 'sigma'
+
+        # Equations
+        eq1 = "sigma*drho = -1j*kx*dvx -dlnrhodz*dvz -1.0*dz(dvz)"
+        eq2 = "sigma*dA = 1.0*dvz"
+        eq3 = ("sigma*dvx = -1j*kx*p/rho*drho -1j*kx*p/rho*dT" +
+               "-nu*4/3*kx**2*dvx -nu*1j*kx*2/3*dz(dvz)")
+        eq4 = ("sigma*dvz = -T*dz(drho) -T*dz(dT) -T*dlnpdz*dT" +
+               "+va**2*dz(dz(dA)) -va**2*kx**2*dA" +
+               "-1/rho*1j*kx*drhonudz*2/3*dvx -1j*kx*nu*2/3*dz(dvx)" +
+               "+1/rho*drhonudz*1/3*dz(dvz) +nu*1/3*dz(dz(dvz))")
+        eq5 = ("sigma*dT = -1j*kx*2/3*dvx -2/3*dz(dvz) -dlnTdz*dvz" +
+               "-2/3*kx**2*kappa*dT -2/3*kx**2*kappa*dlnTdz*dA")
 
         self.equations = [eq1, eq2, eq3, eq4, eq5]
 

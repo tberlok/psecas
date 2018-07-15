@@ -148,6 +148,8 @@ class Solver():
         mat1 = np.zeros((dim*NN, dim*NN), dtype="complex128")
 
         for j, equation in enumerate(equations):
+            # Evaluate RHS of equation
+            equation = equation.split('=')[1]
             mats = self._find_submatrices(equation)
             for i, variable in enumerate(variables):
                 if boundaries is not None:
@@ -158,6 +160,31 @@ class Solver():
         self.mat1 = mat1
 
     def _get_matrix2(self):
+        import numpy as np
+        dim = self.system.dim
+        NN = self.grid.NN
+        sys = self.system
+        equations = sys.equations
+        variables = sys.variables
+        boundaries = sys.boundaries
+
+        mat2 = np.zeros((dim*NN, dim*NN), dtype="complex128")
+
+        for j, equation in enumerate(equations):
+            # Evaluate LHS of equation
+            equation = equation.split('=')[0]
+            equation = self._var_replace(equation, sys.eigenvalue, '1.0')
+            mats = self._find_submatrices(equation)
+            for i, variable in enumerate(variables):
+                self._set_submatrix(mat2, mats[i], j+1, i+1, False)
+        self.mat2 = mat2
+
+        if boundaries is not None:
+            for j, equation in enumerate(equations):
+                if boundaries[j]:
+                    self._set_boundary(j+1)
+
+    def _get_matrix2_old(self):
         import numpy as np
         dim = self.system.dim
         NN = self.grid.NN

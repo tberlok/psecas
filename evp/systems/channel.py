@@ -21,14 +21,13 @@ class Channel():
         # Number of equations in system
         self.dim = len(self.variables)
 
-        # Equations (Careful! No space between minus and the term it
-        # belongs to)
-        eq1 = "1*dz(dz(f)) +z*dz(f)"
+        # String used for eigenvalue (do not use lambda!)
+        self.eigenvalue = 'sigma'
+
+        # Equations
+        eq1 = "-h*sigma*f = 1*dz(dz(f)) +z*dz(f)"
 
         self.equations = [eq1]
-
-        # RHS of the eigenvalue problem
-        self.rhs_equations = ['-h*f']
 
     def make_background(self):
         """Functing for creating the background profiles.

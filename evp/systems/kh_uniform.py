@@ -41,12 +41,15 @@ class KelvinHelmholtzUniform():
         # Number of equations in system
         self.dim = len(self.variables)
 
+        # String used for eigenvalue (do not use lambda!)
+        self.eigenvalue = 'sigma'
+
         # Equations (Careful! No space behind minus
-        eq1 = "-1j*kx*v*drho -1j*kx*dvx -1.0*dz(dvz)"
-        eq2 = "-1j*kx*v*dA +1.0*dvz"
-        eq3 = "-1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT -nu*4/3*kx**2*dvx -nu*2*kx**2*dvdz*dA -nu*1j*kx*2/3*dz(dvz)"
-        eq4 = "-1j*kx*v*dvz -1/rho*p*dz(drho) -1/rho*p*dz(dT) +va**2*dz(dz(dA)) -va**2*kx**2*dA -1j*kx*nu*2/3*dz(dvx) -1j*kx*nu*d2vdz*dA -1j*kx*nu*dvdz*dz(dA) +nu*1/3*dz(dz(dvz))"
-        eq5 = "-1j*kx*v*dT -1j*kx*2/3*dvx -2/3*dz(dvz)"
+        eq1 = "sigma*drho = -1j*kx*v*drho -1j*kx*dvx -1.0*dz(dvz)"
+        eq2 = "sigma*dA = -1j*kx*v*dA +1.0*dvz"
+        eq3 = "sigma*dvx = -1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT -nu*4/3*kx**2*dvx -nu*2*kx**2*dvdz*dA -nu*1j*kx*2/3*dz(dvz)"
+        eq4 = "sigma*dvz = -1j*kx*v*dvz -1/rho*p*dz(drho) -1/rho*p*dz(dT) +va**2*dz(dz(dA)) -va**2*kx**2*dA -1j*kx*nu*2/3*dz(dvx) -1j*kx*nu*d2vdz*dA -1j*kx*nu*dvdz*dz(dA) +nu*1/3*dz(dz(dvz))"
+        eq5 = "sigma*dT = -1j*kx*v*dT -1j*kx*2/3*dvx -2/3*dz(dvz)"
 
         self.equations = [eq1, eq2, eq3, eq4, eq5]
 

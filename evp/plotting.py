@@ -33,6 +33,34 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     else:
         plt.show()
 
+def get_2Dmap(system, var, xmin, xmax, Nx, Nz):
+    import numpy as np
+    dx = (xmax-xmin)/Nx
+    xg = (0.5 + np.arange(Nx))*dx
+    dz = (system.grid.zmax-system.grid.zmin)/Nz
+    zg = (0.5 + np.arange(Nz))*dz
+    xx, zz = np.meshgrid(xg, zg)
+
+    # Wavenumber
+    kx = system.kx
+
+    val = np.zeros((Nz, Nx))
+
+    def return_real_ampl(f, x):
+        return (f.real*2*np.cos(kx*x) - f.imag*2*np.sin(kx*x))
+
+    # Interpolate onto z-grid
+    if type(var) is str:
+        yr = system.grid.interpolate(zg, system.result[var].real)
+        yi = system.grid.interpolate(zg, system.result[var].imag)
+    else:
+        yr = system.grid.interpolate(zg, var.real)
+        yi = system.grid.interpolate(zg, var.imag)
+    y = yr + 1j*yi
+    for i in range(Nx):
+        val[:, i] = return_real_ampl(y, xg[i])
+
+    return val
 
 def load_system(filename):
     """Load object containing solution.
@@ -80,6 +108,8 @@ def write_athena(system, Nz, Lz, path=None):
     if 'dA' in system.variables:
         znodes = np.arange(0., (Nz+1)*dz, dz)
         perturb.append(grid.interpolate(znodes, result['dA'].imag))
+    else:
+        perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
     np.savetxt(path + 'imagPerturbations{}.txt'.format(Nz), perturb,
@@ -94,6 +124,8 @@ def write_athena(system, Nz, Lz, path=None):
 
     if 'dA' in system.variables:
         perturb.append(grid.interpolate(znodes, result['dA'].real))
+    else:
+        perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
     np.savetxt(path + 'realPerturbations{}.txt'.format(Nz), perturb,

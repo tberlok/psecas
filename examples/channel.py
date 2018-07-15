@@ -6,7 +6,6 @@ from evp.systems.channel import Channel
 grid = ChebyshevRationalGrid(N=199, L=1)
 system = Channel(grid)
 
-# kx is weird to have as a parameter here TODO: fix that
 ch = Solver(grid, system)
 
 

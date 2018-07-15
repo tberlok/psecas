@@ -22,7 +22,7 @@ class Solver():
         self.mat2[(var_n-1)*NN, (var_n-1)*NN] = 0.0
         self.mat2[var_n*NN-1, var_n*NN-1] = 0.0
 
-    def _find_submatrices(self, eq, verbose=False):
+    def _find_submatrices_old(self, eq, verbose=False):
         import numpy as np
         import re
 
@@ -66,6 +66,74 @@ class Solver():
                         print('\t\tFound ', s2)
                     res = eval(term[:-len(s2)])
                     mats[i] += (res*self.grid.d2.T).T
+        return mats
+
+    def _find_submatrices(self, eq, verbose=False):
+        import numpy as np
+
+        def var_replace(eq, var, new):
+            """
+            Replace all instances of string var with string new.
+            This function differs from the default string replace method in
+            that it only makes the replace if var is not contained inside a
+            word.
+
+            Example:
+            eq = "-1j*kx*v*drho -drhodz*dvz -1.0*dz(dvz) - drho"
+            var_replace(eq, 'drho', 'foo')
+            returns '-1j*kx*v*foo -drhodz*dvz -1.0*dz(dvz) - foo'
+            where drhodz has not been replaced.
+            """
+            pos = 0
+            while pos != -1:
+                pos = eq.find(var, pos)
+                if pos != -1:
+                    substitute = True
+                    # Check if character to the left is a letter
+                    if pos > 0:
+                        if eq[pos-1].isalpha():
+                            substitute = False
+                    # Check if character to the right is a letter
+                    if pos + len(var) < len(eq):
+                        if eq[pos+len(var)].isalpha():
+                            substitute = False
+                    if substitute:
+                        eq = eq[:pos] + new + eq[pos+len(var):]
+                    # Increment pos to prevent the function from repeatedly
+                    # finding the same occurrence of var
+                    else:
+                        pos += len(var)
+            return eq
+
+        # This is a nasty trick
+        globals().update(self.system.__dict__)
+        globals().update(self.system.grid.__dict__)
+
+        NN = self.grid.NN
+        dim = self.system.dim
+
+        mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
+        eqs_t = []
+        if verbose:
+            print('\nParsing equation:', eq)
+
+        for i, var in enumerate(variables):
+            if var in eq:
+                variables_t = list(np.copy(variables))
+                eq_t = eq
+                eq_t = eq_t.replace('dz(dz(' + var + '))', 'd2.T')
+                eq_t = eq_t.replace('dz(' + var + ')', 'd1.T')
+                eq_t = var_replace(eq_t, var, 'd0.T')
+
+                variables_t.remove(var)
+                for var2 in variables_t:
+                    eq_t = eq_t.replace('dz(dz(' + var2 + '))', '0.0')
+                    eq_t = eq_t.replace('dz(' + var2 + ')', '0.0')
+                    eq_t = var_replace(eq_t, var2, '0.0')
+                if verbose:
+                    print('\nEvaluating expression:', eq_t)
+                mats[i] = eval(eq_t).T
+
         return mats
 
     def _get_matrix1(self):

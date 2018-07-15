@@ -43,6 +43,20 @@ class Grid():
         self._zmax = value
         self.make_grid()
 
+    def dz(self, vec):
+        """First derivative of vec defined at zg"""
+        import numpy as np
+        assert type(vec) is np.ndarray
+        assert vec.shape == self.NN
+        return np.matmul(self.d1, vec)
+
+    def dz2(self, vec):
+        """Second derivative of vec defined at zg"""
+        import numpy as np
+        assert type(vec) is np.ndarray
+        assert vec.shape == self.NN
+        return np.matmul(self.d2, vec)
+
 
 class FourierGrid(Grid):
     def __init__(self, N, zmin, zmax):

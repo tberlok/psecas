@@ -107,7 +107,7 @@ class Solver():
 
         # This is a nasty trick
         globals().update(self.system.__dict__)
-        globals().update(self.system.grid.__dict__)
+        grid = self.system.grid
 
         NN = self.grid.NN
         dim = self.system.dim
@@ -121,9 +121,11 @@ class Solver():
             if var in eq:
                 variables_t = list(np.copy(variables))
                 eq_t = eq
-                eq_t = eq_t.replace('dz(dz(' + var + '))', 'd2.T')
-                eq_t = eq_t.replace('dz(' + var + ')', 'd1.T')
-                eq_t = self._var_replace(eq_t, var, 'd0.T')
+                der = 'd' + grid.z + '('
+                eq_t = eq_t.replace(der + der + var + '))', 'grid.d2.T')
+                eq_t = eq_t.replace(der + var + ')', 'grid.d1.T')
+                eq_t = self._var_replace(eq_t, var, 'grid.d0.T')
+                eq_t = self._var_replace(eq_t, grid.z, 'grid.zg')
 
                 variables_t.remove(var)
                 for var2 in variables_t:

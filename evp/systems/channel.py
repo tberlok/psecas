@@ -25,7 +25,7 @@ class Channel():
         self.eigenvalue = 'sigma'
 
         # Equations
-        eq1 = "-h*sigma*f = 1*dz(dz(f)) +z*dz(f)"
+        eq1 = "-h*sigma*f = 1*dr(dr(f)) +r*dr(f)"
 
         self.equations = [eq1]
 
@@ -38,4 +38,3 @@ class Channel():
 
         # Define Background Functions
         self.h = np.exp(-zg**2/2)
-        self.z = zg

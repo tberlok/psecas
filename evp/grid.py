@@ -1,5 +1,5 @@
 class Grid():
-    def __init__(self, N, zmin, zmax):
+    def __init__(self, N, zmin, zmax, z='z'):
         self._observers = []
 
         assert zmax > zmin
@@ -8,6 +8,9 @@ class Grid():
         self._zmin = zmin
         self._zmax = zmax
         self.make_grid()
+
+        # Grid variable name
+        self.z = z
 
     @property
     def L(self):
@@ -175,12 +178,15 @@ class ChebyshevExtremaGrid(Grid):
 
 
 class ChebyshevRationalGrid():
-    def __init__(self, N, L):
+    def __init__(self, N, L, z='z'):
         self._observers = []
 
         self._N = N
         self._L = L
         self.make_grid()
+
+        # Grid variable name
+        self.z = z
 
     def bind_to(self, callback):
         self._observers.append(callback)

@@ -78,6 +78,13 @@ class MagnetoThermalInstability():
         self.B0 = sqrt(2*self.p0/self._beta)
         self.va = self.B0/sqrt(self.mu0*self.rho0)
 
+    def get_bx_and_by(self):
+        """Calculate dbx and dbz. Requires a solution stored!"""
+        import numpy as np
+        self.grid.make_grid()
+        self.result.update({'dbx':-np.matmul(self.grid.d1, self.result['dA']),
+                           'dbz':1j*self.kx*self.result['dA']})
+
     def make_background(self):
         """Functing for creating the background profiles.
         Returns symbolic expressions (as a function of z) """

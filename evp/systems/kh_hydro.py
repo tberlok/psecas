@@ -34,10 +34,11 @@ class KelvinHelmholtzHydroOnly():
         # Boundary conditions
         self.boundaries = None
 
-        # Equations (Careful! No space behind the minus
+        # Equations
         eq1 = "-1j*kx*v*drho -1j*kx*dvx -dlnrhodz*dvz -1.0*dz(dvz)"
         eq2 = "-1j*kx*v*dvx -dvdz*dvz -1j*kx*p/rho*drho -1j*kx*p/rho*dT"
-        eq3 = "-1j*kx*v*dvz -1/rho*dpdz*drho -1/rho*p*dz(drho) -1/rho*dpdz*dT -1/rho*p*dz(dT)"
+        eq3 = ("-1j*kx*v*dvz -1/rho*dpdz*drho -1/rho*p*dz(drho)" +
+               "-1/rho*dpdz*dT -1/rho*p*dz(dT)")
         eq4 = "-1j*kx*v*dT -1j*kx*2/3*dvx -dlnTdz*dvz -2/3*dz(dvz)"
 
         self.equations = [eq1, eq2, eq3, eq4]

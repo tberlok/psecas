@@ -1,4 +1,4 @@
-def golden_section(f, a, b, tol=1e-5):
+def golden_section(f, a, b, tol=1e-5, **kwargs):
     '''
     Golden section search.
 
@@ -26,15 +26,15 @@ def golden_section(f, a, b, tol=1e-5):
     (a, b) = (min(a, b), max(a, b))
     h = b - a
     if h <= tol:
-        yield (a, b)
+        return (a, b)
 
     # required steps to achieve tolerance
     n = int(np.ceil(np.log(tol/h)/np.log(invphi)))
 
     c = a + invphi2 * h
     d = a + invphi * h
-    yc = f(c)
-    yd = f(d)
+    yc = f(c, **kwargs)
+    yd = f(d, **kwargs)
 
     for k in range(n-1):
         if yc < yd:
@@ -43,16 +43,16 @@ def golden_section(f, a, b, tol=1e-5):
             yd = yc
             h = invphi*h
             c = a + invphi2 * h
-            yc = f(c)
+            yc = f(c, **kwargs)
         else:
             a = c
             c = d
             yc = yd
             h = invphi*h
             d = a + invphi * h
-            yd = f(d)
+            yd = f(d, **kwargs)
 
-        if yc < yd:
-            yield (a, d)
-        else:
-            yield (c, b)
+    if yc < yd:
+        return (a, d)
+    else:
+        return (c, b)

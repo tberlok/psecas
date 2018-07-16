@@ -101,7 +101,7 @@ if True:
     ampl = 1e-2
     A = ampl*dA - np.tile(zg, (Nx, 1)).T
     axes[0].contour(xx, zz, A, 32, colors='tab:gray',
-                 linestyles='solid')
+                    linestyles='solid')
     t = 1
     sigma = s.result['omega'].real
     B2 = ((s.B0 + s.B0*dbx*np.exp(sigma*t))**2 + (s.B0*dbz*np.exp(sigma*t))**2)
@@ -115,47 +115,47 @@ if True:
 if False:
     # Both methods now give similar results. Beware the eigenvalues can swap in
     # phase, e.g. \pm between calls to the solver.
-   from numpy.fft import rfftfreq, fftfreq
+    from numpy.fft import rfftfreq, fftfreq
 
-   sign = -1
+    sign = -1
 
-   def rfft2 (f, sign):
-       """Real-to-complex Fourier transform for fields that are periodic in x and
-       either symmetric (sign = +1) or anti-symmetric (sign = -1) about the
-       y-boundaries"""
-       from numpy import vstack
-       from numpy.fft import rfft2
-       return rfft2 (vstack ((f, sign*f[::-1,:])))
+    def rfft2(f, sign):
+        """Real-to-complex Fourier transform for fields that are periodic in x
+        and either symmetric (sign = +1) or anti-symmetric (sign = -1) about
+        the y-boundaries"""
+        from numpy import vstack
+        from numpy.fft import rfft2
+        return rfft2(vstack((f, sign*f[::-1, :])))
 
-   def irfft2 (f):
-       "Inverse transform"
-       from numpy.fft import irfft2
-       return irfft2 (f)[:f.shape[0]//2,:]
+    def irfft2(f):
+        "Inverse transform"
+        from numpy.fft import irfft2
+        return irfft2(f)[:f.shape[0]//2, :]
 
-   Bx = 1.0 + ampl*dbx
-   By = ampl*dbz
+    Bx = 1.0 + ampl*dbx
+    By = ampl*dbz
 
-   Bx = Bx
-   By = By
-   # Wave numbers
-   kx, ky = np.meshgrid (2*np.pi*rfftfreq (Nx)/dx, 2*np.pi*fftfreq (2*Nz)/dz)
-   k2 = kx*kx + ky*ky
-   k2[0,0] = 1.0
-   k21 = 1.0/k2
-   k21[0,0] = 0.0
+    Bx = Bx
+    By = By
+    # Wave numbers
+    kx, ky = np.meshgrid(2*np.pi*rfftfreq(Nx)/dx, 2*np.pi*fftfreq(2*Nz)/dz)
+    k2 = kx*kx + ky*ky
+    k2[0, 0] = 1.0
+    k21 = 1.0/k2
+    k21[0, 0] = 0.0
 
-   # Fourier transformed magnetic field
-   Bx_hat = rfft2 (Bx, +1*sign)
-   By_hat = rfft2 (By, -1*sign)
+    # Fourier transformed magnetic field
+    Bx_hat = rfft2(Bx, +1*sign)
+    By_hat = rfft2(By, -1*sign)
 
-   # Compute vector potential in Coulom gauge.
-   # Note that Jz = ∂By/∂x - ∂Bz/∂y = -∂²Az
-   Az = irfft2 (1j*k21*(kx*By_hat - ky*Bx_hat))
-   # Add contribution from mean field
-   Az -= By.mean ()*xx
+    # Compute vector potential in Coulom gauge.
+    # Note that Jz = ∂By/∂x - ∂Bz/∂y = -∂²Az
+    Az = irfft2(1j*k21*(kx*By_hat - ky*Bx_hat))
+    # Add contribution from mean field
+    Az -= By.mean()*xx
 
-   axes[0, 1].contour(xx, zz, Az, 32, colors='tab:gray',
-                 linestyles='solid')
+    axes[0, 1].contour(xx, zz, Az, 32, colors='tab:gray',
+                       linestyles='solid')
 
 if False:
     from evp import write_athena, save_system
@@ -184,15 +184,9 @@ if False:
     from evp import golden_section
 
     def f(kx, **kwargs):
-
-        # system = MagnetoThermalInstability(grid, beta, Kn0, kx, only_interior=True)
-        # system.boundaries = [False, True, False, True, True]
-
-        # solver = Solver(grid, system)
         system.kx = kx
-        # mode = 0
-        # Ns = np.hstack((np.arange(1, 5)*32, np.arange(3, 12)*64))
-        omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=False, tol=1e-4)
+        omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=False,
+                                                tol=1e-4)
 
         return -omega.real
 

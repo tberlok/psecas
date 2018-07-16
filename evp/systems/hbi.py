@@ -1,4 +1,4 @@
-class HeatFluxDrivenBouyancyInstability():
+class HeatFluxDrivenBuoyancyInstability():
     """
        Linearized equations for the HBI
        See Latter & Kunz 2012.
@@ -17,8 +17,9 @@ class HeatFluxDrivenBouyancyInstability():
         # Variables to solve for
         self.variables = ['drho', 'dA', 'dvx', 'dvz', 'dT']
 
-        self.labels = [r'$\delta \rho$', r'$\delta A$', r'$\delta v_x$',
-                       r'$\delta v_z$', r'$\delta T$']
+        self.labels = [r'$\delta \rho/\rho$', r'$\delta A/B$',
+                       r'$\delta v_x/c_s$', r'$\delta v_z/c_s$',
+                       r'$\delta T/T$']
 
         # Boundary conditions
         self.boundaries = [False, False, False, True, True]
@@ -31,7 +32,6 @@ class HeatFluxDrivenBouyancyInstability():
 
         # String used for eigenvalue (do not use lambda!)
         self.eigenvalue = 'sigma'
-
 
         # Equations
         eq1 = "sigma*drho = -1j*kx*dvx -dlnrhodz*dvz -dz(dvz)"
@@ -50,18 +50,16 @@ class HeatFluxDrivenBouyancyInstability():
 
     def get_bx_and_by(self):
         """Calculate dbx and dbz. Requires a solution stored!"""
-        # Make sure this is correct!
         import numpy as np
         self.grid.make_grid()
-        self.result.update({'dbx':-np.matmul(self.grid.d1, self.result['dA']),
-                           'dbz':1j*self.kx*self.result['dA']})
+        self.result.update({'dbx': -np.matmul(self.grid.d1, self.result['dA']),
+                           'dbz': 1j*self.kx*self.result['dA']})
 
     def make_background(self):
         """Functing for creating the background profiles.
         """
         import sympy as sym
-        import numpy as np
-        from sympy import exp, diff, lambdify
+        from sympy import exp, lambdify
         z = sym.symbols("z")
 
         zg = self.grid.zg
@@ -75,9 +73,9 @@ class HeatFluxDrivenBouyancyInstability():
 
         zeta = 2.5**(7/2) - 1
 
-        T_sym   = (1 + zeta*z)**(2/7)
-        p_sym   = exp(-7/5*G/zeta*((1+zeta*z)**(5/7) - 1 ))
-        rho_sym = p_sym/T_sym;
+        T_sym = (1 + zeta*z)**(2/7)
+        p_sym = exp(-7/5*G/zeta*((1+zeta*z)**(5/7) - 1))
+        rho_sym = p_sym/T_sym
 
         self.T = lambdify(z, T_sym)(zg)
         self.rho = lambdify(z, rho_sym)(zg)

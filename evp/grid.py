@@ -50,14 +50,14 @@ class Grid():
         """First derivative of vec defined at zg"""
         import numpy as np
         assert type(vec) is np.ndarray
-        assert vec.shape == self.NN
+        assert vec.shape[0] == self.NN
         return np.matmul(self.d1, vec)
 
     def dz2(self, vec):
         """Second derivative of vec defined at zg"""
         import numpy as np
         assert type(vec) is np.ndarray
-        assert vec.shape == self.NN
+        assert vec.shape[0] == self.NN
         return np.matmul(self.d2, vec)
 
 
@@ -117,10 +117,6 @@ class FourierGrid(Grid):
             y = ak[0].real/2.0 + cos + sin
             return y
 
-        # y = np.zeros(self.N)
-        # for i in range(self.N):
-        #   y[i] = to_grid(z[i])
-
         to_grid_v = np.vectorize(to_grid)
 
         return to_grid_v(z)
@@ -177,7 +173,7 @@ class ChebyshevExtremaGrid(Grid):
         return chebval(z, c)
 
 
-class ChebyshevRationalGrid():
+class ChebyshevRationalGrid(Grid):
     def __init__(self, N, L, z='z'):
         self._observers = []
 
@@ -268,17 +264,3 @@ class ChebyshevRationalGrid():
         c, res = chebfit(xg, f, deg=self.N, full=True)
         x = z/np.sqrt(self.L**2 + z**2)
         return chebval(x, c)
-
-    def dz(self, vec):
-        """First derivative of vec defined at zg"""
-        import numpy as np
-        assert type(vec) is np.ndarray
-        assert vec.shape == self.NN
-        return np.matmul(self.d1, vec)
-
-    def dz2(self, vec):
-        """Second derivative of vec defined at zg"""
-        import numpy as np
-        assert type(vec) is np.ndarray
-        assert vec.shape == self.NN
-        return np.matmul(self.d2, vec)

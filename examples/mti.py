@@ -86,7 +86,7 @@ if True:
     fig, axes = plt.subplots(num=3, ncols=3, sharey=True)
     s = system
 
-    pa = s.rho*s.nu*(2*1j*s.kx*s.result['dvx'] - s.grid.dz(s.result['dvz']))
+    pa = s.rho*s.nu*(2*1j*s.kx*s.result['dvx'] - s.grid.der(s.result['dvz']))
     pa = get_2Dmap(system, pa, xmin, xmax, Nx, Nz)
     axes[0].imshow(pa, extent=extent)
     axes[0].set_title(r'$\Delta p$')

@@ -1,5 +1,5 @@
 from .solver import Solver
-from grids import FourierGrid, ChebyshevRationalGrid, ChebyshevExtremaGrid
+from evp.grids import FourierGrid, ChebyshevRationalGrid, ChebyshevExtremaGrid
 from .config import setup
 from .plotting import plot_solution, load_system, save_system, write_athena
 from .mpi_io import IO

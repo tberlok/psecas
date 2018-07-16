@@ -46,14 +46,14 @@ class Grid():
         self._zmax = value
         self.make_grid()
 
-    def dz(self, vec):
+    def der(self, vec):
         """First derivative of vec defined at zg"""
         import numpy as np
         assert type(vec) is np.ndarray
         assert vec.shape[0] == self.NN
         return np.matmul(self.d1, vec)
 
-    def dz2(self, vec):
+    def dder(self, vec):
         """Second derivative of vec defined at zg"""
         import numpy as np
         assert type(vec) is np.ndarray

@@ -56,7 +56,7 @@ def test_chebyshev_differentation(show=False):
     return (yp_num, yp_exac)
 
 
-def test_rational_chebyshev_interpolation(show=False):
+def test_rational_chebyshev_differentation(show=False):
     """Test the differentation routine of ChebyshevRationalGrid"""
     import numpy as np
     from evp import ChebyshevRationalGrid
@@ -96,4 +96,4 @@ def test_rational_chebyshev_interpolation(show=False):
 if __name__ == '__main__':
     (yp_num, yp_exac) = test_fourier_differentation(show=True)
     (yp_num, yp_exac) = test_chebyshev_differentation(show=True)
-    (yp_num, yp_exac) = test_rational_chebyshev_interpolation(show=True)
+    (yp_num, yp_exac) = test_rational_chebyshev_differentation(show=True)

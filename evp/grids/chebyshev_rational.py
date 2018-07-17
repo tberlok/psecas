@@ -25,16 +25,16 @@ class ChebyshevRationalGrid(Grid):
         self.make_grid()
 
     @property
-    def L(self):
-        return self._L
-
-    @property
     def zmin(self):
         return self.zg.min()
 
     @property
     def zmax(self):
         return self.zg.max()
+
+    @property
+    def L(self):
+        return self._L
 
     @L.setter
     def L(self, value):

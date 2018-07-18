@@ -51,7 +51,7 @@ jobs:
             mkdir test-reports
             export PYTHONPATH=/home/circleci/repo
             pytest --junitxml=test-reports/junit.xml
-            pytest /home/circleci/repo/evp/grids --junitxml=test-reports/junit.xml
+            pytest /home/circleci/repo/evp/grids/* --junitxml=test-reports/junit.xml
 
       - store_test_results:
           path: test-reports

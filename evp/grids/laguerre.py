@@ -102,7 +102,7 @@ def test_lagurre_differentation(show=False):
     return (yp_num, yp_exac)
 
 
-def test_hermite_interpolation(show=False):
+def test_lagurre__interpolation(show=False):
     """Test the inperpolation routine of LaguerreGrid"""
     import numpy as np
 
@@ -131,4 +131,4 @@ def test_hermite_interpolation(show=False):
 
 if __name__ == '__main__':
     test_lagurre_differentation(show=True)
-    test_hermite_interpolation(show=True)
+    test_lagurre__interpolation(show=True)

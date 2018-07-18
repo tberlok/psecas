@@ -3,3 +3,4 @@ matplotlib
 scipy
 sympy
 pytest
+git+https://github.com/tberlok/dmsuite.git

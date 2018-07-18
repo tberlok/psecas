@@ -256,14 +256,14 @@ class Solver():
 
             # Zero out large values which are most likely numerical
             # TODO: Don't have this hardcoded
-            E = self.sorting_strategy(E)
-
-            # Sort from largest to smallest eigenvalue
-            index = np.argsort(np.real(E))[::-1]
+            E, index = self.sorting_strategy(E)
 
             # Choose the eigenvalue mode value only
             omega = E[index[mode]]
             v = V[:, index[mode]]
+            # Save all eigenvalues and eigenvectors here
+            self.E = E[index]
+            self.v = V[:, index]
             if verbose:
                 print("N: {}, all eigenvalues: {}".format(self.grid.N, omega))
         else:
@@ -298,7 +298,9 @@ class Solver():
         import numpy as np
         E[np.abs(E.real) > 10.] = 0
         E[np.abs(E.imag) > 10.] = 0
-        return E
+        # Sort from largest to smallest eigenvalue
+        index = np.argsort(np.real(E))[::-1]
+        return (E, index)
 
     def solve_only_eigenvalues(self, verbose=False):
         import numpy as np

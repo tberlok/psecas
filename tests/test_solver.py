@@ -72,7 +72,8 @@ def test_channel(show=False, verbose=False):
         """Sorting strategy for channel modes"""
         E[E.real > 100.] = 0
         E[E.real < -10.] = 0
-        return E
+        index = np.argsort(np.real(E))[::-1]
+        return (E, index)
 
     solver.sorting_strategy = sorting_strategy
 

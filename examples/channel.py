@@ -13,7 +13,8 @@ def sorting_strategy(E):
     """Sorting strategy for channel modes"""
     E[E.real > 100.] = 0
     E[E.real < -10.] = 0
-    return E
+    index = np.argsort(np.real(E))[::-1]
+    return (E, index)
 
 
 # Overwrite the default sorting strategy in the Solver class

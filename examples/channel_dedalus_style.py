@@ -24,7 +24,9 @@ class ChannelSolver(Solver):
         """Sorting strategy for channel modes. E is a list of eigenvalues"""
         E[E.real > 100.] = 0
         E[E.real < -10.] = 0
-        return E
+        index = np.argsort(np.real(E))[::-1]
+        return (E, index)
+
 
 # Create a solver object
 solver = ChannelSolver(grid, system)

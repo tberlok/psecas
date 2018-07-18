@@ -323,7 +323,8 @@ class Solver():
             print(omega)
         return omega
 
-    def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False):
+    def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False,
+                       guess_tol=0.1):
         import numpy as np
 
         self.grid.N = Ns[0]
@@ -335,7 +336,7 @@ class Solver():
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
-            if err > 0.1:
+            if err > guess_tol:
                 (a_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:

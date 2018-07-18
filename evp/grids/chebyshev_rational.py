@@ -2,6 +2,11 @@ from .grid import Grid
 
 
 class ChebyshevRationalGrid(Grid):
+    """
+    Rational Chebyshev functions on y ∈ [-∞, ∞]: the TBn(y)
+
+    See Boyd page 356.
+    """
     def __init__(self, N, L, z='z'):
         self._observers = []
 

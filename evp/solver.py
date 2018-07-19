@@ -186,30 +186,6 @@ class Solver():
                 if boundaries[j]:
                     self._set_boundary(j+1)
 
-    def _get_matrix2_old(self):
-        import numpy as np
-        dim = self.system.dim
-        NN = self.grid.NN
-        equations = self.system.equations
-        variables = self.system.variables
-        boundaries = self.system.boundaries
-        try:
-            # Construct matrix mat2
-            rhs_equations = self.system.rhs_equations
-            mat2 = np.zeros((dim*NN, dim*NN), dtype="complex128")
-            for j, equation in enumerate(rhs_equations):
-                mats = self._find_submatrices(equation)
-                for i, variable in enumerate(variables):
-                    self._set_submatrix(mat2, mats[i], j+1, i+1, False)
-            self.mat2 = mat2
-        except AttributeError:
-            self.mat2 = np.eye(dim*NN)
-
-        if boundaries is not None:
-            for j, equation in enumerate(equations):
-                if boundaries[j]:
-                    self._set_boundary(j+1)
-
     def keep_result(self, omega, vec, mode):
 
         # Store result

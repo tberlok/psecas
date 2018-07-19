@@ -3,9 +3,18 @@ from evp.grids.grid import Grid
 
 class ChebyshevTLnGrid(Grid):
     """
-    Rational Chebyshev functions on y ∈ [0, ∞]: the TLn(y)
+    This grid uses Rational Chebyshev functions on y ∈ [0, ∞], the TLn(y)
+    functions, to dicretize the system (Boyd page 369 and Table E.7 p. 558)
 
-    See Boyd page 369.
+    N: The number of grid points
+    C: A scaling parameter which regulates the extent of the grid
+
+    Optional:
+    z: a string which can be set to e.g. 'x' if x is used as the
+       coordinate in your linearized equations.
+
+    The domain is in theory [0, ∞] but in practice the minimum and
+    maximum values of the grid depend on both N and C.
     """
     def __init__(self, N, C=1, z='z'):
         self._observers = []

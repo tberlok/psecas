@@ -2,6 +2,20 @@ from .grid import Grid
 
 
 class ChebyshevExtremaGrid(Grid):
+    """
+    This grid uses the Chebyshev extrema and endpoints grid on
+    z ∈ [zmin, zmax] to dicretize the system. This grid is also known as the
+    Gaus-Lobatto grid. Implementation follows Boyd Appendix F.8 on page 570.
+
+    N: The number of grid points
+    zmin: The z value at the lower boundary
+    zmax: The z value at the upper boundary
+
+    Optional:
+    z: a string which can be set to e.g. 'x' if x is used as the
+       coordinate in your linearized equations.
+
+    """
     def __init__(self, N, zmin, zmax, z='z'):
         super().__init__(N, zmin, zmax, z=z)
 

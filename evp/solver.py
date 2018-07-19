@@ -5,8 +5,10 @@ class Solver():
         self.system = system
 
     def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
-        """Set submatrix corresponding to the term proportional to var_n
-        (variable number) in eq_n (equation number). """
+        """
+        Set submatrix corresponding to the term proportional to var_n
+        (variable number) in eq_n (equation number).
+        """
         NN = self.grid.NN
         N = self.grid.N
         if boundary:
@@ -93,6 +95,9 @@ class Solver():
         return mats
 
     def _get_matrix1(self):
+        """
+        Calculate the matrix M₂ neded in the solve method.
+        """
         import numpy as np
         dim = self.system.dim
         NN = self.grid.NN
@@ -116,6 +121,9 @@ class Solver():
         self.mat1 = mat1
 
     def _get_matrix2(self):
+        """
+        Calculate the matrix M₂ neded in the solve method.
+        """
         import numpy as np
         dim = self.system.dim
         NN = self.grid.NN
@@ -149,10 +157,20 @@ class Solver():
 
     def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
         """
-        Solve the EVP generated with the grid and parameters contained in the
-        system object.
+        Construct and solve the (generalized) eigenvalue problem (EVP)
 
-        Stores a dictionary with the result in self.system.result.
+            M₁ v = ω M₂ v
+
+        generated with the grid and parameters contained in the system object.
+
+        Here ω is the eigenvalue and v is the eigenmode.
+        Note that M₂ is a diagonal matrix if no boundary conditions are set.
+        In that case the EVP is simply
+
+            M₁ v = ω v
+
+        This method stores a dictionary with the result of the calculation
+        in self.system.result.
 
         Returns: One eigenvalue and its eigenvector.
 
@@ -224,7 +242,12 @@ class Solver():
         return (omega, v)
 
     def sorting_strategy(self, E):
-        """A default sorting strategy"""
+        """
+        A default sorting strategy.
+
+        "Large" real and imaginary eigenvalues are removed and the eigenvalues
+        are sorted from largest to smallest
+        """
         import numpy as np
         E[np.abs(E.real) > 10.] = 0
         E[np.abs(E.imag) > 10.] = 0
@@ -234,31 +257,54 @@ class Solver():
 
     def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False,
                        guess_tol=0.1):
+        """
+        Iteratively call the solve method with increasing grid resolution, N.
+        Returns when the relative difference in the eigenvalue is less than
+        the tolerance, tol.
+
+        Ns: list of resolutions to try, e.g. Ns = arange(32)*10
+
+        mode: the index in the list of eigenvalues returned from solve
+
+        tol: the target precision of the eigenvalue
+
+        verbose (default False): print out information about the calculation.
+
+        guess_tol: Increasing the resolution will inevitably lead to a more
+        expensive computation. A speedup can however be achieved when
+        searching for a single eigenvalue. This method can in this
+        case use the eigenvalue from the previous calculation as a guess for
+        the result of the new calculation. The parameter guess_tol makes sure
+        that the guess used is a good guess. If guess_tol=0.1 the method will
+        start using guesses when the relative difference to the previous
+        iteration is 10 %.
+        """
         import numpy as np
 
         self.grid.N = Ns[0]
-        (a_old, v) = self.solve(mode=mode, verbose=verbose)
+        (omega_old, v) = self.solve(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
-        (a_new, v) = self.solve(mode=mode, verbose=verbose)
-        err = np.abs(a_old - a_new)/np.abs(a_old)
+        (omega_new, v) = self.solve(mode=mode, verbose=verbose)
+        err = np.abs(omega_old - omega_new)/np.abs(omega_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
             if err > guess_tol:
-                (a_new, v) = self.solve(mode=mode, verbose=verbose)
+                (omega_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (a_new, v) = self.solve(a_old, mode=mode, verbose=verbose)
+                (omega_new, v) = self.solve(omega_old, mode=mode,
+                                            verbose=verbose)
 
-            err = np.abs(a_old - a_new)/np.abs(a_old)
+            err = np.abs(omega_old - omega_new)/np.abs(omega_old)
             # Converged
             if err < tol:
                 self.system.result.update({'converged': True})
                 self.system.result.update({'err': err})
-                return (a_new, v, err)
+                return (omega_new, v, err)
             # Overwrite old with new
-            a_old = np.copy(a_new)
+            omega_old = np.copy(omega_new)
 
         self.system.result.update({'converged': False})
         self.system.result.update({'err': err})

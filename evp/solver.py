@@ -47,12 +47,14 @@ class Solver():
 
         if guess is None:
             if boundaries is None:
+                # Solve a standard EVP
+                # TODO: Invert mat2 if it is diagonal but not eye.
                 E, V = eig(self.mat1)
             else:
+                # Solve a generalized EVP
                 E, V = eig(self.mat1, self.mat2)
 
-            # Zero out large values which are most likely numerical
-            # TODO: Don't have this hardcoded
+            # Sort the eigenvalues
             E, index = self.sorting_strategy(E)
 
             # Choose the eigenvalue mode value only

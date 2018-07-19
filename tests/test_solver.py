@@ -57,7 +57,7 @@ def test_channel(show=False, verbose=False):
     from evp import Solver, ChebyshevRationalGrid
     from evp.systems.channel import Channel
 
-    grid = ChebyshevRationalGrid(N=199, L=1, z='r')
+    grid = ChebyshevRationalGrid(N=199, z='r')
     system = Channel(grid)
 
     # kx is weird to have as a parameter here TODO: fix that

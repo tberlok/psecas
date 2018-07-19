@@ -17,7 +17,7 @@ from evp import HermiteGrid, SincGrid, ChebyshevRationalGrid
 N = 40
 
 # Create grids
-grid1 = ChebyshevRationalGrid(N=N-1, L=2)
+grid1 = ChebyshevRationalGrid(N=N-1, C=2)
 grid2 = SincGrid(N=N, C=2)
 grid3 = HermiteGrid(N=N, C=1)
 

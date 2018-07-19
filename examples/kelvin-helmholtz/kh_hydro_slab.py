@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
     The equilibrium changes sign at z=0 and is therefore not periodic.
 """
 
-grid = ChebyshevRationalGrid(N=32, L=0.2)
+grid = ChebyshevRationalGrid(N=32, C=0.2)
 
 u0 = 1.
 delta = 1.

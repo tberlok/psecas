@@ -7,11 +7,11 @@ class ChebyshevRationalGrid(Grid):
 
     See Boyd page 356.
     """
-    def __init__(self, N, L, z='z'):
+    def __init__(self, N, C=1, z='z'):
         self._observers = []
 
         self._N = N
-        self._L = L
+        self._C = C
         self.make_grid()
 
         # Grid variable name
@@ -38,12 +38,12 @@ class ChebyshevRationalGrid(Grid):
         return self.zg.max()
 
     @property
-    def L(self):
-        return self._L
+    def C(self):
+        return self._C
 
-    @L.setter
-    def L(self, value):
-        self._L = value
+    @C.setter
+    def C(self, value):
+        self._C = value
         self.make_grid()
 
     def cheb_roots(self, N):
@@ -64,7 +64,7 @@ class ChebyshevRationalGrid(Grid):
 
     def make_grid(self):
         import numpy as np
-        L = self.L
+        C = self.C
         self.NN = self.N + 1
         N = self.NN
 
@@ -73,11 +73,11 @@ class ChebyshevRationalGrid(Grid):
 
         Q = 1 - zg_int**2.0
 
-        zg = L*zg_int/np.sqrt(Q)
+        zg = C*zg_int/np.sqrt(Q)
 
         for ii in range(N):
             for jj in range(N):
-                d1[ii, jj] = np.sqrt(Q[ii])*Q[ii]*d1_int[ii, jj]/L
+                d1[ii, jj] = np.sqrt(Q[ii])*Q[ii]*d1_int[ii, jj]/C
 
         d2 = np.dot(d1, d1)
         self.zg = zg
@@ -93,9 +93,9 @@ class ChebyshevRationalGrid(Grid):
         """See equations 17.37 and 17.38 in Boyd"""
         from numpy.polynomial.chebyshev import chebfit, chebval
         import numpy as np
-        xg = self.zg/np.sqrt(self.L**2 + self.zg**2)
+        xg = self.zg/np.sqrt(self.C**2 + self.zg**2)
         c, res = chebfit(xg, f, deg=self.N, full=True)
-        x = z/np.sqrt(self.L**2 + z**2)
+        x = z/np.sqrt(self.C**2 + z**2)
         return chebval(x, c)
 
 
@@ -122,7 +122,7 @@ def test_rational_chebyshev_differentation(show=False):
         return yp
 
     N = 100
-    grid = ChebyshevRationalGrid(N, L=4)
+    grid = ChebyshevRationalGrid(N, C=4)
 
     c = np.ones(4)
     y = psi(grid.zg, c)
@@ -160,9 +160,9 @@ def test_rational_chebyshev_interpolation(show=False):
         return hermval(x, c)*np.exp(-x**2/2)
 
     N = 95
-    grid = ChebyshevRationalGrid(N, L=4)
+    grid = ChebyshevRationalGrid(N, C=4)
 
-    grid_fine = ChebyshevRationalGrid(N*4, L=4)
+    grid_fine = ChebyshevRationalGrid(N*4, C=4)
     z = grid_fine.zg
 
     y = psi(grid.zg, np.array(np.ones(4)))

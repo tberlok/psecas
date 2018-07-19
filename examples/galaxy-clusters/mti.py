@@ -3,6 +3,18 @@ from evp import Solver, ChebyshevExtremaGrid
 from evp.systems.mti import MagnetoThermalInstability
 from evp import plot_solution
 
+"""
+    The linear solution for the magnetothermal instability (MTI)
+    in a quasi-global setup, i.e. periodic in x and non-periodic in z.
+
+    Linearized equations for the MTI with anisotropic viscosity and heat
+    conduction for a constant magnetic field in the x-direction.
+
+    See the following paper for more details:
+
+    T. Berlok et al, in prep.
+"""
+
 N = 64
 zmin = 0
 zmax = 1

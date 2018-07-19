@@ -4,6 +4,26 @@ from evp.systems.kh_hydro import KelvinHelmholtzHydroOnly
 import time
 import matplotlib.pyplot as plt
 
+"""
+    The pure hydrodynamic version of the Kelvin-Helmholtz instability
+    with a smoothly varying velocity profile. The equilibrium also allows
+    for a density and temperature variation in z. The equilibrium is periodic
+    with the velocity profile changing sign at z1 and z2 a Fourier grid
+    is used to solve the EVP.
+
+    The linearized equations for this setup are derived in
+
+    Berlok, T. et al, in prep
+
+    and the equilibrium has been previously been used for simulations in
+
+    Lecoanet, D., McCourt, M., Quataert, E., Burns, K. J., Vasil, G. M.,
+    Oishi, J. S., O’Leary, R. M. (2016).
+    A validated non-linear kelvin-helmholtz benchmark for numerical
+    hydrodynamics, MNRAS, 455(4), 4274–4288.
+    https://doi.org/10.1093/mnras/stv2564
+"""
+
 # Plot omega vs kx
 if True:
     grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)

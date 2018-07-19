@@ -1,6 +1,14 @@
 class MagnetoThermalInstability():
-    """Linearized equations for the MTI with ansitropic viscosity and heat
+    """
+       The linear solution for the magnetothermal instability (MTI)
+       in a quasi-global setup, i.e. periodic in x and non-periodic in z.
+
+       Linearized equations for the MTI with anisotropic viscosity and heat
        conduction for a constant magnetic field in the x-direction.
+
+       See the following paper for more details:
+
+       T. Berlok et al, in prep.
     """
     def __init__(self, grid, beta, Kn0, kx, only_interior=True):
         # Problem parameters

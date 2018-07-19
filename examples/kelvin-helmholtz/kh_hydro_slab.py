@@ -4,6 +4,14 @@ from evp import plot_solution
 import numpy as np
 import matplotlib.pyplot as plt
 
+"""
+    Find the eigenmodes of the KH instability on the domain z ∈ [-∞, ∞]
+    assuming that the perturbations are zero at the boundaries.
+
+    This the pure hydro version of the Kelvin-Helmholtz instability.
+    The equilibrium changes sign at z=0 and is therefore not periodic.
+"""
+
 grid = ChebyshevRationalGrid(N=32, L=0.2)
 
 u0 = 1.

@@ -3,6 +3,16 @@ from evp import Solver, ChebyshevExtremaGrid
 from evp.systems.hbi import HeatFluxDrivenBuoyancyInstability
 from evp import plot_solution
 
+"""
+    The linear solution for the heat-flux-driven buoyancy instability (HBI)
+    in a quasi-global setup, i.e. periodic in x and non-periodic in z.
+
+    See the following paper for more details:
+
+    H. N. Latter, M. W. Kunz, 2012, MNRAS, 423, 1964
+    The HBI in a quasi-global model of the intracluster medium
+"""
+
 N = 64
 zmin = 0
 zmax = 2

@@ -3,6 +3,19 @@ from evp import Solver, FourierGrid
 from evp.systems.kh_uniform import KelvinHelmholtzUniform
 from evp import golden_section
 
+"""
+    A common task is to find the maximal growth rate as a function of
+    wavenumber (or some other parameter).
+
+    Here we show how to use the golden_section method to find the wavenumber
+    that gives maximal growth.
+
+    The wavenumber is returned to a specified tolerance.
+
+    Using golden_section is much cheaper than calculating the growth rate for
+    a fine mesh of wave vectors and taking the maximum.
+"""
+
 
 def f(kx, **kwargs):
 

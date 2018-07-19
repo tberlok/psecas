@@ -1,7 +1,12 @@
 class HeatFluxDrivenBuoyancyInstability():
     """
-       Linearized equations for the HBI
-       See Latter & Kunz 2012.
+       The linear equations for the heat-flux-driven buoyancy instability (HBI)
+       in a quasi-global setup, i.e. periodic in x and non-periodic in z.
+
+       See the following paper for more details:
+
+       H. N. Latter, M. W. Kunz, 2012, MNRAS, 423, 1964
+       The HBI in a quasi-global model of the intracluster medium
     """
     def __init__(self, grid, beta, Kn, kx):
 

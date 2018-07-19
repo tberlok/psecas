@@ -2,6 +2,13 @@ import numpy as np
 from evp import Solver, FourierGrid, write_athena, save_system
 from evp.systems.kh_uniform import KelvinHelmholtzUniform
 
+"""
+    This example shows how the eigenmodes can be stored in text format which
+    can be loaded into the MHD code Athena (Stone, J. et al, 2008).
+
+    It also shows how to save a system using Python's pickle package.
+"""
+
 # Set up a grid
 grid = FourierGrid(N=64, zmin=0, zmax=2)
 

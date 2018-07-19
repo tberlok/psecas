@@ -2,6 +2,18 @@ import numpy as np
 from evp import Solver, ChebyshevRationalGrid, System
 from evp import plot_solution
 
+"""
+    The vertical shear instability in protoplanetary accretion disks.
+
+    See for instance the following paper for more details:
+
+    O. M. Umurhan,  R. P. Nelson and O. Gressel,
+    Linear analysis of the vertical shear instability: outstanding issues
+    and improved solutions, A&A 586, A33 (2016),
+    DOI: 10.1051/0004-6361/201526494
+"""
+
+
 # Make a Child of the System class and override the make_background method
 class VerticalShearInstability(System):
     def __init__(self, grid, variables, eigenvalue):

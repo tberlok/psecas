@@ -148,26 +148,27 @@ class Solver():
                 if boundaries[j]:
                     self._set_boundary(j+1)
 
-    def keep_result(self, omega, vec, mode):
+    def keep_result(self, sigma, vec, mode):
 
         # Store result
         self.system.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN]
                               for j, var in enumerate(self.system.variables)}
-        self.system.result.update({'omega': omega, 'mode': mode})
+        self.system.result.update({self.system.eigenvalue: sigma,
+                                  'mode': mode})
 
     def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
 
-            M₁ v = ω M₂ v
+            M₁ v = σ M₂ v
 
         generated with the grid and parameters contained in the system object.
 
-        Here ω is the eigenvalue and v is the eigenmode.
+        Here σ is the eigenvalue and v is the eigenmode.
         Note that M₂ is a diagonal matrix if no boundary conditions are set.
         In that case the EVP is simply
 
-            M₁ v = ω v
+            M₁ v = σ v
 
         This method stores a dictionary with the result of the calculation
         in self.system.result.
@@ -207,13 +208,13 @@ class Solver():
             E, index = self.sorting_strategy(E)
 
             # Choose the eigenvalue mode value only
-            omega = E[index[mode]]
+            sigma = E[index[mode]]
             v = V[:, index[mode]]
             # Save all eigenvalues and eigenvectors here
             self.E = E[index]
             self.v = V[:, index]
             if verbose:
-                print("N: {}, all eigenvalues: {}".format(self.grid.N, omega))
+                print("N: {}, all eigenvalues: {}".format(self.grid.N, sigma))
         else:
             from scipy.sparse.linalg import eigs
             if useOPinv:
@@ -225,21 +226,21 @@ class Solver():
                     OPinv = inv(self.mat1 - guess*self.mat2)
                 from scipy import sparse
                 smat = sparse.csr_matrix(self.mat1)
-                omega, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
+                sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
             else:
                 if boundaries is None:
-                    omega, v = eigs(self.mat1, k=1, sigma=guess)
+                    sigma, v = eigs(self.mat1, k=1, sigma=guess)
                 else:
-                    omega, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
+                    sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
             # Convert result from eigs to have same format as result from eig
-            omega = omega[0]
+            sigma = sigma[0]
             v = np.squeeze(v)
             if verbose:
-                print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, omega))
+                print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, sigma))
 
-        self.keep_result(omega, v, mode)
+        self.keep_result(sigma, v, mode)
 
-        return (omega, v)
+        return (sigma, v)
 
     def sorting_strategy(self, E):
         """
@@ -282,29 +283,29 @@ class Solver():
         import numpy as np
 
         self.grid.N = Ns[0]
-        (omega_old, v) = self.solve(mode=mode, verbose=verbose)
+        (sigma_old, v) = self.solve(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
-        (omega_new, v) = self.solve(mode=mode, verbose=verbose)
-        err = np.abs(omega_old - omega_new)/np.abs(omega_old)
+        (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
+        err = np.abs(sigma_old - sigma_new)/np.abs(sigma_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
             if err > guess_tol:
-                (omega_new, v) = self.solve(mode=mode, verbose=verbose)
+                (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (omega_new, v) = self.solve(omega_old, mode=mode,
+                (sigma_new, v) = self.solve(sigma_old, mode=mode,
                                             verbose=verbose)
 
-            err = np.abs(omega_old - omega_new)/np.abs(omega_old)
+            err = np.abs(sigma_old - sigma_new)/np.abs(sigma_old)
             # Converged
             if err < tol:
                 self.system.result.update({'converged': True})
                 self.system.result.update({'err': err})
-                return (omega_new, v, err)
+                return (sigma_new, v, err)
             # Overwrite old with new
-            omega_old = np.copy(omega_new)
+            sigma_old = np.copy(sigma_new)
 
         self.system.result.update({'converged': False})
         self.system.result.update({'err': err})

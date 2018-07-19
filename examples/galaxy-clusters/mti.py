@@ -115,7 +115,7 @@ if True:
     axes[0].contour(xx, zz, A, 32, colors='tab:gray',
                     linestyles='solid')
     t = 1
-    sigma = s.result['omega'].real
+    sigma = s.result['sigma'].real
     B2 = ((s.B0 + s.B0*dbx*np.exp(sigma*t))**2 + (s.B0*dbz*np.exp(sigma*t))**2)
     axes[1].imshow(B2, extent=extent)
     axes[1].set_title(r'$B^2$')

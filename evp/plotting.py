@@ -25,7 +25,7 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
         axes[j].plot(grid.zg, sol[var].imag, 'C1.', label='Imag')
         axes[j].set_ylabel(system.labels[j])
     axes[system.dim-1].set_xlabel(r"$z$")
-    axes[0].set_title(title.format(sol['omega'], system.kx, sol['mode']))
+    axes[0].set_title(title.format(sol[system.eigenvalue], system.kx, sol['mode']))
     axes[0].legend(frameon=False)
 
     if not pylab and filename is not None:

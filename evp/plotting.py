@@ -33,6 +33,7 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     else:
         plt.show()
 
+
 def get_2Dmap(system, var, xmin, xmax, Nx, Nz):
     import numpy as np
     dx = (xmax-xmin)/Nx
@@ -61,6 +62,7 @@ def get_2Dmap(system, var, xmin, xmax, Nx, Nz):
         val[:, i] = return_real_ampl(y, xg[i])
 
     return val
+
 
 def load_system(filename):
     """Load object containing solution.

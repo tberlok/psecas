@@ -5,6 +5,7 @@ from evp import Solver, ChebyshevRationalGrid, System
 # Create grid
 grid = ChebyshevRationalGrid(N=199, L=1, z='r')
 
+
 # Make a Child of the System class and override the make_background method
 class Channel(System):
     def make_background(self):
@@ -12,11 +13,13 @@ class Channel(System):
         zg = self.grid.zg
         self.h = np.exp(-zg**2/2)
 
+
 # Create the Channel system
 system = Channel(grid, variables='f', eigenvalue='sigma')
 
 # Add the first (and only) equation
 system.add_equation("-h*sigma*f = 1*dr(dr(f)) +r*dr(f)", boundary=True)
+
 
 # Overwrite the default sorting method in the Solver class
 class ChannelSolver(Solver):

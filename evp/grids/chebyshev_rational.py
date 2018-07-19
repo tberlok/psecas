@@ -1,4 +1,4 @@
-from .grid import Grid
+from evp.grids.grid import Grid
 
 
 class ChebyshevRationalGrid(Grid):

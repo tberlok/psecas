@@ -1,4 +1,4 @@
-from .grid import Grid
+from evp.grids.grid import Grid
 
 
 class ChebyshevExtremaGrid(Grid):
@@ -69,7 +69,6 @@ class ChebyshevExtremaGrid(Grid):
 def test_chebyshev_differentation(show=False):
     """Test the differentation routine of FourierGrid"""
     import numpy as np
-    from evp import ChebyshevExtremaGrid
 
     N = 20
     zmin = -1
@@ -83,7 +82,7 @@ def test_chebyshev_differentation(show=False):
 
     if show:
         import matplotlib.pyplot as plt
-        plt.figure(2)
+        plt.figure(1)
         plt.clf()
         plt.title("Differentation with matrix (ChebyshevExtremaGrid)")
         plt.plot(z, yp_exac, '-')
@@ -98,7 +97,6 @@ def test_chebyshev_differentation(show=False):
 def test_chebyshev_interpolation(show=False):
     """Test the inperpolation routine of ChebyshevExtremaGrid"""
     import numpy as np
-    from evp import ChebyshevExtremaGrid
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval

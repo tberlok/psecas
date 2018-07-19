@@ -4,7 +4,7 @@ from evp.grids.grid import Grid
 class HermiteGrid(Grid):
     """
         This grid uses Hermite polynomials on z ∈ [-∞, ∞] to dicretize the
-        system. dmsuite is used to for the setup of the grid.
+        system. dmsuite is used for the setup of the grid.
 
         N: The number of grid points
         C: A scaling parameter which regulates the extent of the grid

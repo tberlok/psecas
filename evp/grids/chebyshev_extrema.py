@@ -2,8 +2,8 @@ from .grid import Grid
 
 
 class ChebyshevExtremaGrid(Grid):
-    def __init__(self, N, zmin, zmax):
-        super().__init__(N, zmin, zmax)
+    def __init__(self, N, zmin, zmax, z='z'):
+        super().__init__(N, zmin, zmax, z=z)
 
     def make_grid(self):
         import numpy as np

@@ -302,27 +302,6 @@ class Solver():
         index = np.argsort(np.real(E))[::-1]
         return (E, index)
 
-    def solve_only_eigenvalues(self, verbose=False):
-        import numpy as np
-        from scipy.linalg import eigvals
-
-        boundaries = self.system.boundaries
-
-        self._get_matrix()
-        if boundaries is None:
-            E = eigvals(self.mat1)
-        else:
-            E = eigvals(self.mat1, self.mat2)
-        # Zero out large values which are most likely numerical
-        E[E.real > 2.] = 0
-        index = np.argsort(np.real(E))[::-1]
-
-        i = 0
-        omega = E[index[i]]
-        if verbose:
-            print(omega)
-        return omega
-
     def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False,
                        guess_tol=0.1):
         import numpy as np
@@ -355,21 +334,3 @@ class Solver():
         self.system.result.update({'err': err})
 
         # raise RuntimeError("Did not converge!")
-
-    def iterate_solver_simple(self, min=6, max=11, tol=1e-6):
-        import numpy as np
-        from numpy import arange
-        N = 2**min
-        self.grid.N = N
-        a_old = self.solve_only_eigenvalues()
-
-        for N in 2**arange(min+1, max):
-            self.grid.N = int(N)
-            a_new = self.solve_only_eigenvalues()
-            err = abs(a_old - a_new)/abs(a_old)
-            if err < tol:
-                return (a_new, err)
-            # Overwrite old with new
-            a_old = np.copy(a_new)
-
-        raise RuntimeError("Did not converge!")

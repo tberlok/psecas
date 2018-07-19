@@ -1,4 +1,7 @@
 class Grid():
+    """
+    Base class for grids.
+    """
     def __init__(self, N, zmin, zmax, z='z'):
         self._observers = []
 

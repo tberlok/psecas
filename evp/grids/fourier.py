@@ -1,7 +1,20 @@
-from .grid import Grid
+from evp.grids.grid import Grid
 
 
 class FourierGrid(Grid):
+    """
+    This grid uses the Fourier grid on z ∈ [zmin, zmax] to dicretize the
+    system. The grid is periodic.
+
+    N: The number of grid points
+    zmin: The z value at the lower boundary
+    zmax: The z value at the upper boundary
+
+    Optional:
+    z: a string which can be set to e.g. 'x' if x is used as the
+       coordinate in your linearized equations.
+
+    """
     def __init__(self, N, zmin, zmax,  z='z'):
         super().__init__(N, zmin, zmax,  z=z)
 
@@ -10,6 +23,10 @@ class FourierGrid(Grid):
         return self.L/self.N
 
     def make_grid(self):
+        """
+        Make the grid. We use the toeplitz implementation which is outlined
+        in the book by Trefethen and the accompanying Matlab files.
+        """
         import numpy as np
         from numpy import sin, tan, arange, pi
         from scipy.linalg import toeplitz

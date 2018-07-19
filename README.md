@@ -2,7 +2,7 @@
 # Introduction
 
 This github repository contains a collection of methods for solving
-eigenvalue problems using pseudo-spectral methods. These methods are described
+eigenvalue problems (EVPs) using pseudo-spectral methods. These methods are described
 in e.g. the books
 [Spectral Methods in Matlab](https://people.maths.ox.ac.uk/trefethen/spectral.html)
 by Lloyd N. Trefethen,
@@ -11,8 +11,10 @@ by Bengt Fornberg and
 [Chebyshev and Fourier Spectral Methods](http://depts.washington.edu/ph506/Boyd.pdf)
 by John P. Boyd.
 
+### How it works
 The user writes down a linearized set of equations, the eigenvalue problem,
-which is then discretized on either an infinite, finite or periodic domain.
+which is automatically discretized on either an infinite, finite or
+periodic domain. The resulting EVP can then be solved to a requested precision.
 
 ### Overview of the code
 The code consist of three main classes
@@ -50,7 +52,9 @@ J. A. C. Weidemann and S. C. Reddy, A MATLAB Differentiation Matrix Suite,
 ACM Transactions on Mathematical Software, 26, (2000): 465-519.
 
 for creating the Laguerre and Hermite grids. The other grids are created using
-the description in [Boyd's book.](http://depts.washington.edu/ph506/Boyd.pdf)
+the descriptions in the books by
+[Boyd](http://depts.washington.edu/ph506/Boyd.pdf) and
+[Trefethen.](https://people.maths.ox.ac.uk/trefethen/spectral.html)
 
 # Examples
 

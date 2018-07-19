@@ -45,7 +45,8 @@ if False:
 
     (a, b) = golden_section(f, 3.512295, 3.513135, tol=1e-5)
 
-if True:
+# Create initial conditions for Athena simulation
+if False:
     from evp import write_athena, save_system
     kxmax = 3.5128286141291243
     grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)
@@ -56,7 +57,7 @@ if True:
     omega, v, err = solver.iterate_solver(Ns, verbose=False, tol=1e-6)
 
     # Write files for loading into Athena
-    write_athena(system, Nz=256, Lz=2.0)
+    # write_athena(system, Nz=256, Lz=2.0)
 
     # Write directly to the Athena directory
     write_athena(system, Nz=256, Lz=2.0,

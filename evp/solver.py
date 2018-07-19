@@ -22,52 +22,6 @@ class Solver():
         self.mat2[(var_n-1)*NN, (var_n-1)*NN] = 0.0
         self.mat2[var_n*NN-1, var_n*NN-1] = 0.0
 
-    def _find_submatrices_old(self, eq, verbose=False):
-        import numpy as np
-        import re
-
-        # This is a nasty trick
-        globals().update(self.system.__dict__)
-
-        NN = self.grid.NN
-        dim = self.system.dim
-
-        mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
-
-        if verbose:
-            print('\nParsing equation:', eq)
-        s = re.split(r" ", eq)
-
-        for term in s:
-            if len(term) == 0:
-                s.remove('')
-        for term in s:
-            if verbose:
-                print('\tParsing term:', term)
-            for i, var in enumerate(self.system.variables):
-                # No derivative
-                s0 = "*" + var
-                s1 = "*dz(" + var + ")"
-                s2 = "*dz(dz(" + var + "))"
-                if term.endswith(s0):
-                    if verbose:
-                        print('\t\tFound ', s0)
-                    res = eval(term[:-len(s0)])
-                    mats[i] += (res*self.grid.d0.T).T
-                # 1st derivative
-                if term.endswith(s1):
-                    if verbose:
-                        print('\t\tFound ', s1)
-                    res = eval(term[:-len(s1)])
-                    mats[i] += (res*self.grid.d1.T).T
-                # 2nd derivative
-                if term.endswith(s2):
-                    if verbose:
-                        print('\t\tFound ', s2)
-                    res = eval(term[:-len(s2)])
-                    mats[i] += (res*self.grid.d2.T).T
-        return mats
-
     def _var_replace(self, eq, var, new):
         """
         Replace all instances of string var with string new.

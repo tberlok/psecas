@@ -4,158 +4,6 @@ class Solver():
         self.grid = grid
         self.system = system
 
-    def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
-        """
-        Set submatrix corresponding to the term proportional to var_n
-        (variable number) in eq_n (equation number).
-        """
-        NN = self.grid.NN
-        N = self.grid.N
-        if boundary:
-            submat[0, :] = 0
-            submat[N, :] = 0
-            if eq_n == var_n:
-                submat[0, 0] = 1
-                submat[N, N] = 1
-        mat1[(eq_n-1)*NN:eq_n*NN, (var_n-1)*NN:var_n*NN] = submat
-
-    def _set_boundary(self, var_n):
-        NN = self.grid.NN
-        self.mat2[(var_n-1)*NN, (var_n-1)*NN] = 0.0
-        self.mat2[var_n*NN-1, var_n*NN-1] = 0.0
-
-    def _var_replace(self, eq, var, new):
-        """
-        Replace all instances of string var with string new.
-        This function differs from the default string replace method in
-        that it only makes the replace if var is not contained inside a
-        word.
-
-        Example:
-        eq = "-1j*kx*v*drho -drhodz*dvz -1.0*dz(dvz) - drho"
-        var_replace(eq, 'drho', 'foo')
-        returns '-1j*kx*v*foo -drhodz*dvz -1.0*dz(dvz) - foo'
-        where drhodz has not been replaced.
-        """
-        pos = 0
-        while pos != -1:
-            pos = eq.find(var, pos)
-            if pos != -1:
-                substitute = True
-                # Check if character to the left is a letter
-                if pos > 0:
-                    if eq[pos-1].isalpha():
-                        substitute = False
-                # Check if character to the right is a letter
-                if pos + len(var) < len(eq):
-                    if eq[pos+len(var)].isalpha():
-                        substitute = False
-                if substitute:
-                    eq = eq[:pos] + new + eq[pos+len(var):]
-                # Increment pos to prevent the function from repeatedly
-                # finding the same occurrence of var
-                else:
-                    pos += len(var)
-        return eq
-
-    def _find_submatrices(self, eq, verbose=False):
-        import numpy as np
-
-        # This is a nasty trick
-        globals().update(self.system.__dict__)
-        grid = self.system.grid
-
-        NN = self.grid.NN
-        dim = self.system.dim
-
-        mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
-
-        if verbose:
-            print('\nParsing equation:', eq)
-
-        for i, var in enumerate(self.system.variables):
-            if var in eq:
-                variables_t = list(np.copy(self.system.variables))
-                eq_t = eq
-                der = 'd' + grid.z + '('
-                eq_t = eq_t.replace(der + der + var + '))', 'grid.d2.T')
-                eq_t = eq_t.replace(der + var + ')', 'grid.d1.T')
-                eq_t = self._var_replace(eq_t, var, 'grid.d0.T')
-                eq_t = self._var_replace(eq_t, grid.z, 'grid.zg')
-
-                variables_t.remove(var)
-                for var2 in variables_t:
-                    eq_t = eq_t.replace('dz(dz(' + var2 + '))', '0.0')
-                    eq_t = eq_t.replace('dz(' + var2 + ')', '0.0')
-                    eq_t = self._var_replace(eq_t, var2, '0.0')
-                if verbose:
-                    print('\nEvaluating expression:', eq_t)
-                mats[i] = eval(eq_t).T
-
-        return mats
-
-    def _get_matrix1(self):
-        """
-        Calculate the matrix M₂ neded in the solve method.
-        """
-        import numpy as np
-        dim = self.system.dim
-        NN = self.grid.NN
-        equations = self.system.equations
-        variables = self.system.variables
-        boundaries = self.system.boundaries
-
-        # Construct matrix mat1
-        mat1 = np.zeros((dim*NN, dim*NN), dtype="complex128")
-
-        for j, equation in enumerate(equations):
-            # Evaluate RHS of equation
-            equation = equation.split('=')[1]
-            mats = self._find_submatrices(equation)
-            for i, variable in enumerate(variables):
-                if boundaries is not None:
-                    self._set_submatrix(mat1, mats[i], j+1, i+1, boundaries[j])
-                else:
-                    self._set_submatrix(mat1, mats[i], j+1, i+1, False)
-
-        self.mat1 = mat1
-
-    def _get_matrix2(self):
-        """
-        Calculate the matrix M₂ neded in the solve method.
-        """
-        import numpy as np
-        dim = self.system.dim
-        NN = self.grid.NN
-        sys = self.system
-        equations = sys.equations
-        variables = sys.variables
-        boundaries = sys.boundaries
-
-        mat2 = np.zeros((dim*NN, dim*NN), dtype="complex128")
-
-        for j, equation in enumerate(equations):
-            # Evaluate LHS of equation
-            equation = equation.split('=')[0]
-            equation = self._var_replace(equation, sys.eigenvalue, '1.0')
-            mats = self._find_submatrices(equation)
-            for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i], j+1, i+1, False)
-        self.mat2 = mat2
-
-        if boundaries is not None:
-            for j, equation in enumerate(equations):
-                if boundaries[j]:
-                    self._set_boundary(j+1)
-
-    def keep_result(self, sigma, vec, mode):
-
-        # Store result
-        self.system.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN]
-                              for j, var in enumerate(self.system.variables)}
-        self.system.result.update({self.system.eigenvalue: sigma,
-                                  'mode': mode})
-
     def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
@@ -242,20 +90,6 @@ class Solver():
 
         return (sigma, v)
 
-    def sorting_strategy(self, E):
-        """
-        A default sorting strategy.
-
-        "Large" real and imaginary eigenvalues are removed and the eigenvalues
-        are sorted from largest to smallest
-        """
-        import numpy as np
-        E[np.abs(E.real) > 10.] = 0
-        E[np.abs(E.imag) > 10.] = 0
-        # Sort from largest to smallest eigenvalue
-        index = np.argsort(np.real(E))[::-1]
-        return (E, index)
-
     def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False,
                        guess_tol=0.1):
         """
@@ -311,3 +145,169 @@ class Solver():
         self.system.result.update({'err': err})
 
         # raise RuntimeError("Did not converge!")
+
+    def sorting_strategy(self, E):
+        """
+        A default sorting strategy.
+
+        "Large" real and imaginary eigenvalues are removed and the eigenvalues
+        are sorted from largest to smallest
+        """
+        import numpy as np
+        E[np.abs(E.real) > 10.] = 0
+        E[np.abs(E.imag) > 10.] = 0
+        # Sort from largest to smallest eigenvalue
+        index = np.argsort(np.real(E))[::-1]
+        return (E, index)
+
+    def keep_result(self, sigma, vec, mode):
+
+        # Store result
+        self.system.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN]
+                              for j, var in enumerate(self.system.variables)}
+        self.system.result.update({self.system.eigenvalue: sigma,
+                                  'mode': mode})
+
+    def _get_matrix1(self):
+        """
+        Calculate the matrix M₂ neded in the solve method.
+        """
+        import numpy as np
+        dim = self.system.dim
+        NN = self.grid.NN
+        equations = self.system.equations
+        variables = self.system.variables
+        boundaries = self.system.boundaries
+
+        # Construct matrix mat1
+        mat1 = np.zeros((dim*NN, dim*NN), dtype="complex128")
+
+        for j, equation in enumerate(equations):
+            # Evaluate RHS of equation
+            equation = equation.split('=')[1]
+            mats = self._find_submatrices(equation)
+            for i, variable in enumerate(variables):
+                if boundaries is not None:
+                    self._set_submatrix(mat1, mats[i], j+1, i+1, boundaries[j])
+                else:
+                    self._set_submatrix(mat1, mats[i], j+1, i+1, False)
+
+        self.mat1 = mat1
+
+    def _get_matrix2(self):
+        """
+        Calculate the matrix M₂ neded in the solve method.
+        """
+        import numpy as np
+        dim = self.system.dim
+        NN = self.grid.NN
+        sys = self.system
+        equations = sys.equations
+        variables = sys.variables
+        boundaries = sys.boundaries
+
+        mat2 = np.zeros((dim*NN, dim*NN), dtype="complex128")
+
+        for j, equation in enumerate(equations):
+            # Evaluate LHS of equation
+            equation = equation.split('=')[0]
+            equation = self._var_replace(equation, sys.eigenvalue, '1.0')
+            mats = self._find_submatrices(equation)
+            for i, variable in enumerate(variables):
+                self._set_submatrix(mat2, mats[i], j+1, i+1, False)
+        self.mat2 = mat2
+
+        if boundaries is not None:
+            for j, equation in enumerate(equations):
+                if boundaries[j]:
+                    self._set_boundary(j+1)
+
+    def _var_replace(self, eq, var, new):
+        """
+        Replace all instances of string var with string new.
+        This function differs from the default string replace method in
+        that it only makes the replace if var is not contained inside a
+        word.
+
+        Example:
+        eq = "-1j*kx*v*drho -drhodz*dvz -1.0*dz(dvz) - drho"
+        var_replace(eq, 'drho', 'foo')
+        returns '-1j*kx*v*foo -drhodz*dvz -1.0*dz(dvz) - foo'
+        where drhodz has not been replaced.
+        """
+        pos = 0
+        while pos != -1:
+            pos = eq.find(var, pos)
+            if pos != -1:
+                substitute = True
+                # Check if character to the left is a letter
+                if pos > 0:
+                    if eq[pos-1].isalpha():
+                        substitute = False
+                # Check if character to the right is a letter
+                if pos + len(var) < len(eq):
+                    if eq[pos+len(var)].isalpha():
+                        substitute = False
+                if substitute:
+                    eq = eq[:pos] + new + eq[pos+len(var):]
+                # Increment pos to prevent the function from repeatedly
+                # finding the same occurrence of var
+                else:
+                    pos += len(var)
+        return eq
+
+    def _find_submatrices(self, eq, verbose=False):
+        import numpy as np
+
+        # This is a nasty trick
+        globals().update(self.system.__dict__)
+        grid = self.system.grid
+
+        NN = self.grid.NN
+        dim = self.system.dim
+
+        mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
+
+        if verbose:
+            print('\nParsing equation:', eq)
+
+        for i, var in enumerate(self.system.variables):
+            if var in eq:
+                variables_t = list(np.copy(self.system.variables))
+                eq_t = eq
+                der = 'd' + grid.z + '('
+                eq_t = eq_t.replace(der + der + var + '))', 'grid.d2.T')
+                eq_t = eq_t.replace(der + var + ')', 'grid.d1.T')
+                eq_t = self._var_replace(eq_t, var, 'grid.d0.T')
+                eq_t = self._var_replace(eq_t, grid.z, 'grid.zg')
+
+                variables_t.remove(var)
+                for var2 in variables_t:
+                    eq_t = eq_t.replace('dz(dz(' + var2 + '))', '0.0')
+                    eq_t = eq_t.replace('dz(' + var2 + ')', '0.0')
+                    eq_t = self._var_replace(eq_t, var2, '0.0')
+                if verbose:
+                    print('\nEvaluating expression:', eq_t)
+                mats[i] = eval(eq_t).T
+
+        return mats
+
+    def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
+        """
+        Set submatrix corresponding to the term proportional to var_n
+        (variable number) in eq_n (equation number).
+        """
+        NN = self.grid.NN
+        N = self.grid.N
+        if boundary:
+            submat[0, :] = 0
+            submat[N, :] = 0
+            if eq_n == var_n:
+                submat[0, 0] = 1
+                submat[N, N] = 1
+        mat1[(eq_n-1)*NN:eq_n*NN, (var_n-1)*NN:var_n*NN] = submat
+
+    def _set_boundary(self, var_n):
+        NN = self.grid.NN
+        self.mat2[(var_n-1)*NN, (var_n-1)*NN] = 0.0
+        self.mat2[var_n*NN-1, var_n*NN-1] = 0.0

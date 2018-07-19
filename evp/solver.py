@@ -113,13 +113,13 @@ class Solver():
         dim = self.system.dim
 
         mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
-        eqs_t = []
+
         if verbose:
             print('\nParsing equation:', eq)
 
-        for i, var in enumerate(variables):
+        for i, var in enumerate(self.system.variables):
             if var in eq:
-                variables_t = list(np.copy(variables))
+                variables_t = list(np.copy(self.system.variables))
                 eq_t = eq
                 der = 'd' + grid.z + '('
                 eq_t = eq_t.replace(der + der + var + '))', 'grid.d2.T')

@@ -35,7 +35,7 @@ class LegendreExtremaGrid(Grid):
         cp = legder([0]*N + [1])
         zg = np.hstack([-1.0, legroots(cp), 1.0])
 
-        P_N = legval(zg, cp)
+        P_N = legval(zg, [0]*N + [1])
 
         for ii in range(N+1):
             for jj in range(N+1):
@@ -51,9 +51,9 @@ class LegendreExtremaGrid(Grid):
 
         d2 = np.dot(d1, d1)
 
-        self.zg = -(zg - 1)*L/2 + self.zmin
+        self.zg = (zg + 1)*L/2 + self.zmin
         self.d0 = np.eye(self.NN)
-        self.d1 = -d1/factor
+        self.d1 = d1/factor
         self.d2 = d2/factor**2
 
         # Call other objects that depend on the grid

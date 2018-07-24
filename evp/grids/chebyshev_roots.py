@@ -3,9 +3,9 @@ from evp.grids.grid import Grid
 
 class ChebyshevRootsGrid(Grid):
     """
-    This grid uses the Chebyshev extrema and endpoints grid on
-    z ∈ [zmin, zmax] to dicretize the system. This grid is also known as the
-    Gaus-Lobatto grid. Implementation follows Boyd Appendix F.8 on page 570.
+    This grid uses the Chebyshev Interior or Roots grid on
+    z ∈ [zmin, zmax] to discretize the system.
+    Implementation follows Boyd Appendix F.9 on page 571.
 
     N: The number of grid points
     zmin: The z value at the lower boundary

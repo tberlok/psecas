@@ -6,3 +6,4 @@ from .sinc import SincGrid
 from .hermite import HermiteGrid
 from .laguerre import LaguerreGrid
 from .chebyshev_semi_infinite import ChebyshevTLnGrid
+from .legendre_extrema import LegendreExtremaGrid

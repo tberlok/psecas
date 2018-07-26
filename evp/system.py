@@ -13,7 +13,10 @@ class System():
         # current grid resolution
         self.grid.bind_to(self.make_background)
 
-        self.variables = list(variables)
+        if type(variables) is str:
+            self.variables = list([variables])
+        else:
+            self.variables = list(variables)
 
         self.labels = variables
 

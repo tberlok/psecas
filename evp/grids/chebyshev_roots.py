@@ -25,6 +25,7 @@ class ChebyshevRootsGrid(Grid):
         N = self._N
         self.NN = N + 1
         L = self.L
+        N = self.NN
 
         factor = L/2
 

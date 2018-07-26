@@ -41,9 +41,9 @@ class LegendreExtremaGrid(Grid):
             for jj in range(N+1):
                 if ii == jj:
                     if ii == 0:
-                        d1[ii, jj] = N*(N+1)/4
-                    elif ii == N:
                         d1[ii, jj] = -N*(N+1)/4
+                    elif ii == N:
+                        d1[ii, jj] = N*(N+1)/4
                     else:
                         d1[ii, jj] = 0
                 else:

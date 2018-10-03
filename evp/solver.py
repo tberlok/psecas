@@ -46,8 +46,13 @@ class Solver:
         self._get_matrix1()
         self._get_matrix2()
 
+        try:
+            do_gen_evp = self.system.do_gen_evp
+        except AttributeError:
+            do_gen_evp = False
+
         if guess is None:
-            if boundaries is None or all([boundaries]):
+            if not any(boundaries) or all(boundaries) and not do_gen_evp:
                 # Solve a standard EVP
                 # TODO: Invert mat2 if it is diagonal but not eye.
                 E, V = eig(self.mat1)
@@ -73,7 +78,7 @@ class Solver:
                 # from numpy.linalg import pinv as inv
                 from numpy.linalg import inv
 
-                if boundaries is None or all([boundaries]):
+                if not any(boundaries) or all(boundaries) and not do_gen_evp:
                     OPinv = inv(
                         self.mat1 - guess * np.eye(self.mat1.shape[0])
                     )
@@ -84,7 +89,7 @@ class Solver:
                 smat = sparse.csr_matrix(self.mat1)
                 sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
             else:
-                if boundaries is None or all([boundaries]):
+                if not any(boundaries) or all(boundaries) and not do_gen_evp:
                     sigma, v = eigs(self.mat1, k=1, sigma=guess)
                 else:
                     sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
@@ -99,7 +104,7 @@ class Solver:
         return (sigma, v)
 
     def iterate_solver(
-        self, Ns, mode=0, tol=1e-6, atol=1e-6, verbose=False, guess_tol=0.1
+        self, Ns, mode=0, tol=1e-6, atol=1e-16, verbose=False, guess_tol=0.1
     ):
         """
         Iteratively call the solve method with increasing grid resolution, N.
@@ -175,8 +180,13 @@ class Solver:
     def keep_result(self, sigma, vec, mode):
         import numpy as np
 
+        try:
+            do_gen_evp = self.system.do_gen_evp
+        except AttributeError:
+            do_gen_evp = False
+
         # Store result
-        if all([self.system.boundaries]):
+        if all(self.system.boundaries) and not do_gen_evp:
             # Add zeros at both ends of the solution
             self.system.result = {
                 var: np.hstack(
@@ -207,7 +217,12 @@ class Solver:
         variables = self.system.variables
         boundaries = self.system.boundaries
 
-        if all([boundaries]):
+        try:
+            do_gen_evp = self.system.do_gen_evp
+        except AttributeError:
+            do_gen_evp = False
+
+        if all((boundaries)) and not do_gen_evp:
             # If all boundaries are true (i.e. values are zero there)
             # then we can solve standard evp instead of a generalized evp.
             rows = []
@@ -219,10 +234,9 @@ class Solver:
                         [mat[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
                     )
                 )
-            mat1 = np.concatenate(rows, axis=0)
+            mat1 = np.array(np.concatenate(rows, axis=0), dtype="complex128")
 
         else:
-
             # Construct matrix mat1
             mat1 = np.zeros((dim * NN, dim * NN), dtype="complex128")
 
@@ -231,7 +245,7 @@ class Solver:
                 equation = equation.split("=")[1]
                 mats = self._find_submatrices(equation)
                 for i, variable in enumerate(variables):
-                    if boundaries is not None:
+                    if any(boundaries):
                         self._set_submatrix(
                             mat1, mats[i], j + 1, i + 1, boundaries[j]
                         )
@@ -266,7 +280,7 @@ class Solver:
                 self._set_submatrix(mat2, mats[i], j + 1, i + 1, False)
         self.mat2 = mat2
 
-        if boundaries is not None:
+        if any(boundaries):
             for j, equation in enumerate(equations):
                 if boundaries[j]:
                     self._set_boundary(j + 1)

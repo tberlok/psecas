@@ -49,7 +49,7 @@ class KelvinHelmholtzUniform():
                        r'$\delta v_z$', r'$\delta T$']
 
         # Boundary conditions
-        self.boundaries = None
+        self.boundaries = [False, False, False, False, False]
 
         # Number of equations in system
         self.dim = len(self.variables)

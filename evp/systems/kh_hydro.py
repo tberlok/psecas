@@ -46,7 +46,7 @@ class KelvinHelmholtzHydroOnly():
                        r'$\delta v_z$', r'$\delta T$']
 
         # Boundary conditions
-        self.boundaries = None
+        self.boundaries = [False, False, False, False]
 
         # String used for eigenvalue (do not use lambda!)
         self.eigenvalue = 'sigma'

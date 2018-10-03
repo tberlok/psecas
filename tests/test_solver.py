@@ -98,7 +98,7 @@ def test_channel(show=False, verbose=False):
     if show:
         plt.show()
 
-    np.testing.assert_allclose(results, checks, atol=1e-6)
+    np.testing.assert_allclose(results, checks, rtol=1e-6)
 
 
 if __name__ == '__main__':

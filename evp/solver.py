@@ -47,7 +47,7 @@ class Solver:
         self._get_matrix2()
 
         if guess is None:
-            if boundaries is None or all(boundaries):
+            if boundaries is None or all([boundaries]):
                 # Solve a standard EVP
                 # TODO: Invert mat2 if it is diagonal but not eye.
                 E, V = eig(self.mat1)
@@ -73,7 +73,7 @@ class Solver:
                 # from numpy.linalg import pinv as inv
                 from numpy.linalg import inv
 
-                if boundaries is None or all(boundaries):
+                if boundaries is None or all([boundaries]):
                     OPinv = inv(
                         self.mat1 - guess * np.eye(self.mat1.shape[0])
                     )
@@ -84,7 +84,7 @@ class Solver:
                 smat = sparse.csr_matrix(self.mat1)
                 sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
             else:
-                if boundaries is None or all(boundaries):
+                if boundaries is None or all([boundaries]):
                     sigma, v = eigs(self.mat1, k=1, sigma=guess)
                 else:
                     sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
@@ -176,7 +176,7 @@ class Solver:
         import numpy as np
 
         # Store result
-        if all(self.system.boundaries):
+        if all([self.system.boundaries]):
             # Add zeros at both ends of the solution
             self.system.result = {
                 var: np.hstack(
@@ -207,7 +207,7 @@ class Solver:
         variables = self.system.variables
         boundaries = self.system.boundaries
 
-        if all(boundaries):
+        if all([boundaries]):
             # If all boundaries are true (i.e. values are zero there)
             # then we can solve standard evp instead of a generalized evp.
             rows = []

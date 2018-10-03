@@ -34,12 +34,16 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
         plt.show()
 
 
-def get_2Dmap(system, var, xmin, xmax, Nx, Nz):
+def get_2Dmap(system, var, xmin, xmax, Nx, Nz, zmin=None, zmax=None, time=0):
     import numpy as np
     dx = (xmax-xmin)/Nx
     xg = (0.5 + np.arange(Nx))*dx
-    dz = (system.grid.zmax-system.grid.zmin)/Nz
-    zg = (0.5 + np.arange(Nz))*dz
+
+    if zmin is None or zmax is None:
+        zmin = system.grid.zmin
+        zmax = system.grid.zmax
+    dz = (zmax - zmin) / Nz
+    zg = (0.5 + np.arange(Nz)) * dz + zmin
     xx, zz = np.meshgrid(xg, zg)
 
     # Wavenumber
@@ -49,6 +53,10 @@ def get_2Dmap(system, var, xmin, xmax, Nx, Nz):
 
     def return_real_ampl(f, x):
         return (f.real*2*np.cos(kx*x) - f.imag*2*np.sin(kx*x))
+
+    def return_real_ampl(f, x):
+        """Hardcode to the sigma notation..."""
+        return (2*f*np.exp(1j*kx*x + system.result['sigma']*time)).real
 
     # Interpolate onto z-grid
     if type(var) is str:
@@ -83,7 +91,7 @@ def save_system(system, filename):
     pickle.dump(system, open(filename, 'wb'))
 
 
-def write_athena(system, Nz, Lz, path=None):
+def write_athena(system, Nz, Lz, path=None, name=None):
     """
     Interpolate theory onto grid in Athena
     """
@@ -100,6 +108,9 @@ def write_athena(system, Nz, Lz, path=None):
     if path is None:
         path = './'
 
+    if name is None:
+        name = 'Pertubations'
+
     # Calculate and store imaginary part
     perturb = []
     for key in system.variables:
@@ -114,7 +125,7 @@ def write_athena(system, Nz, Lz, path=None):
         perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
-    np.savetxt(path + 'imagPerturbations{}.txt'.format(Nz), perturb,
+    np.savetxt(path + 'imag' + name + '{}.txt'.format(Nz), perturb,
                delimiter="\t", newline="\n", fmt="%1.16e")
 
     # Calculate and store real part
@@ -130,5 +141,5 @@ def write_athena(system, Nz, Lz, path=None):
         perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
-    np.savetxt(path + 'realPerturbations{}.txt'.format(Nz), perturb,
+    np.savetxt(path + 'real' + name + '{}.txt'.format(Nz), perturb,
                delimiter="\t", newline="\n", fmt="%1.16e")

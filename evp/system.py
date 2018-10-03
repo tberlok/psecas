@@ -1,8 +1,9 @@
-class System():
+class System:
     """
     Dedalus style initialization of an EVP problem.
     This will be useful for people for comparing with Dedalus.
     """
+
     def __init__(self, grid, variables, eigenvalue):
         self.equations = []
         self.boundaries = []

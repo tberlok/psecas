@@ -81,7 +81,7 @@ class KelvinHelmholtzHydroOnly():
         self._delta = value
         self.make_background()
 
-    def make_background(self, zg=None):
+    def make_background(self, return_dict=False):
         import sympy as sym
         import numpy as np
         from sympy import tanh, diff, lambdify, symbols
@@ -90,9 +90,6 @@ class KelvinHelmholtzHydroOnly():
         u0 = self.u0
         delta = self.delta
 
-        # Use grid as default
-        if zg is None:
-            zg = self.grid.zg
         globals().update(self.__dict__)
 
         # Define Background Functions
@@ -110,14 +107,32 @@ class KelvinHelmholtzHydroOnly():
         dvdz_sym = sym.diff(v_sym, z)
         d2vdz_sym = sym.diff(dvdz_sym, z)
 
-        # Analytic equilibrium functions evaluated at zg
-        ones = np.ones_like(zg)
-        self.T = ones*lambdify(z, T_sym)(zg)
-        self.rho = ones*lambdify(z, rho_sym)(zg)
-        self.p = ones*lambdify(z, p_sym)(zg)
-        self.dpdz = ones*lambdify(z, sym.diff(p_sym, z))(zg)
-        self.dlnTdz = ones*lambdify(z, sym.diff(T_sym, z)/T_sym)(zg)
-        self.dlnrhodz = ones*lambdify(z, sym.diff(rho_sym, z)/rho_sym)(zg)
-        self.v = ones*lambdify(z, v_sym)(zg)
-        self.dvdz = ones*lambdify(z, dvdz_sym)(zg)
-        self.d2vdz = ones*lambdify(z, d2vdz_sym)(zg)
+        T_an = lambdify(z, T_sym)
+        rho_an = lambdify(z, rho_sym)
+        p_an = lambdify(z, p_sym)
+        dpdz_an = lambdify(z, sym.diff(p_sym, z))
+        dlnpdz_an = lambdify(z, sym.diff(p_sym, z)/p_sym)
+        dlnTdz_an = lambdify(z, sym.diff(T_sym, z)/T_sym)
+        dlnrhodz_an = lambdify(z, sym.diff(rho_sym, z)/rho_sym)
+        v_an = lambdify(z, v_sym)
+        dvdz_an = lambdify(z, dvdz_sym)
+        d2vdz_an = lambdify(z, d2vdz_sym)
+
+        # Use grid as default
+        if not return_dict:
+            zg = self.grid.zg
+            # Analytic equilibrium functions evaluated at zg
+            ones = np.ones_like(zg)
+            self.T = ones*T_an(zg)
+            self.rho = ones*rho_an(zg)
+            self.p = ones*p_an(zg)
+            self.dpdz = ones*dpdz_an(zg)
+            self.dlnTdz = ones*dlnTdz_an(zg)
+            self.dlnrhodz = ones*dlnrhodz_an(zg)
+            self.v = ones*v_an(zg)
+            self.dvdz = ones*dvdz_an(zg)
+            self.d2vdz = ones*d2vdz_an(zg)
+            self.cs = np.sqrt(self.p/self.rho)
+            self.dlnpdz = ones*dlnpdz_an(zg)
+        else:
+            return {'T': T_an, 'rho': rho_an, 'v': v_an, 'p': p_an}

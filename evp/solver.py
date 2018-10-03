@@ -1,5 +1,6 @@
-class Solver():
+class Solver:
     """docstring for Solver"""
+
     def __init__(self, grid, system):
         self.grid = grid
         self.system = system
@@ -46,7 +47,7 @@ class Solver():
         self._get_matrix2()
 
         if guess is None:
-            if boundaries is None:
+            if boundaries is None or all(boundaries):
                 # Solve a standard EVP
                 # TODO: Invert mat2 if it is diagonal but not eye.
                 E, V = eig(self.mat1)
@@ -67,18 +68,23 @@ class Solver():
                 print("N: {}, all eigenvalues: {}".format(self.grid.N, sigma))
         else:
             from scipy.sparse.linalg import eigs
+
             if useOPinv:
                 # from numpy.linalg import pinv as inv
                 from numpy.linalg import inv
-                if boundaries is None:
-                    OPinv = inv(self.mat1 - guess*np.eye(self.mat1.shape[0]))
+
+                if boundaries is None or all(boundaries):
+                    OPinv = inv(
+                        self.mat1 - guess * np.eye(self.mat1.shape[0])
+                    )
                 else:
-                    OPinv = inv(self.mat1 - guess*self.mat2)
+                    OPinv = inv(self.mat1 - guess * self.mat2)
                 from scipy import sparse
+
                 smat = sparse.csr_matrix(self.mat1)
                 sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
             else:
-                if boundaries is None:
+                if boundaries is None or all(boundaries):
                     sigma, v = eigs(self.mat1, k=1, sigma=guess)
                 else:
                     sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
@@ -92,8 +98,9 @@ class Solver():
 
         return (sigma, v)
 
-    def iterate_solver(self, Ns, mode=0, tol=1e-6, verbose=False,
-                       guess_tol=0.1):
+    def iterate_solver(
+        self, Ns, mode=0, tol=1e-6, atol=1e-6, verbose=False, guess_tol=0.1
+    ):
         """
         Iteratively call the solve method with increasing grid resolution, N.
         Returns when the relative difference in the eigenvalue is less than
@@ -122,7 +129,7 @@ class Solver():
         (sigma_old, v) = self.solve(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
         (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
-        err = np.abs(sigma_old - sigma_new)/np.abs(sigma_old)
+        err = np.abs(sigma_old - sigma_new) / np.abs(sigma_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
@@ -131,20 +138,22 @@ class Solver():
                 (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (sigma_new, v) = self.solve(sigma_old, mode=mode,
-                                            verbose=verbose)
+                (sigma_new, v) = self.solve(
+                    sigma_old, mode=mode, verbose=verbose
+                )
 
-            err = np.abs(sigma_old - sigma_new)/np.abs(sigma_old)
+            abs_error = np.abs(sigma_old - sigma_new)
+            rel_err = abs_error / np.abs(sigma_old)
             # Converged
-            if err < tol:
-                self.system.result.update({'converged': True})
-                self.system.result.update({'err': err})
+            if rel_err < tol or abs_error < atol:
+                self.system.result.update({"converged": True})
+                self.system.result.update({"err": err})
                 return (sigma_new, v, err)
             # Overwrite old with new
             sigma_old = np.copy(sigma_new)
 
-        self.system.result.update({'converged': False})
-        self.system.result.update({'err': err})
+        self.system.result.update({"converged": False})
+        self.system.result.update({"err": err})
 
         # raise RuntimeError("Did not converge!")
 
@@ -156,43 +165,80 @@ class Solver():
         are sorted from largest to smallest
         """
         import numpy as np
-        E[np.abs(E.real) > 10.] = 0
-        E[np.abs(E.imag) > 10.] = 0
+
+        E[np.abs(E.real) > 10.0] = 0
+        E[np.abs(E.imag) > 10.0] = 0
         # Sort from largest to smallest eigenvalue
         index = np.argsort(np.real(E))[::-1]
         return (E, index)
 
     def keep_result(self, sigma, vec, mode):
+        import numpy as np
 
         # Store result
-        self.system.result = {var: vec[j*self.grid.NN:(j+1)*self.grid.NN]
-                              for j, var in enumerate(self.system.variables)}
-        self.system.result.update({self.system.eigenvalue: sigma,
-                                  'mode': mode})
+        if all(self.system.boundaries):
+            # Add zeros at both ends of the solution
+            self.system.result = {
+                var: np.hstack(
+                    [0.0, vec[j * (self.grid.N - 1) : (j + 1) *
+                     (self.grid.N - 1)], 0.0]
+                )
+                for j, var in enumerate(self.system.variables)
+            }
+        else:
+            self.system.result = {
+                var: vec[j * self.grid.NN : (j + 1) * self.grid.NN]
+                for j, var in enumerate(self.system.variables)
+            }
+        self.system.result.update(
+            {self.system.eigenvalue: sigma, "mode": mode}
+        )
 
     def _get_matrix1(self):
         """
         Calculate the matrix M₂ neded in the solve method.
         """
         import numpy as np
+
         dim = self.system.dim
         NN = self.grid.NN
+        grid = self.grid
         equations = self.system.equations
         variables = self.system.variables
         boundaries = self.system.boundaries
 
-        # Construct matrix mat1
-        mat1 = np.zeros((dim*NN, dim*NN), dtype="complex128")
+        if all(boundaries):
+            # If all boundaries are true (i.e. values are zero there)
+            # then we can solve standard evp instead of a generalized evp.
+            rows = []
+            for j, equation in enumerate(equations):
+                equation = equation.split("=")[1]
+                mats = self._find_submatrices(equation)
+                rows.append(
+                    np.concatenate(
+                        [mat[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
+                    )
+                )
+            mat1 = np.concatenate(rows, axis=0)
 
-        for j, equation in enumerate(equations):
-            # Evaluate RHS of equation
-            equation = equation.split('=')[1]
-            mats = self._find_submatrices(equation)
-            for i, variable in enumerate(variables):
-                if boundaries is not None:
-                    self._set_submatrix(mat1, mats[i], j+1, i+1, boundaries[j])
-                else:
-                    self._set_submatrix(mat1, mats[i], j+1, i+1, False)
+        else:
+
+            # Construct matrix mat1
+            mat1 = np.zeros((dim * NN, dim * NN), dtype="complex128")
+
+            for j, equation in enumerate(equations):
+                # Evaluate RHS of equation
+                equation = equation.split("=")[1]
+                mats = self._find_submatrices(equation)
+                for i, variable in enumerate(variables):
+                    if boundaries is not None:
+                        self._set_submatrix(
+                            mat1, mats[i], j + 1, i + 1, boundaries[j]
+                        )
+                    else:
+                        self._set_submatrix(
+                            mat1, mats[i], j + 1, i + 1, False
+                        )
 
         self.mat1 = mat1
 
@@ -201,6 +247,7 @@ class Solver():
         Calculate the matrix M₂ neded in the solve method.
         """
         import numpy as np
+
         dim = self.system.dim
         NN = self.grid.NN
         sys = self.system
@@ -208,21 +255,21 @@ class Solver():
         variables = sys.variables
         boundaries = sys.boundaries
 
-        mat2 = np.zeros((dim*NN, dim*NN), dtype="complex128")
+        mat2 = np.zeros((dim * NN, dim * NN), dtype="complex128")
 
         for j, equation in enumerate(equations):
             # Evaluate LHS of equation
-            equation = equation.split('=')[0]
-            equation = self._var_replace(equation, sys.eigenvalue, '1.0')
+            equation = equation.split("=")[0]
+            equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation)
             for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i], j+1, i+1, False)
+                self._set_submatrix(mat2, mats[i], j + 1, i + 1, False)
         self.mat2 = mat2
 
         if boundaries is not None:
             for j, equation in enumerate(equations):
                 if boundaries[j]:
-                    self._set_boundary(j+1)
+                    self._set_boundary(j + 1)
 
     def _var_replace(self, eq, var, new):
         """
@@ -244,14 +291,14 @@ class Solver():
                 substitute = True
                 # Check if character to the left is a letter
                 if pos > 0:
-                    if eq[pos-1].isalpha():
+                    if eq[pos - 1].isalpha():
                         substitute = False
                 # Check if character to the right is a letter
                 if pos + len(var) < len(eq):
-                    if eq[pos+len(var)].isalpha():
+                    if eq[pos + len(var)].isalpha():
                         substitute = False
                 if substitute:
-                    eq = eq[:pos] + new + eq[pos+len(var):]
+                    eq = eq[:pos] + new + eq[pos + len(var) :]
                 # Increment pos to prevent the function from repeatedly
                 # finding the same occurrence of var
                 else:
@@ -271,25 +318,25 @@ class Solver():
         mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
 
         if verbose:
-            print('\nParsing equation:', eq)
+            print("\nParsing equation:", eq)
 
         for i, var in enumerate(self.system.variables):
             if var in eq:
                 variables_t = list(np.copy(self.system.variables))
                 eq_t = eq
-                der = 'd' + grid.z + '('
-                eq_t = eq_t.replace(der + der + var + '))', 'grid.d2.T')
-                eq_t = eq_t.replace(der + var + ')', 'grid.d1.T')
-                eq_t = self._var_replace(eq_t, var, 'grid.d0.T')
-                eq_t = self._var_replace(eq_t, grid.z, 'grid.zg')
+                der = "d" + grid.z + "("
+                eq_t = eq_t.replace(der + der + var + "))", "grid.d2.T")
+                eq_t = eq_t.replace(der + var + ")", "grid.d1.T")
+                eq_t = self._var_replace(eq_t, var, "grid.d0.T")
+                eq_t = self._var_replace(eq_t, grid.z, "grid.zg")
 
                 variables_t.remove(var)
                 for var2 in variables_t:
-                    eq_t = eq_t.replace('dz(dz(' + var2 + '))', '0.0')
-                    eq_t = eq_t.replace('dz(' + var2 + ')', '0.0')
-                    eq_t = self._var_replace(eq_t, var2, '0.0')
+                    eq_t = eq_t.replace("dz(dz(" + var2 + "))", "0.0")
+                    eq_t = eq_t.replace("dz(" + var2 + ")", "0.0")
+                    eq_t = self._var_replace(eq_t, var2, "0.0")
                 if verbose:
-                    print('\nEvaluating expression:', eq_t)
+                    print("\nEvaluating expression:", eq_t)
                 mats[i] = eval(eq_t).T
 
         return mats
@@ -307,9 +354,11 @@ class Solver():
             if eq_n == var_n:
                 submat[0, 0] = 1
                 submat[N, N] = 1
-        mat1[(eq_n-1)*NN:eq_n*NN, (var_n-1)*NN:var_n*NN] = submat
+        mat1[
+            (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
+        ] = submat
 
     def _set_boundary(self, var_n):
         NN = self.grid.NN
-        self.mat2[(var_n-1)*NN, (var_n-1)*NN] = 0.0
-        self.mat2[var_n*NN-1, var_n*NN-1] = 0.0
+        self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
+        self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0

@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/tberlok/evp/tree/master.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/evp/tree/master)
+[![CircleCI](https://circleci.com/gh/tberlok/freja.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/freja)
 # Introduction
 
 This github repository contains a collection of methods for solving
@@ -44,8 +44,7 @@ An overview of various grid types is shown on page 11 in the book by
 
 <img src="images/boyd_overview.png" width="300">
 
-The code currently has all the grids mentioned on this figure except for
-Legendre polynomials. We use ([a fork](https://github.com/tberlok/dmsuite))
+The code currently has all the grids mentioned on this figure. We use ([a fork](https://github.com/tberlok/dmsuite))
 of a Python version of
 
 J. A. C. Weidemann and S. C. Reddy, A MATLAB Differentiation Matrix Suite,

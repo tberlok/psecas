@@ -1,5 +1,5 @@
 from freja import Solver, ChebyshevRationalGrid
-from freja.systems.kh_hydro_slab import KelvinHelmholtzHydroOnlySlab
+from freja.systems.kh_hydro_sheet import KelvinHelmholtzHydroOnlySlab
 from freja import plot_solution
 import numpy as np
 import matplotlib.pyplot as plt

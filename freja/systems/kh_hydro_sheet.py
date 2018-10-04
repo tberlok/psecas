@@ -5,7 +5,7 @@ class KelvinHelmholtzHydroOnlySlab:
     The equilibrium changes sign at z=0 and is not periodic.
     """
 
-    def __init__(self, grid, u0, delta, kx, a=0.147):
+    def __init__(self, grid, u0, delta, kx, a=0.05):
 
         self._u0 = u0
         self._delta = delta
@@ -85,8 +85,8 @@ class KelvinHelmholtzHydroOnlySlab:
         globals().update(self.__dict__)
 
         # Define Background Functions
-        v_sym = u0 * (1.0 + tanh(z / a)) / 2.0
-        rho_sym = rho0 * (1.0 + tanh(-z / a)) * (delta - 1) / 2 + 1
+        v_sym = u0 * (tanh(z / a))
+        rho_sym = rho0 + rho0 * (1 + tanh(-z / a)) * delta / 2
 
         dvdz_sym = diff(v_sym, z)
         d2vdz_sym = diff(dvdz_sym, z)

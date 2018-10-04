@@ -40,7 +40,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
 
     solver = Solver(grid, system)
 
-    Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
+    Ns = np.hstack((np.arange(2, 16)*32, np.arange(2, 12)*64))
     omega, v, err = solver.iterate_solver(Ns, tol=1e-5, verbose=verbose)
 
     if show:

@@ -14,16 +14,17 @@ Kn0 = 200
 
 system = MagnetoThermalInstability(grid, beta, Kn0, only_interior=True)
 
-kx = 2*np.pi*2
+kx = 2 * np.pi * 2
 mti = Solver(grid, system, kx)
 
-Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
+Ns = np.hstack((np.arange(1, 4) * 32, np.arange(2, 12) * 64))
 omega, v, err = mti.iterate_solver2(Ns, i=2, tol=1e-8)
 # mti.solver(i=5)
 
 
 def interpolate(z, f):
     from numpy.polynomial.chebyshev import chebfit, chebval
+
     c, res = chebfit(grid.zg, f, deg=grid.N, full=True)
     # c = chebfit(grid.zg, f, deg=grid.N, full=False)
     return chebval(z, c)
@@ -31,7 +32,7 @@ def interpolate(z, f):
 
 y = mti.result['drho'].real
 
-z = np.linspace(grid.zmin, grid.zmax-0.01, 1000)
+z = np.linspace(grid.zmin, grid.zmax - 0.01, 1000)
 
 plt.figure(1)
 plt.clf()

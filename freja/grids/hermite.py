@@ -16,11 +16,12 @@ class HermiteGrid(Grid):
         The domain is in theory [-∞, ∞] but in practice the minimum and
         maximum values of the grid depend on both N and C.
     """
-    def __init__(self, N, C=1, z='z'):
+
+    def __init__(self, N, C=1, z="z"):
         self._observers = []
 
         self.maxN = 245
-        msg = 'It appears that dmsuite cannot handle N larger than {}'
+        msg = "It appears that dmsuite cannot handle N larger than {}"
         assert N <= self.maxN, msg.format(self.maxN)
 
         self._N = N
@@ -41,7 +42,7 @@ class HermiteGrid(Grid):
 
     @N.setter
     def N(self, value):
-        msg = 'N = {} requested. Maximum allowed is {}'
+        msg = "N = {} requested. Maximum allowed is {}"
         assert value <= self.maxN, msg.format(value, self.maxN)
         self._N = value
         self.make_grid()
@@ -65,12 +66,13 @@ class HermiteGrid(Grid):
 
     def make_grid(self):
         import numpy as np
+
         # from numpy.polynomial import Hermite as H
         self.NN = self.N
 
         from dmsuite import herdif
 
-        zg, D = herdif(self.NN, 2, 1/self.C)
+        zg, D = herdif(self.NN, 2, 1 / self.C)
 
         self.zg = zg
         self.d0 = np.eye(self.NN)
@@ -87,6 +89,7 @@ class HermiteGrid(Grid):
         # c, res = hermfit(self.zg, f, deg=self.N, full=True)
         # return hermval(z, c)
         from scipy.interpolate import barycentric_interpolate
+
         return barycentric_interpolate(self.zg, f, z)
 
 
@@ -96,19 +99,22 @@ def test_hermite_differentation(show=False):
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval
-        return hermval(x, c)*np.exp(-x**2/2)
+
+        return hermval(x, c) * np.exp(-x ** 2 / 2)
 
     def dpsi(x, c):
         from numpy.polynomial.hermite import hermval, hermder
-        yp = hermval(x, hermder(c))*np.exp(-x**2/2) - x*psi(x, c)
+
+        yp = hermval(x, hermder(c)) * np.exp(-x ** 2 / 2) - x * psi(x, c)
         return yp
 
     def d2psi(x, c):
         """Second derivative of psi"""
         from numpy.polynomial.hermite import hermval, hermder
-        yp = hermval(x, hermder(hermder(c)))*np.exp(-x**2/2)
-        yp += - x*hermval(x, hermder(c))*np.exp(-x**2/2)
-        yp += - psi(x, c) - x*dpsi(x, c)
+
+        yp = hermval(x, hermder(hermder(c))) * np.exp(-x ** 2 / 2)
+        yp += -x * hermval(x, hermder(c)) * np.exp(-x ** 2 / 2)
+        yp += -psi(x, c) - x * dpsi(x, c)
         return yp
 
     N = 245
@@ -123,12 +129,13 @@ def test_hermite_differentation(show=False):
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(1)
         plt.clf()
         fig, axes = plt.subplots(num=1, nrows=2)
         axes[0].set_title("Differentation with matrix (Hermite)")
-        axes[0].plot(grid.zg, yp_exac, '-', grid.zg, yp_num, '--')
-        axes[1].plot(grid.zg, ypp_exac, '-', grid.zg, ypp_num, '--')
+        axes[0].plot(grid.zg, yp_exac, "-", grid.zg, yp_num, "--")
+        axes[1].plot(grid.zg, ypp_exac, "-", grid.zg, ypp_num, "--")
         for ax in axes:
             ax.set_xlim(-15, 15)
         axes[0].set_ylim(-15, 15)
@@ -146,7 +153,8 @@ def test_hermite_interpolation(show=False):
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval
-        return hermval(x, c)*np.exp(-x**2/2)
+
+        return hermval(x, c) * np.exp(-x ** 2 / 2)
 
     N = 200
     grid = HermiteGrid(N)
@@ -161,12 +169,13 @@ def test_hermite_interpolation(show=False):
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(2)
         plt.clf()
         plt.title("Interpolation with Hermite")
-        plt.plot(z, y_fine, '-')
-        plt.plot(z, y_interpolated, '--')
-        plt.plot(grid.zg, y, '+')
+        plt.plot(z, y_fine, "-")
+        plt.plot(z, y_interpolated, "--")
+        plt.plot(grid.zg, y, "+")
         plt.xlim(-15, 15)
         plt.ylim(-5, 10)
         plt.show()
@@ -175,6 +184,6 @@ def test_hermite_interpolation(show=False):
     return (y_fine, y_interpolated)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_hermite_differentation(show=True)
     test_hermite_interpolation(show=True)

@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from freja import Solver, System
-from freja import ChebyshevExtremaGrid, ChebyshevRootsGrid, LegendreExtremaGrid
+from freja import (
+    ChebyshevExtremaGrid,
+    ChebyshevRootsGrid,
+    LegendreExtremaGrid,
+)
 
 """
 Solve the Schrödinger equation
@@ -53,8 +57,9 @@ modes = 5
 # Create figure
 plt.figure(1)
 plt.clf()
-fig, axes = plt.subplots(num=1, ncols=modes, nrows=3, sharey=True,
-                         sharex=True)
+fig, axes = plt.subplots(
+    num=1, ncols=modes, nrows=3, sharey=True, sharex=True
+)
 
 for j, grid in enumerate(grids):
     # Create system
@@ -72,7 +77,9 @@ for j, grid in enumerate(grids):
     for mode in range(modes):
         E, vec = solver.solve(mode=mode)
         # Plottting
-        axes[j, mode].set_title(r"$E/E_0 = ${:1.5f}".format(E.real/np.pi**2*2))
+        axes[j, mode].set_title(
+            r"$E/E_0 = ${:1.5f}".format(E.real / np.pi ** 2 * 2)
+        )
         axes[j, mode].plot(z, grid.interpolate(z, system.result['phi'].real))
         axes[j, mode].plot(z, grid.interpolate(z, system.result['phi'].imag))
         # axes[j, mode].set_ylim(-1, 1)

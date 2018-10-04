@@ -1,4 +1,4 @@
-class Channel():
+class Channel:
     """Linearized equations for channel mode."""
 
     def __init__(self, grid):
@@ -8,9 +8,9 @@ class Channel():
         self.grid.bind_to(self.make_background)
 
         # Variables to solve for
-        self.variables = ['f']
+        self.variables = ["f"]
 
-        self.labels = [r'$f(z)$']
+        self.labels = [r"$f(z)$"]
 
         # Boundary conditions
         self.boundaries = [True]
@@ -26,7 +26,7 @@ class Channel():
         self.dim = len(self.variables)
 
         # String used for eigenvalue (do not use lambda!)
-        self.eigenvalue = 'sigma'
+        self.eigenvalue = "sigma"
 
         # Equations
         eq1 = "-h*sigma*f = 1*dr(dr(f)) +r*dr(f)"
@@ -41,4 +41,4 @@ class Channel():
         zg = self.grid.zg
 
         # Define Background Functions
-        self.h = np.exp(-zg**2/2)
+        self.h = np.exp(-zg ** 2 / 2)

@@ -39,7 +39,7 @@ if True:
         omega_vec.append(omega)
         print(kx, omega)
         t2 = time.time()
-        print("Solver took {} seconds".format(t2-t1))
+        print("Solver took {} seconds".format(t2 - t1))
     omega_vec = np.array(omega_vec)
 
     plt.figure(1)
@@ -58,7 +58,7 @@ if False:
         system = KelvinHelmholtzHydroOnly(grid, u0=1.0, delta=1.0, kx=kx)
         solver = Solver(grid, system)
 
-        Ns = np.hstack((np.arange(1, 5)*16, np.arange(3, 12)*32))
+        Ns = np.hstack((np.arange(1, 5) * 16, np.arange(3, 12) * 32))
         omega, v, err = solver.iterate_solver(Ns, verbose=False, tol=1e-6)
 
         return -omega.real
@@ -68,25 +68,27 @@ if False:
 # Create initial conditions for Athena simulation
 if False:
     from freja import write_athena, save_system
+
     kxmax = 3.5128286141291243
     grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)
     system = KelvinHelmholtzHydroOnly(grid, u0=1.0, delta=1.0, kx=kxmax)
     solver = Solver(grid, system)
 
-    Ns = np.hstack((np.arange(1, 5)*16, np.arange(3, 12)*32))
+    Ns = np.hstack((np.arange(1, 5) * 16, np.arange(3, 12) * 32))
     omega, v, err = solver.iterate_solver(Ns, verbose=False, tol=1e-6)
 
     # Write files for loading into Athena
     # write_athena(system, Nz=256, Lz=2.0)
 
     # Write directly to the Athena directory
-    write_athena(system, Nz=256, Lz=2.0,
-                 path='/Users/berlok/codes/athena/bin/')
+    write_athena(
+        system, Nz=256, Lz=2.0, path='/Users/berlok/codes/athena/bin/'
+    )
 
     save_system(system, '/Users/berlok/codes/athena/bin/kh-with-delta.p')
 
     plt.figure(1)
     plt.plot(kxmax, omega.real, '+')
 
-    Lx = 2*np.pi/system.kx
+    Lx = 2 * np.pi / system.kx
     print(Lx)

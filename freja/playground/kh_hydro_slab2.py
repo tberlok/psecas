@@ -7,20 +7,29 @@ N = 88
 
 grid = ChebyshevRationalGrid(N, L=0.2)
 
-u0 = 1.
+u0 = 1.0
 delta = 0.0
 
 system = KelvinHelmholtzHydroOnly(grid, u0, delta, z1=-0.5, z2=0.5)
 system.boundaries = [True, True, True, True]
 
-kx = 2.
+kx = 2.0
 kh = Solver(grid, system, kx)
 
 omega, v = kh.solver()
-result = {var: v[j*grid.NN: (j+1)*grid.NN] for j,
-          var in enumerate(system.variables)}
-result.update({'omega': omega, 'kx': kx, 'zg': grid.zg,
-               'variables': system.variables, 'mode': 0})
+result = {
+    var: v[j * grid.NN : (j + 1) * grid.NN]
+    for j, var in enumerate(system.variables)
+}
+result.update(
+    {
+        'omega': omega,
+        'kx': kx,
+        'zg': grid.zg,
+        'variables': system.variables,
+        'mode': 0,
+    }
+)
 
 # Save with numpy npz
 np.savez('test.npz', **result)
@@ -36,6 +45,7 @@ pickle.dump(grid, open('grid.p', 'wb'))
 
 def plot_solution(sol, filename=None, n=1, smooth=True):
     from freja import setup
+
     pylab = setup('ps')
     import matplotlib.pyplot as plt
 
@@ -46,15 +56,17 @@ def plot_solution(sol, filename=None, n=1, smooth=True):
     for j, var in enumerate(sol['variables']):
         if smooth:
             z = np.linspace(grid.zmin, grid.zmax, 2000)
-            axes[j].plot(z, grid.interpolate(z, sol[var].real),
-                         'C0', label='Real')
-            axes[j].plot(z, grid.interpolate(z, sol[var].imag),
-                         'C1', label='Imag')
+            axes[j].plot(
+                z, grid.interpolate(z, sol[var].real), 'C0', label='Real'
+            )
+            axes[j].plot(
+                z, grid.interpolate(z, sol[var].imag), 'C1', label='Imag'
+            )
         else:
             axes[j].plot(sol['zg'], sol[var].real, 'C0+', label='Real')
             axes[j].plot(sol['zg'], sol[var].imag, 'C1+', label='Imag')
         axes[j].set_ylabel(system.labels[j])
-    axes[system.dim-1].set_xlabel(r"$z$")
+    axes[system.dim - 1].set_xlabel(r"$z$")
     axes[0].set_title(title.format(sol['omega'], sol['kx'], sol['m']))
     axes[0].legend(frameon=False)
 

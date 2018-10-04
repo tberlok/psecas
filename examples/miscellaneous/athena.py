@@ -21,7 +21,7 @@ system = KelvinHelmholtzUniform(grid, beta=1e3, nu=1e-2, kx=kx)
 solver = Solver(grid, system)
 
 # Iteratively solve
-Ns = np.hstack((np.arange(1, 5)*32, np.arange(3, 12)*64))
+Ns = np.hstack((np.arange(1, 5) * 32, np.arange(3, 12) * 64))
 solver.iterate_solver(Ns, verbose=True, tol=1e-10)
 
 # Write files for loading into Athena

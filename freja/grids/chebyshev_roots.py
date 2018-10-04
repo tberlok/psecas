@@ -16,7 +16,8 @@ class ChebyshevRootsGrid(Grid):
        coordinate in your linearized equations.
 
     """
-    def __init__(self, N, zmin, zmax, z='z'):
+
+    def __init__(self, N, zmin, zmax, z="z"):
         super().__init__(N, zmin, zmax, z=z)
 
     def make_grid(self):
@@ -27,25 +28,28 @@ class ChebyshevRootsGrid(Grid):
         L = self.L
         N = self.NN
 
-        factor = L/2
+        factor = L / 2
 
         d1 = np.zeros((N, N))
-        zg = np.cos(np.pi*(2*np.arange(1, N+1)-1)/(2*N))
-        Q = 1 - zg**2
+        zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
+        Q = 1 - zg ** 2
 
-        for ii in range(1, N+1):
-            for jj in range(1, N+1):
+        for ii in range(1, N + 1):
+            for jj in range(1, N + 1):
                 if ii == jj:
-                    d1[ii-1, jj-1] = 0.5*zg[jj-1]/Q[jj-1]
+                    d1[ii - 1, jj - 1] = 0.5 * zg[jj - 1] / Q[jj - 1]
                 else:
-                    d1[ii-1, jj-1] = (-1)**(ii+jj)*np.sqrt(Q[jj-1]/Q[ii-1]) / \
-                                   (zg[ii-1] - zg[jj-1])
+                    d1[ii - 1, jj - 1] = (
+                        (-1) ** (ii + jj)
+                        * np.sqrt(Q[jj - 1] / Q[ii - 1])
+                        / (zg[ii - 1] - zg[jj - 1])
+                    )
 
         d2 = np.dot(d1, d1)
-        self.zg = -(zg - 1)*L/2 + self.zmin
+        self.zg = -(zg - 1) * L / 2 + self.zmin
         self.d0 = np.eye(self.NN)
-        self.d1 = -d1/factor
-        self.d2 = d2/factor**2
+        self.d1 = -d1 / factor
+        self.d2 = d2 / factor ** 2
 
         # Call other objects that depend on the grid
         for callback in self._observers:
@@ -53,6 +57,7 @@ class ChebyshevRootsGrid(Grid):
 
     def interpolate(self, z, f):
         from numpy.polynomial.chebyshev import chebfit, chebval
+
         c, res = chebfit(self.zg, f, deg=self.N, full=True)
         # c = chebfit(grid.zg, f, deg=grid.N, full=False)
         return chebval(z, c)
@@ -68,17 +73,18 @@ def test_chebyshev_differentation(show=False):
     grid = ChebyshevRootsGrid(N, zmin, zmax)
 
     z = grid.zg
-    y = np.exp(z)*np.sin(5*z)
-    yp_exac = np.exp(z)*(np.sin(5*z) + 5*np.cos(5*z))
+    y = np.exp(z) * np.sin(5 * z)
+    yp_exac = np.exp(z) * (np.sin(5 * z) + 5 * np.cos(5 * z))
     yp_num = np.matmul(grid.d1, y)
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(1)
         plt.clf()
         plt.title("Differentation with matrix (ChebyshevRootsGrid)")
-        plt.plot(z, yp_exac, '-')
-        plt.plot(z, yp_num, '--')
+        plt.plot(z, yp_exac, "-")
+        plt.plot(z, yp_num, "--")
         plt.show()
 
     np.testing.assert_allclose(yp_num, yp_exac, atol=1e-16)
@@ -92,34 +98,36 @@ def test_chebyshev_interpolation(show=False):
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval
-        return hermval(x, c)*np.exp(-x**2/2)
+
+        return hermval(x, c) * np.exp(-x ** 2 / 2)
 
     N = 40
     zmin = -1.1
     zmax = 1.5
     grid = ChebyshevRootsGrid(N, zmin, zmax)
 
-    grid_fine = ChebyshevRootsGrid(N*4, zmin, zmax)
+    grid_fine = ChebyshevRootsGrid(N * 4, zmin, zmax)
     z = grid_fine.zg
 
-    y = np.exp(grid.zg)*np.sin(5*grid.zg)
-    y_fine = np.exp(z)*np.sin(5*z)
+    y = np.exp(grid.zg) * np.sin(5 * grid.zg)
+    y_fine = np.exp(z) * np.sin(5 * z)
     y_interpolated = grid.interpolate(z, y)
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(2)
         plt.clf()
         plt.title("Interpolation with Chebyshev")
-        plt.plot(z, y_fine, '-')
-        plt.plot(z, y_interpolated, '--')
-        plt.plot(grid.zg, y, '+')
+        plt.plot(z, y_fine, "-")
+        plt.plot(z, y_interpolated, "--")
+        plt.plot(grid.zg, y, "+")
         plt.show()
 
     np.testing.assert_allclose(y_fine, y_interpolated, atol=1e-12)
     return (y_fine, y_interpolated)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     (yp_num, yp_exac) = test_chebyshev_differentation(show=True)
     (y_fine, y_interpolated) = test_chebyshev_interpolation(show=True)

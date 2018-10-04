@@ -16,11 +16,12 @@ class LaguerreGrid(Grid):
         The domain is in theory [0, ∞] but in practice the minimum and
         maximum values of the grid depend on both N and C.
     """
-    def __init__(self, N, C=1, z='z'):
+
+    def __init__(self, N, C=1, z="z"):
         self._observers = []
 
         self.maxN = 120
-        msg = 'It appears that dmsuite cannot handle N larger than {}'
+        msg = "It appears that dmsuite cannot handle N larger than {}"
         assert N <= self.maxN, msg.format(self.maxN)
 
         self._N = N
@@ -41,7 +42,7 @@ class LaguerreGrid(Grid):
 
     @N.setter
     def N(self, value):
-        msg = 'N = {} requested. Maximum allowed is {}'
+        msg = "N = {} requested. Maximum allowed is {}"
         assert value <= self.maxN, msg.format(value, self.maxN)
         self._N = value
         self.make_grid()
@@ -65,12 +66,13 @@ class LaguerreGrid(Grid):
 
     def make_grid(self):
         import numpy as np
+
         # from numpy.polynomial import Laguerre as H
         self.NN = self.N + 1
 
         from dmsuite import lagdif
 
-        zg, D = lagdif(self.NN, 2, 1/self.C)
+        zg, D = lagdif(self.NN, 2, 1 / self.C)
 
         self.zg = zg
         self.d0 = np.eye(self.NN)
@@ -84,6 +86,7 @@ class LaguerreGrid(Grid):
     def interpolate(self, z, f):
         """"""
         from scipy.interpolate import barycentric_interpolate
+
         return barycentric_interpolate(self.zg, f, z)
 
 
@@ -102,12 +105,13 @@ def test_lagurre_differentation(show=False):
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(1)
         plt.clf()
         fig, axes = plt.subplots(num=1, nrows=2)
         axes[0].set_title("Differentation with matrix (Laguerre)")
-        axes[0].semilogx(grid.zg, yp_exac, '-+', grid.zg, yp_num, '--')
-        axes[1].semilogx(grid.zg, ypp_exac, '-+', grid.zg, ypp_num, '--')
+        axes[0].semilogx(grid.zg, yp_exac, "-+", grid.zg, yp_num, "--")
+        axes[1].semilogx(grid.zg, ypp_exac, "-+", grid.zg, ypp_num, "--")
         plt.show()
 
     np.testing.assert_allclose(yp_num, yp_exac, atol=1e-14)
@@ -131,18 +135,19 @@ def test_lagurre__interpolation(show=False):
 
     if show:
         import matplotlib.pyplot as plt
+
         plt.figure(2)
         plt.clf()
         plt.title("Interpolation with Laguerre")
-        plt.semilogx(z, y_fine, '-')
-        plt.semilogx(z, y_interpolated, '--')
-        plt.semilogx(grid.zg, y, '+')
+        plt.semilogx(z, y_fine, "-")
+        plt.semilogx(z, y_interpolated, "--")
+        plt.semilogx(grid.zg, y, "+")
         plt.show()
 
     np.testing.assert_allclose(y_fine, y_interpolated, atol=1e-16)
     return (y_fine, y_interpolated)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_lagurre_differentation(show=True)
     test_lagurre__interpolation(show=True)

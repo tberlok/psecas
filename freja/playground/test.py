@@ -19,5 +19,5 @@ kh = Solver(grid, system, kx)
 
 omega, v = kh.solver()
 
-Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
+Ns = np.hstack((np.arange(1, 4) * 32, np.arange(2, 12) * 64))
 omega, v, err = kh.iterate_solver2(Ns, tol=1e-8)

@@ -1,4 +1,4 @@
-class KelvinHelmholtzUniform():
+class KelvinHelmholtzUniform:
     """
        Kelvin-Helmholtz instability with anisotropic viscosity and a constant
        magnetic field in the x-direction. The equilibrium is assumed to have
@@ -16,8 +16,10 @@ class KelvinHelmholtzUniform():
        clusters of galaxies: Effects of anisotropic viscosity. Astrophysical
        Journal, 768(2). https://doi.org/10.1088/0004-637X/768/2/175
     """
+
     def __init__(self, grid, beta, nu, kx, u0=1, z1=0.5, z2=1.5, a=0.05):
         import numpy as np
+
         # Parameters that change (TODO: make nu, beta, and chi0 part of this)
         self._u0 = u0
         self.nu = nu
@@ -25,13 +27,13 @@ class KelvinHelmholtzUniform():
 
         self.kx = kx
 
-        self.gamma = 5.0/3
+        self.gamma = 5.0 / 3
         self.p = 1.0
         self.rho = 1.0
         self.mu0 = 1.0
 
-        self.B = np.sqrt(2*self.p/beta)
-        self.va = self.B/np.sqrt(self.mu0*self.rho)
+        self.B = np.sqrt(2 * self.p / beta)
+        self.va = self.B / np.sqrt(self.mu0 * self.rho)
 
         self.grid = grid
         self.grid.bind_to(self.make_background)
@@ -44,9 +46,14 @@ class KelvinHelmholtzUniform():
         self.make_background()
 
         # Variables to solve for
-        self.variables = ['drho', 'dA', 'dvx', 'dvz', 'dT']
-        self.labels = [r'$\delta \rho$', r'$\delta A$', r'$\delta v_x$',
-                       r'$\delta v_z$', r'$\delta T$']
+        self.variables = ["drho", "dA", "dvx", "dvz", "dT"]
+        self.labels = [
+            r"$\delta \rho$",
+            r"$\delta A$",
+            r"$\delta v_x$",
+            r"$\delta v_z$",
+            r"$\delta T$",
+        ]
 
         # Boundary conditions
         self.boundaries = [False, False, False, False, False]
@@ -55,7 +62,7 @@ class KelvinHelmholtzUniform():
         self.dim = len(self.variables)
 
         # String used for eigenvalue (do not use lambda!)
-        self.eigenvalue = 'sigma'
+        self.eigenvalue = "sigma"
 
         # Equations (Careful! No space behind minus
         eq1 = "sigma*drho = -1j*kx*v*drho -1j*kx*dvx -1.0*dz(dvz)"
@@ -77,6 +84,7 @@ class KelvinHelmholtzUniform():
 
     def make_background(self):
         from sympy import tanh, diff, lambdify, symbols
+
         z = symbols("z")
 
         zg = self.grid.zg
@@ -87,7 +95,7 @@ class KelvinHelmholtzUniform():
         a = self.a
 
         # Define Background Functions
-        v_sym = u0*(tanh((z-z1)/a) - tanh((z-z2)/a) - 1.0)
+        v_sym = u0 * (tanh((z - z1) / a) - tanh((z - z2) / a) - 1.0)
 
         dvdz_sym = diff(v_sym, z)
         d2vdz_sym = diff(dvdz_sym, z)

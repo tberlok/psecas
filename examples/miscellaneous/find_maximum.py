@@ -30,15 +30,15 @@ def f(kx, **kwargs):
     solver = Solver(grid, system)
 
     # Iteratively solve
-    Ns = np.hstack((np.arange(1, 5)*16, np.arange(3, 12)*32))
+    Ns = np.hstack((np.arange(1, 5) * 16, np.arange(3, 12) * 32))
     omega, v, err = solver.iterate_solver(Ns, verbose=False, tol=1e-4)
 
     return -omega.real
 
 
-(a, b) = golden_section(f, 3., 6, tol=1e-3, nu=0.0)
-print(a, b, (a+b)/2, -f((a+b)/2))
-(a, b) = golden_section(f, 3., 6, tol=1e-3, nu=1e-2)
-print(a, b, (a+b)/2, -f((a+b)/2))
-(a, b) = golden_section(f, 3., 6, tol=1e-3, nu=1e-1)
-print(a, b, (a+b)/2, -f((a+b)/2))
+(a, b) = golden_section(f, 3.0, 6, tol=1e-3, nu=0.0)
+print(a, b, (a + b) / 2, -f((a + b) / 2))
+(a, b) = golden_section(f, 3.0, 6, tol=1e-3, nu=1e-2)
+print(a, b, (a + b) / 2, -f((a + b) / 2))
+(a, b) = golden_section(f, 3.0, 6, tol=1e-3, nu=1e-1)
+print(a, b, (a + b) / 2, -f((a + b) / 2))

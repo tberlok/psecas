@@ -3,6 +3,7 @@ from freja import Solver, FourierGrid, IO
 from freja.systems.kh_uniform import KelvinHelmholtzUniform
 import time
 from mpi4py import MPI
+
 comm = MPI.COMM_WORLD
 
 """
@@ -27,7 +28,7 @@ comm = MPI.COMM_WORLD
 
 directory = './data/'
 kx_global = np.linspace(3, 4, 5)
-kx_local = kx_global[comm.rank::comm.size]
+kx_local = kx_global[comm.rank :: comm.size]
 
 grid = FourierGrid(N=64, zmin=0, zmax=2)
 system = KelvinHelmholtzUniform(grid, beta=1e4, nu=1e-2, kx=0)
@@ -40,6 +41,6 @@ for i in range(len(kx_local)):
     system.kx = kx_local[i]
     omega, v = solver.solve()
     io.save_system(i)
-    io.log(i, time.time()-t1, 'kx = {:1.4e}'.format(system.kx))
+    io.log(i, time.time() - t1, 'kx = {:1.4e}'.format(system.kx))
 
 io.finished()

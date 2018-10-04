@@ -18,26 +18,36 @@ kx = 3.52615254237
 kh = Solver(grid, system, kx)
 
 omega, v = kh.solver()
-result = {var: v[j*grid.NN:(j+1)*grid.NN] for j,
-          var in enumerate(system.variables)}
-result.update({'omega': omega, 'kx': kx, 'zg': grid.zg,
-               'variables': system.variables, 'mode': 0})
+result = {
+    var: v[j * grid.NN : (j + 1) * grid.NN]
+    for j, var in enumerate(system.variables)
+}
+result.update(
+    {
+        'omega': omega,
+        'kx': kx,
+        'zg': grid.zg,
+        'variables': system.variables,
+        'mode': 0,
+    }
+)
 
 
 def interpolate(z, f):
-    ak = np.fft.rfft(f)*grid.L/grid.N
+    ak = np.fft.rfft(f) * grid.L / grid.N
     ak[0] /= 2
-    kxs = 2*np.pi*np.fft.rfftfreq(grid.N)*grid.N/grid.L
+    kxs = 2 * np.pi * np.fft.rfftfreq(grid.N) * grid.N / grid.L
 
     def to_grid(z):
-        return np.sum(ak*np.exp(1j*z*kxs)).real
+        return np.sum(ak * np.exp(1j * z * kxs)).real
+
     to_grid_v = np.vectorize(to_grid)
     return to_grid_v(z)
 
 
 y = result['dvz'].real
 
-z = np.linspace(grid.zmin, grid.zmax-0.05, 1000)
+z = np.linspace(grid.zmin, grid.zmax - 0.05, 1000)
 
 plt.figure(1)
 plt.clf()

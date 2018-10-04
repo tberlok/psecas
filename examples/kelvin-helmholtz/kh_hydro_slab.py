@@ -14,16 +14,16 @@ import matplotlib.pyplot as plt
 
 grid = ChebyshevRationalGrid(N=32, C=0.2)
 
-u0 = 1.
-delta = 1.
-kx = 4.
+u0 = 1.0
+delta = 1.0
+kx = 4.0
 
 system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta, kx)
 system.boundaries = [True, True, True, True]
 
 solver = Solver(grid, system)
 
-Ns = np.arange(1, 32)*32
+Ns = np.arange(1, 32) * 32
 omega, v, err = solver.iterate_solver(Ns, mode=0, verbose=True)
 
 limits = [-2, 2]

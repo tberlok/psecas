@@ -6,19 +6,22 @@ def setup(backend="pdf"):
 
     if 'matplotlib.backends' in modules:
         from matplotlib import get_backend, interactive
+
         if get_backend() != backend:
             interactive(True)
     else:
         from matplotlib import use
+
         use(backend)
         from matplotlib import rc
+
         columnwidth = 510.0  # Get this from \showthe\columnwidth
         dpi = 72
         aspect = 0.5  # (sqrt(5) - 1)/2
-        figwidth = columnwidth/dpi
+        figwidth = columnwidth / dpi
         fontsize = 10
 
-        rc('figure', figsize=(figwidth, aspect*figwidth), dpi=dpi)
+        rc('figure', figsize=(figwidth, aspect * figwidth), dpi=dpi)
         rc('xtick', direction='out')
         rc('ytick', direction='out')
         rc('axes', labelsize=fontsize, titlesize=fontsize)
@@ -28,14 +31,18 @@ def setup(backend="pdf"):
         rc('ytick', labelsize=fontsize)
         rc('font', family='serif', serif='cm')
         rc('text', usetex=True)
-        rc('text.latex', preamble=[
-          r'\usepackage[T1]{fontenc}',
-          r'\usepackage[english]{babel}',
-          r'\usepackage[utf8]{inputenc}',
-          r'\usepackage{lmodern}',
-          r'\usepackage{microtype}',
-          r'\usepackage{amsmath}',
-          r'\usepackage{bm}'])
+        rc(
+            'text.latex',
+            preamble=[
+                r'\usepackage[T1]{fontenc}',
+                r'\usepackage[english]{babel}',
+                r'\usepackage[utf8]{inputenc}',
+                r'\usepackage{lmodern}',
+                r'\usepackage{microtype}',
+                r'\usepackage{amsmath}',
+                r'\usepackage{bm}',
+            ],
+        )
 
     from matplotlib import is_interactive
 
@@ -63,4 +70,5 @@ def savefig(figure, scriptname):
 
     if backend == 'ps':
         from os import system
+
         system('epstopdf --hires ' + name + '.eps')

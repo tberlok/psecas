@@ -26,7 +26,7 @@ equation = "-sigma*w = y*dy(dy(w)) + dy(w) + (-1/2 - 1/4*y)*w"
 class Example(Solver):
     def sorting_strategy(self, E):
         """Sorting strategy. E is a list of eigenvalues"""
-        E[E.real > 100.] = 0
+        E[E.real > 100.0] = 0
         E[E.real < 1e-1] = 1e5
         index = np.argsort(np.real(E))
         return (E, index)
@@ -45,8 +45,9 @@ modes = 4
 # Create figure
 plt.figure(1)
 plt.clf()
-fig, axes = plt.subplots(num=1, ncols=modes, nrows=2, sharey=True,
-                         sharex=True)
+fig, axes = plt.subplots(
+    num=1, ncols=modes, nrows=2, sharey=True, sharex=True
+)
 
 for j, grid in enumerate(grids):
     # Create system
@@ -58,13 +59,17 @@ for j, grid in enumerate(grids):
     # Create a solver object
     solver = Example(grid, system)
 
-    z = np.logspace(np.log10(grid.zmin+1e-2), np.log10(0.5e2), 4000)
+    z = np.logspace(np.log10(grid.zmin + 1e-2), np.log10(0.5e2), 4000)
     for mode in range(modes):
-        omega, vec = solver.solve(mode=mode+8)
+        omega, vec = solver.solve(mode=mode + 8)
         # Plottting
         axes[j, mode].set_title(r"$\sigma = ${:1.5f}".format(omega.real))
-        axes[j, mode].semilogx(z, grid.interpolate(z, system.result['w'].real))
-        axes[j, mode].semilogx(z, grid.interpolate(z, system.result['w'].imag))
+        axes[j, mode].semilogx(
+            z, grid.interpolate(z, system.result['w'].real)
+        )
+        axes[j, mode].semilogx(
+            z, grid.interpolate(z, system.result['w'].imag)
+        )
         axes[j, mode].set_ylim(-1, 1)
         axes[j, mode].set_xlim(1e-2, grid.zmax)
     axes[j, 0].set_ylabel(type(grid).__name__)

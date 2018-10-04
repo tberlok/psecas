@@ -1,7 +1,8 @@
-class Grid():
+class Grid:
     """
     Base class for grids.
     """
+
     def __init__(self, N, zmin, zmax, z='z'):
         self._observers = []
 
@@ -52,6 +53,7 @@ class Grid():
     def der(self, vec):
         """First derivative of vec defined at zg"""
         import numpy as np
+
         assert type(vec) is np.ndarray
         assert vec.shape[0] == self.NN
         return np.matmul(self.d1, vec)
@@ -59,6 +61,7 @@ class Grid():
     def dder(self, vec):
         """Second derivative of vec defined at zg"""
         import numpy as np
+
         assert type(vec) is np.ndarray
         assert vec.shape[0] == self.NN
         return np.matmul(self.d2, vec)

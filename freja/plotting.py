@@ -1,6 +1,7 @@
 def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     import numpy as np
     from freja import setup
+
     pylab = setup('ps')
     import matplotlib.pyplot as plt
 
@@ -17,15 +18,19 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
                 z = np.linspace(grid.zmin, grid.zmax, 2000)
             else:
                 z = np.linspace(limits[0], limits[1], 2000)
-            axes[j].plot(z, grid.interpolate(z, sol[var].real),
-                         'C0', label='Real')
-            axes[j].plot(z, grid.interpolate(z, sol[var].imag),
-                         'C1', label='Imag')
+            axes[j].plot(
+                z, grid.interpolate(z, sol[var].real), 'C0', label='Real'
+            )
+            axes[j].plot(
+                z, grid.interpolate(z, sol[var].imag), 'C1', label='Imag'
+            )
         axes[j].plot(grid.zg, sol[var].real, 'C0.', label='Real')
         axes[j].plot(grid.zg, sol[var].imag, 'C1.', label='Imag')
         axes[j].set_ylabel(system.labels[j])
-    axes[system.dim-1].set_xlabel(r"$z$")
-    axes[0].set_title(title.format(sol[system.eigenvalue], system.kx, sol['mode']))
+    axes[system.dim - 1].set_xlabel(r"$z$")
+    axes[0].set_title(
+        title.format(sol[system.eigenvalue], system.kx, sol['mode'])
+    )
     axes[0].legend(frameon=False)
 
     if not pylab and filename is not None:
@@ -36,8 +41,9 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
 
 def get_2Dmap(system, var, xmin, xmax, Nx, Nz, zmin=None, zmax=None, time=0):
     import numpy as np
-    dx = (xmax-xmin)/Nx
-    xg = (0.5 + np.arange(Nx))*dx
+
+    dx = (xmax - xmin) / Nx
+    xg = (0.5 + np.arange(Nx)) * dx
 
     if zmin is None or zmax is None:
         zmin = system.grid.zmin
@@ -52,11 +58,13 @@ def get_2Dmap(system, var, xmin, xmax, Nx, Nz, zmin=None, zmax=None, time=0):
     val = np.zeros((Nz, Nx))
 
     def return_real_ampl(f, x):
-        return (f.real*2*np.cos(kx*x) - f.imag*2*np.sin(kx*x))
+        return f.real * 2 * np.cos(kx * x) - f.imag * 2 * np.sin(kx * x)
 
     def return_real_ampl(f, x):
         """Hardcode to the sigma notation..."""
-        return (2*f*np.exp(1j*kx*x + system.result['sigma']*time)).real
+        return (
+            2 * f * np.exp(1j * kx * x + system.result['sigma'] * time)
+        ).real
 
     # Interpolate onto z-grid
     if type(var) is str:
@@ -65,7 +73,7 @@ def get_2Dmap(system, var, xmin, xmax, Nx, Nz, zmin=None, zmax=None, time=0):
     else:
         yr = system.grid.interpolate(zg, var.real)
         yi = system.grid.interpolate(zg, var.imag)
-    y = yr + 1j*yi
+    y = yr + 1j * yi
     for i in range(Nx):
         val[:, i] = return_real_ampl(y, xg[i])
 
@@ -78,12 +86,14 @@ def load_system(filename):
     Output: system object
     """
     import pickle
+
     system = pickle.load(open(filename, 'rb'))
     return system
 
 
 def save_system(system, filename):
     import pickle
+
     # Delete d0, d1 and d2 for storage effieciency
     del system.grid.d0
     del system.grid.d1
@@ -98,9 +108,9 @@ def write_athena(system, Nz, Lz, path=None, name=None):
     import numpy as np
 
     # Grid points where Athena is defined (improve this!)
-    dz = Lz/Nz
-    z = np.arange(dz/2, Nz*dz, dz)
-    znodes = np.arange(0., (Nz+1)*dz, dz)
+    dz = Lz / Nz
+    z = np.arange(dz / 2, Nz * dz, dz)
+    znodes = np.arange(0.0, (Nz + 1) * dz, dz)
 
     grid = system.grid
     result = system.result
@@ -119,14 +129,19 @@ def write_athena(system, Nz, Lz, path=None, name=None):
             perturb.append(y)
 
     if 'dA' in system.variables:
-        znodes = np.arange(0., (Nz+1)*dz, dz)
+        znodes = np.arange(0.0, (Nz + 1) * dz, dz)
         perturb.append(grid.interpolate(znodes, result['dA'].imag))
     else:
         perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
-    np.savetxt(path + 'imag' + name + '{}.txt'.format(Nz), perturb,
-               delimiter="\t", newline="\n", fmt="%1.16e")
+    np.savetxt(
+        path + 'imag' + name + '{}.txt'.format(Nz),
+        perturb,
+        delimiter="\t",
+        newline="\n",
+        fmt="%1.16e",
+    )
 
     # Calculate and store real part
     perturb = []
@@ -141,5 +156,10 @@ def write_athena(system, Nz, Lz, path=None, name=None):
         perturb.append(np.zeros_like(znodes))
 
     perturb = np.transpose(perturb)
-    np.savetxt(path + 'real' + name + '{}.txt'.format(Nz), perturb,
-               delimiter="\t", newline="\n", fmt="%1.16e")
+    np.savetxt(
+        path + 'real' + name + '{}.txt'.format(Nz),
+        perturb,
+        delimiter="\t",
+        newline="\n",
+        fmt="%1.16e",
+    )

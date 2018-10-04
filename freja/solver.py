@@ -191,8 +191,15 @@ class Solver:
             # Add zeros at both ends of the solution
             self.system.result = {
                 var: np.hstack(
-                    [0.0, vec[j * (self.grid.N - 1) : (j + 1) *
-                     (self.grid.N - 1)], 0.0]
+                    [
+                        0.0,
+                        vec[
+                            j
+                            * (self.grid.N - 1) : (j + 1)
+                            * (self.grid.N - 1)
+                        ],
+                        0.0,
+                    ]
                 )
                 for j, var in enumerate(self.system.variables)
             }

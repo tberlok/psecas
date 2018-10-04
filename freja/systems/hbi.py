@@ -7,7 +7,12 @@ class HeatFluxDrivenBuoyancyInstability():
 
        H. N. Latter, M. W. Kunz, 2012, MNRAS, 423, 1964
        The HBI in a quasi-global model of the intracluster medium
+
+       The boundary conditions are not exactly the same as in this paper,
+       i.e., we do not impose a boundary condition on the magnetic field.
+       Improving this is left for future work.
     """
+
     def __init__(self, grid, beta, Kn, kx):
 
         # Problem parameters

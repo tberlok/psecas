@@ -134,12 +134,13 @@ class Solver:
         (sigma_old, v) = self.solve(mode=mode, verbose=verbose)
         self.grid.N = Ns[1]
         (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
-        err = np.abs(sigma_old - sigma_new) / np.abs(sigma_old)
+        a_err = np.abs(sigma_old - sigma_new)
+        r_err = a_err / np.abs(sigma_old)
 
         for i in range(2, len(Ns)):
             self.grid.N = Ns[i]
             # Not a good guess yet
-            if err > guess_tol:
+            if r_err > guess_tol:
                 (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
@@ -147,18 +148,18 @@ class Solver:
                     sigma_old, mode=mode, verbose=verbose
                 )
 
-            abs_error = np.abs(sigma_old - sigma_new)
-            rel_err = abs_error / np.abs(sigma_old)
+            a_err = np.abs(sigma_old - sigma_new)
+            r_err = a_err / np.abs(sigma_old)
             # Converged
-            if rel_err < tol or abs_error < atol:
+            if r_err < tol or a_err < atol:
                 self.system.result.update({"converged": True})
-                self.system.result.update({"err": err})
-                return (sigma_new, v, err)
+                self.system.result.update({"r_err": r_err, "a_err": a_err})
+                return (sigma_new, v, r_err)
             # Overwrite old with new
             sigma_old = np.copy(sigma_new)
 
         self.system.result.update({"converged": False})
-        self.system.result.update({"err": err})
+        self.system.result.update({"r_err": r_err, "a_err": a_err})
 
         # raise RuntimeError("Did not converge!")
 

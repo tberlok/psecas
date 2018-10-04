@@ -41,13 +41,13 @@ def test_kh_uniform_solution(show=False, verbose=False):
     solver = Solver(grid, system)
 
     Ns = np.hstack((np.arange(1, 4)*32, np.arange(2, 12)*64))
-    omega, v, err = solver.iterate_solver(Ns, tol=1e-8, verbose=verbose)
+    omega, v, err = solver.iterate_solver(Ns, tol=1e-5, verbose=verbose)
 
     if show:
         from evp import plot_solution
         plot_solution(system, smooth=True, num=2)
 
-    np.testing.assert_allclose(1.66548246011, omega, atol=1e-8)
+    np.testing.assert_allclose(1.66548246011, omega, atol=1e-5)
     return err
 
 

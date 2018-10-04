@@ -1,6 +1,6 @@
 import numpy as np
-from evp import Solver, FourierGrid, IO
-from evp.systems.kh_uniform import KelvinHelmholtzUniform
+from freja import Solver, FourierGrid, IO
+from freja.systems.kh_uniform import KelvinHelmholtzUniform
 import time
 from mpi4py import MPI
 comm = MPI.COMM_WORLD

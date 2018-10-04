@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from evp import Solver, FourierGrid
-from evp.systems.kh_uniform import KelvinHelmholtzUniform
+from freja import Solver, FourierGrid
+from freja.systems.kh_uniform import KelvinHelmholtzUniform
 from scipy.interpolate import interp1d
 
 N = 128

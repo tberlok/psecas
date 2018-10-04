@@ -1,6 +1,6 @@
 import numpy as np
-from evp import Solver, FourierGrid
-from evp.systems.kh_uniform import KelvinHelmholtzUniform
+from freja import Solver, FourierGrid
+from freja.systems.kh_uniform import KelvinHelmholtzUniform
 
 N = 64
 zmin = 0

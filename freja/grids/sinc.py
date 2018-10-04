@@ -1,4 +1,4 @@
-from evp.grids.grid import Grid
+from freja.grids.grid import Grid
 
 
 class SincGrid(Grid):

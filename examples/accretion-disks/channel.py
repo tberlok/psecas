@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from evp import Solver, ChebyshevRationalGrid
-from evp.systems.channel import Channel
+from freja import Solver, ChebyshevRationalGrid
+from freja.systems.channel import Channel
 
 grid = ChebyshevRationalGrid(N=199, z='r')
 system = Channel(grid)

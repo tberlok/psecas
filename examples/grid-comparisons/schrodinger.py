@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from evp import Solver, System
-from evp import ChebyshevExtremaGrid, ChebyshevRootsGrid, LegendreExtremaGrid
+from freja import Solver, System
+from freja import ChebyshevExtremaGrid, ChebyshevRootsGrid, LegendreExtremaGrid
 
 """
 Solve the Schrödinger equation

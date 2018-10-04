@@ -1,6 +1,6 @@
 import numpy as np
-from evp import Solver, ChebyshevRationalGrid
-from evp.systems.kh_hydro import KelvinHelmholtzHydroOnly
+from freja import Solver, ChebyshevRationalGrid
+from freja.systems.kh_hydro import KelvinHelmholtzHydroOnly
 import pickle
 
 N = 88
@@ -35,7 +35,7 @@ pickle.dump(grid, open('grid.p', 'wb'))
 
 
 def plot_solution(sol, filename=None, n=1, smooth=True):
-    from evp import setup
+    from freja import setup
     pylab = setup('ps')
     import matplotlib.pyplot as plt
 

@@ -1,4 +1,4 @@
-from evp.grids.grid import Grid
+from freja.grids.grid import Grid
 
 
 class FourierGrid(Grid):
@@ -82,7 +82,7 @@ class FourierGrid(Grid):
 def test_fourier_differentation(show=False):
     """Test the differentation routine of FourierGrid"""
     import numpy as np
-    from evp import FourierGrid
+    from freja import FourierGrid
 
     N = 256
     zmin = 0
@@ -112,7 +112,7 @@ def test_fourier_interpolation(show=False):
     """Test the inperpolation routine of FourierGrid"""
     import numpy as np
     import matplotlib.pyplot as plt
-    from evp import FourierGrid
+    from freja import FourierGrid
 
     N = 16
     zmin = 0

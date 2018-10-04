@@ -77,6 +77,6 @@ at the top-level directory.
 Before using the code, the tests should be run to make sure that everything is
 working. From the top-level directory
 ```
-$ pytest tests/ evp/grids/*
+$ pytest tests/ freja/grids/*
 ```
 

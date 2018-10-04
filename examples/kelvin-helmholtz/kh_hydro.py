@@ -1,6 +1,6 @@
 import numpy as np
-from evp import Solver, FourierGrid
-from evp.systems.kh_hydro import KelvinHelmholtzHydroOnly
+from freja import Solver, FourierGrid
+from freja.systems.kh_hydro import KelvinHelmholtzHydroOnly
 import time
 import matplotlib.pyplot as plt
 
@@ -51,7 +51,7 @@ if True:
 
 # Find the kx that gives maximum growth
 if False:
-    from evp import golden_section
+    from freja import golden_section
 
     def f(kx):
         grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)
@@ -67,7 +67,7 @@ if False:
 
 # Create initial conditions for Athena simulation
 if False:
-    from evp import write_athena, save_system
+    from freja import write_athena, save_system
     kxmax = 3.5128286141291243
     grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)
     system = KelvinHelmholtzHydroOnly(grid, u0=1.0, delta=1.0, kx=kxmax)

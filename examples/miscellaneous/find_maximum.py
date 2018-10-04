@@ -1,7 +1,7 @@
 import numpy as np
-from evp import Solver, FourierGrid
-from evp.systems.kh_uniform import KelvinHelmholtzUniform
-from evp import golden_section
+from freja import Solver, FourierGrid
+from freja.systems.kh_uniform import KelvinHelmholtzUniform
+from freja import golden_section
 
 """
     A common task is to find the maximal growth rate as a function of

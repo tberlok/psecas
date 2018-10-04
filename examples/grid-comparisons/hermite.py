@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from evp import Solver, System
-from evp import HermiteGrid, SincGrid, ChebyshevRationalGrid
+from freja import Solver, System
+from freja import HermiteGrid, SincGrid, ChebyshevRationalGrid
 
 """
     Illustration of the behaviour of three different grids on the

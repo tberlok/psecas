@@ -2,8 +2,8 @@
 def test_mti_solution(show=False, verbose=False):
     """Test eigenvalue solver using ChebyshevExtremaGrid"""
     import numpy as np
-    from evp import Solver, ChebyshevExtremaGrid
-    from evp.systems.mti import MagnetoThermalInstability
+    from freja import Solver, ChebyshevExtremaGrid
+    from freja.systems.mti import MagnetoThermalInstability
 
     grid = ChebyshevExtremaGrid(N=64, zmin=0, zmax=1)
 
@@ -17,7 +17,7 @@ def test_mti_solution(show=False, verbose=False):
                                             verbose=verbose)
 
     if show:
-        from evp import plot_solution
+        from freja import plot_solution
         phi = np.arctan(vec[2].imag/vec[2].real)
         solver.keep_result(omega, vec*np.exp(-1j*phi), mode=mode)
 
@@ -31,8 +31,8 @@ def test_mti_solution(show=False, verbose=False):
 def test_kh_uniform_solution(show=False, verbose=False):
     """Test eigenvalue solver using FourierGrid"""
     import numpy as np
-    from evp import Solver, FourierGrid
-    from evp.systems.kh_uniform import KelvinHelmholtzUniform
+    from freja import Solver, FourierGrid
+    from freja.systems.kh_uniform import KelvinHelmholtzUniform
 
     grid = FourierGrid(N=64, zmin=0, zmax=2)
 
@@ -44,7 +44,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
     omega, v, err = solver.iterate_solver(Ns, tol=1e-5, verbose=verbose)
 
     if show:
-        from evp import plot_solution
+        from freja import plot_solution
         plot_solution(system, smooth=True, num=2)
 
     np.testing.assert_allclose(1.66548246011, omega, atol=1e-5)
@@ -54,8 +54,8 @@ def test_kh_uniform_solution(show=False, verbose=False):
 def test_channel(show=False, verbose=False):
     """Test eigenvalue solver using ChebyshevRationalGrid"""
     import numpy as np
-    from evp import Solver, ChebyshevRationalGrid
-    from evp.systems.channel import Channel
+    from freja import Solver, ChebyshevRationalGrid
+    from freja.systems.channel import Channel
 
     grid = ChebyshevRationalGrid(N=199, z='r')
     system = Channel(grid)

@@ -1,6 +1,6 @@
 import numpy as np
-from evp import Solver, ChebyshevRationalGrid, System
-from evp import plot_solution
+from freja import Solver, ChebyshevRationalGrid, System
+from freja import plot_solution
 
 """
     The vertical shear instability in protoplanetary accretion disks.

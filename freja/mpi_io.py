@@ -68,7 +68,7 @@ class IO:
             # pickle.dump(info, open(data_folder+'info.p', 'wb'))
 
             # Start a log file
-            f = open("evp.log", "w")
+            f = open("freja.log", "w")
 
             f.write("Log file for EVP run\n")
             f.write(
@@ -103,7 +103,7 @@ class IO:
     def log(self, i, time, custum_str):
         from mpi4py.MPI import COMM_WORLD as comm
 
-        f = open("evp.log", "a")
+        f = open("freja.log", "a")
         msg = (
             "Solved EVP with "
             + custum_str
@@ -142,7 +142,7 @@ class IO:
             i = datetime.now()
             endtime = i.strftime("%d/%m/%Y at %H:%M:%S")
 
-            f = open("evp.log", "a")
+            f = open("freja.log", "a")
             f.write("\nCalculation ended on " + endtime + "\n")
             m, s = divmod(seconds, 60)
             h, m = divmod(m, 60)
@@ -154,4 +154,4 @@ class IO:
             f.write(msg.format(d, h, m, s))
             f.close()
 
-            subprocess.call("mv evp.log " + self.data_folder, shell=True)
+            subprocess.call("mv freja.log " + self.data_folder, shell=True)

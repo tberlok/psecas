@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from evp import Solver, ChebyshevRationalGrid, System
+from freja import Solver, ChebyshevRationalGrid, System
 
 # Create grid
 grid = ChebyshevRationalGrid(N=199, L=1, z='r')

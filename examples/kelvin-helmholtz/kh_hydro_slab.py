@@ -1,6 +1,6 @@
-from evp import Solver, ChebyshevRationalGrid
-from evp.systems.kh_hydro_slab import KelvinHelmholtzHydroOnlySlab
-from evp import plot_solution
+from freja import Solver, ChebyshevRationalGrid
+from freja.systems.kh_hydro_slab import KelvinHelmholtzHydroOnlySlab
+from freja import plot_solution
 import numpy as np
 import matplotlib.pyplot as plt
 

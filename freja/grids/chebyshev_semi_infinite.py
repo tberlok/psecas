@@ -38,8 +38,6 @@ class ChebyshevTLnGrid(Grid):
 
     @N.setter
     def N(self, value):
-        msg = "N = {} requested. Maximum allowed is {}"
-        assert value <= self.maxN, msg.format(value, self.maxN)
         self._N = value
         self.make_grid()
 

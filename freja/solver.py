@@ -354,8 +354,8 @@ class Solver:
 
                 variables_t.remove(var)
                 for var2 in variables_t:
-                    eq_t = eq_t.replace("dz(dz(" + var2 + "))", "0.0")
-                    eq_t = eq_t.replace("dz(" + var2 + ")", "0.0")
+                    eq_t = eq_t.replace(der + der + var2 + "))", "0.0")
+                    eq_t = eq_t.replace(der + var2 + ")", "0.0")
                     eq_t = self._var_replace(eq_t, var2, "0.0")
                 if verbose:
                     print("\nEvaluating expression:", eq_t)

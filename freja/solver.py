@@ -354,7 +354,27 @@ class Solver:
                     eq_t = self._var_replace(eq_t, var2, "0.0")
                 if verbose:
                     print("\nEvaluating expression:", eq_t)
-                mats[i] = eval(eq_t).T
+                try:
+                    err_msg1 = (
+                        "During the parsing of:\n\n{}\n\n"
+                        "Freja tried to evaluate\n\n{}\n\n"
+                        "while attempting to evaluate the terms with: {}"
+                        "\nThis caused the following error to occur:\n\n"
+                    )
+                    # Evaluate the expression
+                    mats[i] = eval(eq_t).T
+                except NameError as e:
+                    strerror, = e.args
+                    err_msg2 = (
+                        "\n\nThis is likely because the missing variable has"
+                        "\nnot been defined in your systems class or its\n"
+                        "make_background method."
+                    )
+                    raise NameError(
+                        err_msg1.format(eq, eq_t, var) + strerror + err_msg2
+                    )
+                except Exception as e:
+                    raise Exception(err_msg1.format(eq, eq_t, var) + str(e))
 
         return mats
 

@@ -13,7 +13,7 @@ class Solver:
         # boundaries suggest that an evp is sufficient
         self.do_gen_evp = do_gen_evp
 
-    def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
+    def solve(self, useOPinv=True, verbose=False, mode=0):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
 
@@ -34,8 +34,69 @@ class Solver:
 
         Optional parameters
 
-        guess: If a guess is passed scipy's eigs method is used to find a
+        useOPinv (default True): If true, manually calculate OPinv instead of
+        letting eigs do it.
+
+        verbose (default False): print out information about the calculation.
+
+        mode (default 0): mode=0 is the fastest growing, mode=1 the second
+        fastest and so on.
+        """
+        from scipy.linalg import eig
+
+        boundaries = self.system.boundaries
+
+        # Calculate matrix
+        self.get_matrix1()
+        self.get_matrix2()
+
+        if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
+            # Solve a standard EVP
+            E, V = eig(self.mat1)
+        else:
+            # Solve a generalized EVP
+            E, V = eig(self.mat1, self.mat2)
+
+        # Sort the eigenvalues
+        E, index = self.sorting_strategy(E)
+
+        # Choose the eigenvalue mode value only
+        sigma = E[index[mode]]
+        v = V[:, index[mode]]
+
+        # Save all eigenvalues and eigenvectors here
+        self.E = E[index]
+        self.v = V[:, index]
+        if verbose:
+            print("N: {}, all eigenvalues: {}".format(self.grid.N, sigma))
+
+        self.keep_result(sigma, v, mode)
+
+        return (sigma, v)
+
+    def solve_with_guess(self, guess, useOPinv=True, verbose=False, mode=0):
+        """
+        Construct and solve the (generalized) eigenvalue problem (EVP)
+
+            M₁ v = σ M₂ v
+
+        generated with the grid and parameters contained in the system object.
+
+        Here σ is the eigenvalue and v is the eigenmode.
+        Note that M₂ is a diagonal matrix if no boundary conditions are set.
+        In that case the EVP is simply
+
+            M₁ v = σ v
+
+        This method stores a dictionary with the result of the calculation
+        in self.system.result.
+
+        Returns: One eigenvalue and its eigenvector.
+
+        guess: Scipy's eigs method is used to find a
         single eigenvalue in the proximity of the guess.
+
+        Optional parameters
 
         useOPinv (default True): If true, manually calculate OPinv instead of
         letting eigs do it.
@@ -46,7 +107,7 @@ class Solver:
         fastest and so on.
         """
         import numpy as np
-        from scipy.linalg import eig
+        from scipy.sparse.linalg import eigs
 
         boundaries = self.system.boundaries
 
@@ -54,55 +115,31 @@ class Solver:
         self.get_matrix1()
         self.get_matrix2()
 
-        do_gen_evp = self.do_gen_evp
+        if useOPinv:
+            # from numpy.linalg import pinv as inv
+            from numpy.linalg import inv
 
-        if guess is None:
             if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
-                # Solve a standard EVP
-                # TODO: Invert mat2 if it is diagonal but not eye.
-                E, V = eig(self.mat1)
+                OPinv = inv(
+                    self.mat1 - guess * np.eye(self.mat1.shape[0])
+                )
             else:
-                # Solve a generalized EVP
-                E, V = eig(self.mat1, self.mat2)
+                OPinv = inv(self.mat1 - guess * self.mat2)
+            from scipy import sparse
 
-            # Sort the eigenvalues
-            E, index = self.sorting_strategy(E)
-
-            # Choose the eigenvalue mode value only
-            sigma = E[index[mode]]
-            v = V[:, index[mode]]
-            # Save all eigenvalues and eigenvectors here
-            self.E = E[index]
-            self.v = V[:, index]
-            if verbose:
-                print("N: {}, all eigenvalues: {}".format(self.grid.N, sigma))
+            smat = sparse.csr_matrix(self.mat1)
+            sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
         else:
-            from scipy.sparse.linalg import eigs
-
-            if useOPinv:
-                # from numpy.linalg import pinv as inv
-                from numpy.linalg import inv
-
-                if not any(boundaries) or all(boundaries) and not do_gen_evp:
-                    OPinv = inv(
-                        self.mat1 - guess * np.eye(self.mat1.shape[0])
-                    )
-                else:
-                    OPinv = inv(self.mat1 - guess * self.mat2)
-                from scipy import sparse
-
-                smat = sparse.csr_matrix(self.mat1)
-                sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
+            if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
+                sigma, v = eigs(self.mat1, k=1, sigma=guess)
             else:
-                if not any(boundaries) or all(boundaries) and not do_gen_evp:
-                    sigma, v = eigs(self.mat1, k=1, sigma=guess)
-                else:
-                    sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
-            # Convert result from eigs to have same format as result from eig
-            sigma = sigma[0]
-            v = np.squeeze(v)
-            if verbose:
-                print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, sigma))
+                sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
+
+        # Convert result from eigs to have same format as result from eig
+        sigma = sigma[0]
+        v = np.squeeze(v)
+        if verbose:
+            print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, sigma))
 
         self.keep_result(sigma, v, mode)
 
@@ -149,7 +186,7 @@ class Solver:
                 (sigma_new, v) = self.solve(mode=mode, verbose=verbose)
             # Use guess from previous iteration
             else:
-                (sigma_new, v) = self.solve(
+                (sigma_new, v) = self.solve_with_guess(
                     sigma_old, mode=mode, verbose=verbose
                 )
 

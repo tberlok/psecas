@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from freja import Solver, ChebyshevRationalGrid, System
 
 # Create grid
-grid = ChebyshevRationalGrid(N=199, L=1, z='r')
+grid = ChebyshevRationalGrid(N=199, C=1, z='r')
 
 
 # Make a Child of the System class and override the make_background method
@@ -33,7 +33,7 @@ class ChannelSolver(Solver):
 
 
 # Create a solver object
-solver = ChannelSolver(grid, system)
+solver = ChannelSolver(grid, system, do_gen_evp=True)
 
 plt.figure(1)
 plt.clf()

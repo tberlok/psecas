@@ -1,9 +1,17 @@
 class Solver:
     """docstring for Solver"""
 
-    def __init__(self, grid, system):
+    def __init__(self, grid, system, do_gen_evp=False):
+
+        # Grid object
         self.grid = grid
+
+        # System object with linearized equations, parameters and equilibrium.
         self.system = system
+
+        # do_gen_evp (default False) do the full generalized evp even though
+        # boundaries suggest that an evp is sufficient
+        self.do_gen_evp = do_gen_evp
 
     def solve(self, guess=None, useOPinv=True, verbose=False, mode=0):
         """
@@ -43,16 +51,13 @@ class Solver:
         boundaries = self.system.boundaries
 
         # Calculate matrix
-        self._get_matrix1()
-        self._get_matrix2()
+        self.get_matrix1()
+        self.get_matrix2()
 
-        try:
-            do_gen_evp = self.system.do_gen_evp
-        except AttributeError:
-            do_gen_evp = False
+        do_gen_evp = self.do_gen_evp
 
         if guess is None:
-            if not any(boundaries) or all(boundaries) and not do_gen_evp:
+            if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
                 # Solve a standard EVP
                 # TODO: Invert mat2 if it is diagonal but not eye.
                 E, V = eig(self.mat1)
@@ -181,13 +186,8 @@ class Solver:
     def keep_result(self, sigma, vec, mode):
         import numpy as np
 
-        try:
-            do_gen_evp = self.system.do_gen_evp
-        except AttributeError:
-            do_gen_evp = False
-
         # Store result
-        if all(self.system.boundaries) and not do_gen_evp:
+        if all(self.system.boundaries) and not self.do_gen_evp:
             # Add zeros at both ends of the solution
             self.system.result = {
                 var: np.hstack(
@@ -212,7 +212,7 @@ class Solver:
             {self.system.eigenvalue: sigma, "mode": mode}
         )
 
-    def _get_matrix1(self):
+    def get_matrix1(self, verbose=False):
         """
         Calculate the matrix M₂ neded in the solve method.
         """
@@ -225,18 +225,13 @@ class Solver:
         variables = self.system.variables
         boundaries = self.system.boundaries
 
-        try:
-            do_gen_evp = self.system.do_gen_evp
-        except AttributeError:
-            do_gen_evp = False
-
-        if all((boundaries)) and not do_gen_evp:
+        if all((boundaries)) and not self.do_gen_evp:
             # If all boundaries are true (i.e. values are zero there)
             # then we can solve standard evp instead of a generalized evp.
             rows = []
             for j, equation in enumerate(equations):
                 equation = equation.split("=")[1]
-                mats = self._find_submatrices(equation)
+                mats = self._find_submatrices(equation, verbose)
                 rows.append(
                     np.concatenate(
                         [mat[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
@@ -251,7 +246,7 @@ class Solver:
             for j, equation in enumerate(equations):
                 # Evaluate RHS of equation
                 equation = equation.split("=")[1]
-                mats = self._find_submatrices(equation)
+                mats = self._find_submatrices(equation, verbose)
                 for i, variable in enumerate(variables):
                     if any(boundaries):
                         self._set_submatrix(
@@ -264,7 +259,7 @@ class Solver:
 
         self.mat1 = mat1
 
-    def _get_matrix2(self):
+    def get_matrix2(self, verbose=False):
         """
         Calculate the matrix M₂ neded in the solve method.
         """
@@ -283,7 +278,7 @@ class Solver:
             # Evaluate LHS of equation
             equation = equation.split("=")[0]
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
-            mats = self._find_submatrices(equation)
+            mats = self._find_submatrices(equation, verbose)
             for i, variable in enumerate(variables):
                 self._set_submatrix(mat2, mats[i], j + 1, i + 1, False)
         self.mat2 = mat2

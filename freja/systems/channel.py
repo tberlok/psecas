@@ -15,10 +15,6 @@ class Channel:
         # Boundary conditions
         self.boundaries = [True]
 
-        # Do full generalized evp even though boundaries suggest that an evp
-        # is sufficient
-        self.do_gen_evp = True
-
         # Create initial background
         self.make_background()
 

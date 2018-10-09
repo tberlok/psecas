@@ -61,9 +61,7 @@ def test_channel(show=False, verbose=False):
 
     grid = ChebyshevRationalGrid(N=199, z='r')
     system = Channel(grid)
-
-    # kx is weird to have as a parameter here TODO: fix that
-    solver = Solver(grid, system)
+    solver = Solver(grid, system, do_gen_evp=True)
 
     # Number of modes to test
     modes = 3

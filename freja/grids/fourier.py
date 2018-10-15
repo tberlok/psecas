@@ -130,7 +130,6 @@ def test_fourier_differentation(show=False):
 def test_fourier_interpolation(show=False):
     """Test the inperpolation routine of FourierGrid"""
     import numpy as np
-    import matplotlib.pyplot as plt
     from freja import FourierGrid
 
     N = 16
@@ -156,6 +155,7 @@ def test_fourier_interpolation(show=False):
     y_interpolated = grid.interpolate(z, y)
 
     if show:
+        import matplotlib.pyplot as plt
         plt.figure(1)
         plt.clf()
         plt.title("Interpolation with Fourier series")

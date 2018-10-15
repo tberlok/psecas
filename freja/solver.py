@@ -202,6 +202,7 @@ class Solver:
 
         self.system.result.update({"converged": False})
         self.system.result.update({"r_err": r_err, "a_err": a_err})
+        return (sigma_new, v, r_err)
 
         # raise RuntimeError("Did not converge!")
 

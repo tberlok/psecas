@@ -133,6 +133,9 @@ class IO:
         from mpi4py.MPI import COMM_WORLD as comm
         from mpi4py.MPI import Wtime
 
+        # Wait until all processors are done
+        comm.barrier()
+
         seconds = Wtime() - self.wt
         if comm.rank == 0:
             import subprocess

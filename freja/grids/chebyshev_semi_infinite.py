@@ -89,8 +89,7 @@ class ChebyshevTLnGrid(Grid):
 
         Q = (zg_int - 1) ** 2 / (2 * C)
 
-        for jj in range(N):
-            d1[:, jj] = Q * d1_int[:, jj]
+        d1 = Q[:, None] * d1_int
 
         d2 = np.dot(d1, d1)
         self.zg = zg

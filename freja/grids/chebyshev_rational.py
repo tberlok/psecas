@@ -88,8 +88,7 @@ class ChebyshevRationalGrid(Grid):
 
         zg = C * zg_int / np.sqrt(Q)
 
-        for jj in range(N):
-            d1[:, jj] = np.sqrt(Q) * Q * d1_int[:, jj] / C
+        d1 = d1_int / C * Q[:, None]**(3/2)
 
         d2 = np.dot(d1, d1)
         self.zg = zg

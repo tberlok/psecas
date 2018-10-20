@@ -38,17 +38,13 @@ class LegendreExtremaGrid(Grid):
 
         P_N = legval(zg, [0] * N + [1])
 
-        for ii in range(N + 1):
+        with np.errstate(divide='ignore'):
             for jj in range(N + 1):
-                if ii == jj:
-                    if ii == 0:
-                        d1[ii, jj] = -N * (N + 1) / 4
-                    elif ii == N:
-                        d1[ii, jj] = N * (N + 1) / 4
-                    else:
-                        d1[ii, jj] = 0
-                else:
-                    d1[ii, jj] = P_N[ii] / (P_N[jj] * (zg[ii] - zg[jj]))
+                d1[:, jj] = P_N / (P_N[jj] * (zg - zg[jj]))
+
+        d1[np.diag_indices(N+1)] = 0.0
+        d1[0, 0] = -N * (N + 1) / 4
+        d1[N, N] = +N * (N + 1) / 4
 
         d2 = np.dot(d1, d1)
 

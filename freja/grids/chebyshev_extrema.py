@@ -38,21 +38,14 @@ class ChebyshevExtremaGrid(Grid):
         p[0] = 2
         p[N] = 2
 
-        for ii in range(N + 1):
-            for jj in range(N + 1):
-                if ii == jj:
-                    if ii == 0:
-                        d1[ii, jj] = (1 + 2 * N ** 2) / 6
-                    elif ii == N:
-                        d1[ii, jj] = -(1 + 2 * N ** 2) / 6
-                    else:
-                        d1[ii, jj] = -zg[jj] / (2 * (1 - zg[jj] ** 2))
-                else:
-                    d1[ii, jj] = (
-                        (-1) ** (ii + jj)
-                        * p[ii]
-                        / (p[jj] * (zg[ii] - zg[jj]))
-                    )
+        with np.errstate(divide='ignore'):
+            for jj in range(N+1):
+                d1[:, jj] = ((-1) ** (np.arange(N+1) + jj)
+                             * p / (p[jj] * (zg - zg[jj])))
+            d1[np.diag_indices(N+1)] = -zg / (2 * (1 - zg ** 2))
+
+        d1[0, 0] = (1 + 2 * N ** 2) / 6
+        d1[N, N] = -(1 + 2 * N ** 2) / 6
 
         d2 = np.dot(d1, d1)
         self.zg = -(zg - 1) * L / 2 + self.zmin

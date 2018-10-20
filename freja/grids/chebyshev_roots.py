@@ -32,23 +32,20 @@ class ChebyshevRootsGrid(Grid):
 
         d1 = np.zeros((N, N))
         zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
+        zg = zg[::-1]
         Q = 1 - zg ** 2
 
-        for ii in range(1, N + 1):
-            for jj in range(1, N + 1):
-                if ii == jj:
-                    d1[ii - 1, jj - 1] = 0.5 * zg[jj - 1] / Q[jj - 1]
-                else:
-                    d1[ii - 1, jj - 1] = (
-                        (-1) ** (ii + jj)
-                        * np.sqrt(Q[jj - 1] / Q[ii - 1])
-                        / (zg[ii - 1] - zg[jj - 1])
-                    )
+        with np.errstate(divide='ignore'):
+            for jj in range(N):
+                d1[:, jj] = (-1)**(np.arange(N) + jj) * \
+                    np.sqrt(Q[jj] / Q) / (zg - zg[jj])
+
+        d1[np.diag_indices(N)] = 0.5 * zg / Q
 
         d2 = np.dot(d1, d1)
-        self.zg = -(zg - 1) * L / 2 + self.zmin
+        self.zg = (zg + 1) * L/2 + self.zmin
         self.d0 = np.eye(self.NN)
-        self.d1 = -d1 / factor
+        self.d1 = d1 / factor
         self.d2 = d2 / factor ** 2
 
         # Call other objects that depend on the grid

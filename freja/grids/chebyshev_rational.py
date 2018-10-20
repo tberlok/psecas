@@ -62,18 +62,15 @@ class ChebyshevRationalGrid(Grid):
 
         d1 = np.zeros((N, N))
         zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
+        zg = zg[::-1]
         Q = 1 - zg ** 2
 
-        for ii in range(1, N + 1):
-            for jj in range(1, N + 1):
-                if ii == jj:
-                    d1[ii - 1, jj - 1] = 0.5 * zg[jj - 1] / Q[jj - 1]
-                else:
-                    d1[ii - 1, jj - 1] = (
-                        (-1) ** (ii + jj)
-                        * np.sqrt(Q[jj - 1] / Q[ii - 1])
-                        / (zg[ii - 1] - zg[jj - 1])
-                    )
+        with np.errstate(divide='ignore'):
+            for jj in range(N):
+                d1[:, jj] = (-1)**(np.arange(N) + jj) * \
+                    np.sqrt(Q[jj] / Q) / (zg - zg[jj])
+
+        d1[np.diag_indices(N)] = 0.5 * zg / Q
 
         return (zg, d1)
 
@@ -91,9 +88,8 @@ class ChebyshevRationalGrid(Grid):
 
         zg = C * zg_int / np.sqrt(Q)
 
-        for ii in range(N):
-            for jj in range(N):
-                d1[ii, jj] = np.sqrt(Q[ii]) * Q[ii] * d1_int[ii, jj] / C
+        for jj in range(N):
+            d1[:, jj] = np.sqrt(Q) * Q * d1_int[:, jj] / C
 
         d2 = np.dot(d1, d1)
         self.zg = zg

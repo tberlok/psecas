@@ -59,7 +59,7 @@ class FourierGrid(Grid):
             ]
         )
         d2 = toeplitz(y)
-        self.zg = zg * L / (2 * pi) - zmin
+        self.zg = zg * L / (2 * pi) + zmin
         self.d0 = np.eye(N)
         self.d1 = d1 / factor
         self.d2 = d2 / factor ** 2

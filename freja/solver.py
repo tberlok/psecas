@@ -146,7 +146,8 @@ class Solver:
         return (sigma, v)
 
     def iterate_solver(
-        self, Ns, mode=0, tol=1e-6, atol=1e-16, verbose=False, guess_tol=0.1
+        self, Ns, mode=0, tol=1e-6, atol=1e-16, verbose=False, guess_tol=0.1,
+        useOPinv=True
     ):
         """
         Iteratively call the solve method with increasing grid resolution, N.
@@ -187,7 +188,7 @@ class Solver:
             # Use guess from previous iteration
             else:
                 (sigma_new, v) = self.solve_with_guess(
-                    sigma_old, mode=mode, verbose=verbose
+                    sigma_old, mode=mode, verbose=verbose, useOPinv=useOPinv
                 )
 
             a_err = np.abs(sigma_old - sigma_new)

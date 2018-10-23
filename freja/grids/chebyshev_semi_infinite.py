@@ -61,15 +61,13 @@ class ChebyshevTLnGrid(Grid):
     def cheb_roots(self, N):
         import numpy as np
 
-        d1 = np.zeros((N, N))
         zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
         zg = zg[::-1]
         Q = 1 - zg ** 2
 
         with np.errstate(divide='ignore'):
-            for jj in range(N):
-                d1[:, jj] = (-1)**(np.arange(N) + jj) * \
-                    np.sqrt(Q[jj] / Q) / (zg - zg[jj])
+            d1 = (-1)**(np.arange(N)[:, None] + np.arange(N)[None, :]) * \
+                np.sqrt(Q[None, :] / Q[:, None]) / (zg[:, None] - zg[None, :])
 
         d1[np.diag_indices(N)] = 0.5 * zg / Q
 
@@ -87,10 +85,12 @@ class ChebyshevTLnGrid(Grid):
 
         zg = C * (1 + zg_int) / (1 - zg_int)
 
-        Q = (zg_int - 1) ** 2 / (2 * C)
+        Q = (zg_int - 1) ** 2
 
-        d1 = Q[:, None] * d1_int
+        d1 = Q[:, None] * d1_int / (2 * C)
 
+        # TODO: Calculate d2 using an explicit formula. The above
+        # breaks down at high N
         d2 = np.dot(d1, d1)
         self.zg = zg
         self.d0 = np.eye(N)

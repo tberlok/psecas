@@ -30,7 +30,6 @@ class LegendreExtremaGrid(Grid):
 
         factor = L / 2
 
-        zg = np.zeros(N + 1)
         d1 = np.zeros((N + 1, N + 1))
 
         cp = legder([0] * N + [1])
@@ -39,8 +38,7 @@ class LegendreExtremaGrid(Grid):
         P_N = legval(zg, [0] * N + [1])
 
         with np.errstate(divide='ignore'):
-            for jj in range(N + 1):
-                d1[:, jj] = P_N / (P_N[jj] * (zg - zg[jj]))
+            d1 = P_N[:, None] / (P_N[None, :] * (zg[:, None] - zg[None, :]))
 
         d1[np.diag_indices(N+1)] = 0.0
         d1[0, 0] = -N * (N + 1) / 4

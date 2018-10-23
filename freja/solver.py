@@ -146,7 +146,7 @@ class Solver:
         return (sigma, v)
 
     def iterate_solver(
-        self, Ns, mode=0, tol=1e-6, atol=1e-16, verbose=False, guess_tol=0.1,
+        self, Ns, mode=0, tol=1e-6, atol=1e-16, verbose=False, guess_tol=0.01,
         useOPinv=True
     ):
         """

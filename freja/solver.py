@@ -51,11 +51,11 @@ class Solver:
 
         if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
             # Solve a standard EVP
-            E, V = eig(self.mat1.todense())
+            E, V = eig(self.mat1.toarray())
         else:
             # Solve a generalized EVP
             self.get_matrix2()
-            E, V = eig(self.mat1.todense(), self.mat2.todense())
+            E, V = eig(self.mat1.toarray(), self.mat2.toarray())
 
         # Sort the eigenvalues
         E, index = self.sorting_strategy(E)
@@ -124,7 +124,7 @@ class Solver:
                 )
             else:
                 self.get_matrix2()
-                OPinv = inv((self.mat1 - guess * self.mat2).todense())
+                OPinv = inv((self.mat1 - guess * self.mat2).toarray())
 
             sigma, v = eigs(self.mat1, k=1, sigma=guess, OPinv=OPinv)
         else:
@@ -254,49 +254,32 @@ class Solver:
         """
         Calculate the matrix M₂ neded in the solve method.
         """
-        import numpy as np
+        from scipy import sparse
 
         dim = self.system.dim
-        NN = self.grid.NN
         grid = self.grid
         equations = self.system.equations
-        variables = self.system.variables
         boundaries = self.system.boundaries
 
-        if all((boundaries)) and not self.do_gen_evp:
-            # If all boundaries are true (i.e. values are zero there)
-            # then we can solve standard evp instead of a generalized evp.
-            rows = []
-            for j, equation in enumerate(equations):
-                equation = equation.split("=")[1]
-                mats = self._find_submatrices(equation, verbose)
-                rows.append(
-                    np.concatenate(
-                        [mat.todense()[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
-                    )
-                )
-            mat1 = np.array(np.concatenate(rows, axis=0), dtype="complex128")
+        # Construct all submatrices as sparse matrices
+        rows = []
+        for j, equation in enumerate(equations):
+            equation = equation.split("=")[1]
+            mats = self._find_submatrices(equation, verbose)
+            rows.append(mats)
 
-        else:
-            # Construct matrix mat1
-            mat1 = np.zeros((dim * NN, dim * NN), dtype="complex128")
+        # Modify according to boundary conditions
+        for j in range(dim):
+            for i in range(dim):
+                if all((boundaries)) and not self.do_gen_evp:
+                    rows[j][i] = rows[j][i][1:grid.N, 1:grid.N]
+                elif any(boundaries):
+                    rows[j][i] = self._modify_submatrix(rows[j][i],
+                                                        j + 1, i + 1,
+                                                        boundaries[j])
 
-            for j, equation in enumerate(equations):
-                # Evaluate RHS of equation
-                equation = equation.split("=")[1]
-                mats = self._find_submatrices(equation, verbose)
-                for i, variable in enumerate(variables):
-                    if any(boundaries):
-                        self._set_submatrix(
-                            mat1, mats[i].todense(), j + 1, i + 1, boundaries[j]
-                        )
-                    else:
-                        self._set_submatrix(
-                            mat1, mats[i].todense(), j + 1, i + 1, False
-                        )
-
-        from scipy import sparse
-        self.mat1 = sparse.csr_matrix(mat1)
+        # Assemble everything
+        self.mat1 = sparse.bmat(rows, format='csr')
 
     def get_matrix2(self, verbose=False):
         """
@@ -319,7 +302,7 @@ class Solver:
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
             for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i].todense(), j + 1, i + 1,
+                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1,
                                     False)
         self.mat2 = mat2
 
@@ -420,7 +403,7 @@ class Solver:
             else:
                 submat = np.zeros((NN, NN), dtype=np.complex128)
 
-            mats.append(sparse.csr_matrix(submat))
+            mats.append(sparse.lil_matrix(submat))
 
         return mats
 
@@ -440,6 +423,21 @@ class Solver:
         mat1[
             (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
         ] = submat
+
+    def _modify_submatrix(self, submat, eq_n, var_n, boundary):
+        """
+        Set submatrix corresponding to the term proportional to var_n
+        (variable number) in eq_n (equation number).
+        """
+        N = self.grid.N
+        if boundary:
+            submat[0, :] = 0
+            submat[N, :] = 0
+            if eq_n == var_n:
+                submat[0, 0] = 1
+                submat[N, N] = 1
+
+        return submat
 
     def _set_boundary(self, var_n):
         NN = self.grid.NN

@@ -272,7 +272,7 @@ class Solver:
                 mats = self._find_submatrices(equation, verbose)
                 rows.append(
                     np.concatenate(
-                        [mat[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
+                        [mat.todense()[1 : grid.N, 1 : grid.N] for mat in mats], axis=1
                     )
                 )
             mat1 = np.array(np.concatenate(rows, axis=0), dtype="complex128")
@@ -288,11 +288,11 @@ class Solver:
                 for i, variable in enumerate(variables):
                     if any(boundaries):
                         self._set_submatrix(
-                            mat1, mats[i], j + 1, i + 1, boundaries[j]
+                            mat1, mats[i].todense(), j + 1, i + 1, boundaries[j]
                         )
                     else:
                         self._set_submatrix(
-                            mat1, mats[i], j + 1, i + 1, False
+                            mat1, mats[i].todense(), j + 1, i + 1, False
                         )
 
         from scipy import sparse
@@ -319,7 +319,8 @@ class Solver:
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
             for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i], j + 1, i + 1, False)
+                self._set_submatrix(mat2, mats[i].todense(), j + 1, i + 1,
+                                    False)
         self.mat2 = mat2
 
         if any(boundaries):
@@ -366,15 +367,14 @@ class Solver:
 
     def _find_submatrices(self, eq, verbose=False):
         import numpy as np
+        from scipy import sparse
 
         # This is a nasty trick
         globals().update(self.system.__dict__)
         grid = self.system.grid
 
         NN = self.grid.NN
-        dim = self.system.dim
-
-        mats = [np.zeros((NN, NN), dtype=np.complex128) for i in range(dim)]
+        mats = []
 
         if verbose:
             print("\nParsing equation:", eq)
@@ -404,7 +404,7 @@ class Solver:
                         "\nThis caused the following error to occur:\n\n"
                     )
                     # Evaluate the expression
-                    mats[i] = eval(eq_t).T
+                    submat = eval(eq_t).T
                 except NameError as e:
                     strerror, = e.args
                     err_msg2 = (
@@ -417,6 +417,10 @@ class Solver:
                     )
                 except Exception as e:
                     raise Exception(err_msg1.format(eq, eq_t, var) + str(e))
+            else:
+                submat = np.zeros((NN, NN), dtype=np.complex128)
+
+            mats.append(sparse.csr_matrix(submat))
 
         return mats
 

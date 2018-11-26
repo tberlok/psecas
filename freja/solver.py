@@ -48,13 +48,13 @@ class Solver:
 
         # Calculate matrix
         self.get_matrix1()
-        self.get_matrix2()
 
         if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
             # Solve a standard EVP
             E, V = eig(self.mat1)
         else:
             # Solve a generalized EVP
+            self.get_matrix2()
             E, V = eig(self.mat1, self.mat2)
 
         # Sort the eigenvalues
@@ -113,7 +113,6 @@ class Solver:
 
         # Calculate matrix
         self.get_matrix1()
-        self.get_matrix2()
 
         if useOPinv:
             # from numpy.linalg import pinv as inv
@@ -124,6 +123,7 @@ class Solver:
                     self.mat1 - guess * np.eye(self.mat1.shape[0])
                 )
             else:
+                self.get_matrix2()
                 OPinv = inv(self.mat1 - guess * self.mat2)
             from scipy import sparse
 
@@ -133,6 +133,7 @@ class Solver:
             if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
                 sigma, v = eigs(self.mat1, k=1, sigma=guess)
             else:
+                self.get_matrix2()
                 sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
 
         # Convert result from eigs to have same format as result from eig

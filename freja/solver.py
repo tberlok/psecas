@@ -51,11 +51,11 @@ class Solver:
 
         if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
             # Solve a standard EVP
-            E, V = eig(self.mat1)
+            E, V = eig(self.mat1.todense())
         else:
             # Solve a generalized EVP
             self.get_matrix2()
-            E, V = eig(self.mat1, self.mat2)
+            E, V = eig(self.mat1.todense(), self.mat2.todense())
 
         # Sort the eigenvalues
         E, index = self.sorting_strategy(E)
@@ -124,11 +124,9 @@ class Solver:
                 )
             else:
                 self.get_matrix2()
-                OPinv = inv(self.mat1 - guess * self.mat2)
-            from scipy import sparse
+                OPinv = inv((self.mat1 - guess * self.mat2).todense())
 
-            smat = sparse.csr_matrix(self.mat1)
-            sigma, v = eigs(smat, k=1, sigma=guess, OPinv=OPinv)
+            sigma, v = eigs(self.mat1, k=1, sigma=guess, OPinv=OPinv)
         else:
             if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
                 sigma, v = eigs(self.mat1, k=1, sigma=guess)
@@ -297,7 +295,8 @@ class Solver:
                             mat1, mats[i], j + 1, i + 1, False
                         )
 
-        self.mat1 = mat1
+        from scipy import sparse
+        self.mat1 = sparse.csr_matrix(mat1)
 
     def get_matrix2(self, verbose=False):
         """
@@ -327,6 +326,9 @@ class Solver:
             for j, equation in enumerate(equations):
                 if boundaries[j]:
                     self._set_boundary(j + 1)
+
+        from scipy import sparse
+        self.mat2 = sparse.csr_matrix(mat2)
 
     def _var_replace(self, eq, var, new):
         """

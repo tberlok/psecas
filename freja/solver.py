@@ -13,7 +13,7 @@ class Solver:
         # boundaries suggest that an evp is sufficient
         self.do_gen_evp = do_gen_evp
 
-    def solve(self, useOPinv=True, verbose=False, mode=0):
+    def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
 
@@ -65,8 +65,9 @@ class Solver:
         v = V[:, index[mode]]
 
         # Save all eigenvalues and eigenvectors here
-        self.E = E[index]
-        self.v = V[:, index]
+        if saveall:
+            self.E = E[index]
+            self.v = V[:, index]
         if verbose:
             print("N: {}, all eigenvalues: {}".format(self.grid.N, sigma))
 

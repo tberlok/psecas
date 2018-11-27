@@ -100,17 +100,27 @@ class IO:
         # Used for computing total runtime
         self.wt = Wtime()
 
-    def log(self, i, time, custum_str):
+    def log(self, i, time, custom_str):
         from mpi4py.MPI import COMM_WORLD as comm
 
         f = open(self.data_folder + "freja.log", "a")
         msg = (
             "Solved EVP with "
-            + custum_str
+            + custom_str
             + " in {:1.2f} seconds. \
                Rank {} is {:2.0f}% done.\n"
         )
         f.write(msg.format(time, comm.rank, (i + 1) / self.steps_local * 100))
+        f.close()
+
+    def rank_log(self, string):
+        from mpi4py.MPI import COMM_WORLD as comm
+
+        f = open(self.data_folder + "freja.log", "a")
+        msg = (
+            "Rank {}:".format(comm.rank) + string
+        )
+        f.write(msg)
         f.close()
 
     def save_system(self, i):

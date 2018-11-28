@@ -100,6 +100,9 @@ class IO:
         # Used for computing total runtime
         self.wt = Wtime()
 
+        # Wait until all processors are done
+        comm.barrier()
+
     def log(self, i, time, custom_str):
         from mpi4py.MPI import COMM_WORLD as comm
 

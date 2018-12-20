@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from freja import Solver, System
-from freja import (
+from psecas import Solver, System
+from psecas import (
     ChebyshevExtremaGrid,
     ChebyshevRootsGrid,
     LegendreExtremaGrid,

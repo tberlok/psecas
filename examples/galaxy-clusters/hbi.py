@@ -1,7 +1,7 @@
 import numpy as np
-from freja import Solver, ChebyshevExtremaGrid
-from freja.systems.hbi import HeatFluxDrivenBuoyancyInstability
-from freja import plot_solution
+from psecas import Solver, ChebyshevExtremaGrid
+from psecas.systems.hbi import HeatFluxDrivenBuoyancyInstability
+from psecas import plot_solution
 
 """
     The linear solution for the heat-flux-driven buoyancy instability (HBI)
@@ -39,7 +39,7 @@ plot_solution(system, smooth=True)
 if True:
     # Plot 2D maps of the perturbations
     import matplotlib.pyplot as plt
-    from freja import get_2Dmap
+    from psecas import get_2Dmap
 
     plt.rc("image", origin="lower", cmap="RdBu")
     plt.figure(2)

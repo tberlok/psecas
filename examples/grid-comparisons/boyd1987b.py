@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from freja import Solver, System, LaguerreGrid, ChebyshevTLnGrid
+from psecas import Solver, System, LaguerreGrid, ChebyshevTLnGrid
 
 """
 This problem is discussed in Chapter 17 in Boyd.

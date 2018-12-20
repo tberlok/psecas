@@ -1,6 +1,6 @@
 import numpy as np
-from freja import Solver, FourierGrid, write_athena, save_system
-from freja.systems.kh_uniform import KelvinHelmholtzUniform
+from psecas import Solver, FourierGrid, write_athena, save_system
+from psecas.systems.kh_uniform import KelvinHelmholtzUniform
 
 """
     This example shows how the eigenmodes can be stored in text format which

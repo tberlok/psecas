@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/tberlok/freja.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/freja)
+[![CircleCI](https://circleci.com/gh/tberlok/psecas.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/psecas)
 # Introduction
 
 This github repository contains a collection of methods for solving
@@ -76,6 +76,6 @@ at the top-level directory.
 Before using the code, the tests should be run to make sure that everything is
 working. From the top-level directory
 ```
-$ pytest tests/ freja/grids/*
+$ pytest tests/ psecas/grids/*
 ```
 

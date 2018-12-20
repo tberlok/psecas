@@ -1,6 +1,6 @@
 def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     import numpy as np
-    from freja import setup
+    from psecas import setup
 
     pylab = setup('ps')
     import matplotlib.pyplot as plt

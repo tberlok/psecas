@@ -1,7 +1,7 @@
 import numpy as np
-from freja import Solver, ChebyshevExtremaGrid
-from freja.systems.mti import MagnetoThermalInstability
-from freja import plot_solution
+from psecas import Solver, ChebyshevExtremaGrid
+from psecas.systems.mti import MagnetoThermalInstability
+from psecas import plot_solution
 
 """
     The linear solution for the magnetothermal instability (MTI)
@@ -62,7 +62,7 @@ plot_solution(system, smooth=True)
 if True:
     # Plot 2D maps of the perturbations
     import matplotlib.pyplot as plt
-    from freja import get_2Dmap
+    from psecas import get_2Dmap
 
     plt.rc('image', origin='lower', cmap='RdBu')
     plt.figure(2)
@@ -185,7 +185,7 @@ if False:
     axes[0, 1].contour(xx, zz, Az, 32, colors='tab:gray', linestyles='solid')
 
 if False:
-    from freja import write_athena, save_system
+    from psecas import write_athena, save_system
 
     # Write directly to the Athena directory
     write_athena(
@@ -211,7 +211,7 @@ if False:
     plt.show()
 
 if False:
-    from freja import golden_section
+    from psecas import golden_section
 
     def f(kx, **kwargs):
         system.kx = kx

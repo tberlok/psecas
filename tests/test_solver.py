@@ -1,8 +1,8 @@
 def test_mti_solution(show=False, verbose=False):
     """Test eigenvalue solver using ChebyshevExtremaGrid"""
     import numpy as np
-    from freja import Solver, ChebyshevExtremaGrid
-    from freja.systems.mti import MagnetoThermalInstability
+    from psecas import Solver, ChebyshevExtremaGrid
+    from psecas.systems.mti import MagnetoThermalInstability
 
     grid = ChebyshevExtremaGrid(N=64, zmin=0, zmax=1)
 
@@ -17,7 +17,7 @@ def test_mti_solution(show=False, verbose=False):
     )
 
     if show:
-        from freja import plot_solution
+        from psecas import plot_solution
 
         phi = np.arctan(vec[2].imag / vec[2].real)
         solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
@@ -32,8 +32,8 @@ def test_mti_solution(show=False, verbose=False):
 def test_kh_uniform_solution(show=False, verbose=False):
     """Test eigenvalue solver using FourierGrid"""
     import numpy as np
-    from freja import Solver, FourierGrid
-    from freja.systems.kh_uniform import KelvinHelmholtzUniform
+    from psecas import Solver, FourierGrid
+    from psecas.systems.kh_uniform import KelvinHelmholtzUniform
 
     grid = FourierGrid(N=64, zmin=0, zmax=2)
 
@@ -45,7 +45,7 @@ def test_kh_uniform_solution(show=False, verbose=False):
     omega, v, err = solver.iterate_solver(Ns, tol=1e-5, verbose=verbose)
 
     if show:
-        from freja import plot_solution
+        from psecas import plot_solution
 
         plot_solution(system, smooth=True, num=2)
 
@@ -56,8 +56,8 @@ def test_kh_uniform_solution(show=False, verbose=False):
 def test_channel(show=False, verbose=False):
     """Test eigenvalue solver using ChebyshevRationalGrid"""
     import numpy as np
-    from freja import Solver, ChebyshevRationalGrid
-    from freja.systems.channel import Channel
+    from psecas import Solver, ChebyshevRationalGrid
+    from psecas.systems.channel import Channel
 
     grid = ChebyshevRationalGrid(N=199, z='r')
     system = Channel(grid)

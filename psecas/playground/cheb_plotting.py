@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from freja import Solver, ChebyshevExtremaGrid
-from freja.systems.mti import MagnetoThermalInstability
+from psecas import Solver, ChebyshevExtremaGrid
+from psecas.systems.mti import MagnetoThermalInstability
 from scipy.interpolate import interp1d
 
 N = 32

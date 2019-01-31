@@ -60,7 +60,7 @@ class ChebyshevRootsGrid(Grid):
         return chebval(z, c)
 
 
-def test_chebyshev_differentation(show=False):
+def test_chebyshev_roots_differentation(show=False):
     """Test the differentation routine of FourierGrid"""
     import numpy as np
 
@@ -89,7 +89,7 @@ def test_chebyshev_differentation(show=False):
     return (yp_num, yp_exac)
 
 
-def test_chebyshev_interpolation(show=False):
+def test_chebyshev_roots_interpolation(show=False):
     """Test the inperpolation routine of ChebyshevRootsGrid"""
     import numpy as np
 
@@ -126,5 +126,5 @@ def test_chebyshev_interpolation(show=False):
 
 
 if __name__ == "__main__":
-    (yp_num, yp_exac) = test_chebyshev_differentation(show=True)
-    (y_fine, y_interpolated) = test_chebyshev_interpolation(show=True)
+    (yp_num, yp_exac) = test_chebyshev_roots_differentation(show=True)
+    (y_fine, y_interpolated) = test_chebyshev_roots_interpolation(show=True)

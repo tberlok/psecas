@@ -48,11 +48,11 @@ class KelvinHelmholtzUniform:
         # Variables to solve for
         self.variables = ["drho", "dA", "dvx", "dvz", "dT"]
         self.labels = [
-            r"$\delta \rho$",
-            r"$\delta A$",
-            r"$\delta v_x$",
-            r"$\delta v_z$",
-            r"$\delta T$",
+            r"$\delta \rho/\rho$",
+            r"$\delta A/B$",
+            r"$\delta v_x/c_0$",
+            r"$\delta v_z/c_0$",
+            r"$\delta T/T$",
         ]
 
         # Boundary conditions

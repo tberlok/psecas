@@ -1,10 +1,10 @@
-from freja.grids.grid import Grid
+from psecas.grids.grid import Grid
 
 
-class SincGrid(Grid):
+class HermiteGrid(Grid):
     """
-        This grid uses Whittaker Cardinal or “Sinc” functions on z ∈ [-∞, ∞]
-        to dicretize the system. See Boyd Appendix F.7 page 569.
+        This grid uses Hermite polynomials on z ∈ [-∞, ∞] to dicretize the
+        system. dmsuite is used for the setup of the grid.
 
         N: The number of grid points
         C: A scaling parameter which regulates the extent of the grid
@@ -17,15 +17,21 @@ class SincGrid(Grid):
         maximum values of the grid depend on both N and C.
     """
 
-    def __init__(self, N, C=1, z='z'):
+    def __init__(self, N, C=1, z="z"):
         self._observers = []
 
+        self.maxN = 245
+        msg = "It appears that dmsuite cannot handle N larger than {}"
+        assert N <= self.maxN, msg.format(self.maxN)
+
         self._N = N
+
         self._C = C
-        self.make_grid()
 
         # Grid variable name
         self.z = z
+
+        self.make_grid()
 
     def bind_to(self, callback):
         self._observers.append(callback)
@@ -36,6 +42,8 @@ class SincGrid(Grid):
 
     @N.setter
     def N(self, value):
+        msg = "N = {} requested. Maximum allowed is {}"
+        assert value <= self.maxN, msg.format(value, self.maxN)
         self._N = value
         self.make_grid()
 
@@ -56,60 +64,36 @@ class SincGrid(Grid):
         self._C = value
         self.make_grid()
 
-    @property
-    def dz(self):
-        import numpy as np
-
-        return self.C / np.sqrt(self.N)
-
     def make_grid(self):
         import numpy as np
-        from scipy.linalg import toeplitz
 
-        N = self.N
-        self.NN = N
+        # from numpy.polynomial import Hermite as H
+        self.NN = self.N
 
-        zg = self.dz * (0.5 - N / 2 + np.arange(N))
-        n = np.arange(N)
-        row = -np.hstack([0.0, (-1) ** (n[1:] + 1) / n[1:]])
-        col = np.hstack([0.0, (-1) ** (n[1:] + 1) / n[1:]])
-        col[0] = row[0]
-        d1 = toeplitz(row, col)
-        d1 /= self.dz
+        from dmsuite import herdif
 
-        row = np.hstack([-np.pi ** 2 / 3, -2 * (-1) ** (n[1:]) / n[1:] ** 2])
-        d2 = toeplitz(row)
-        d2 /= self.dz ** 2
+        zg, D = herdif(self.NN, 2, 1 / self.C)
 
         self.zg = zg
-        self.d0 = np.eye(N)
-        self.d1 = d1
-        self.d2 = d2
+        self.d0 = np.eye(self.NN)
+        self.d1 = D[0]
+        self.d2 = D[1]
 
         # Call other objects that depend on the grid
         for callback in self._observers:
             callback()
 
     def interpolate(self, z, f):
-        """
-        Interpolate f located at self.zg onto the grid z.
+        """"""
+        # from numpy.polynomial.hermite import hermfit, hermval
+        # c, res = hermfit(self.zg, f, deg=self.N, full=True)
+        # return hermval(z, c)
+        from scipy.interpolate import barycentric_interpolate
 
-        This function uses Lagrange interpolation (eq. 4.6 in Boyd) with
-        the sinc Cardinal functions (eq F.34 in Boyd)
-        """
-        import numpy as np
-
-        assert len(f) == self.N
-
-        def to_grid(z):
-            return np.sum(f * np.sinc((z - self.zg) / self.dz))
-
-        to_grid_v = np.vectorize(to_grid)
-
-        return to_grid_v(z)
+        return barycentric_interpolate(self.zg, f, z)
 
 
-def test_sinc_differentation(show=False):
+def test_hermite_differentation(show=False):
     """Test the differentation routine of ChebyshevRationalGrid"""
     import numpy as np
 
@@ -119,7 +103,6 @@ def test_sinc_differentation(show=False):
         return hermval(x, c) * np.exp(-x ** 2 / 2)
 
     def dpsi(x, c):
-        """Derivative of psi"""
         from numpy.polynomial.hermite import hermval, hermder
 
         yp = hermval(x, hermder(c)) * np.exp(-x ** 2 / 2) - x * psi(x, c)
@@ -134,10 +117,10 @@ def test_sinc_differentation(show=False):
         yp += -psi(x, c) - x * dpsi(x, c)
         return yp
 
-    N = 200
-    grid = SincGrid(N, C=5)
+    N = 245
+    grid = HermiteGrid(N)
 
-    c = np.ones(4)
+    c = np.ones(6)
     y = psi(grid.zg, c)
     yp_exac = dpsi(grid.zg, c)
     ypp_exac = d2psi(grid.zg, c)
@@ -150,7 +133,7 @@ def test_sinc_differentation(show=False):
         plt.figure(1)
         plt.clf()
         fig, axes = plt.subplots(num=1, nrows=2)
-        axes[0].set_title("Differentation with matrix (Sinc)")
+        axes[0].set_title("Differentation with matrix (Hermite)")
         axes[0].plot(grid.zg, yp_exac, "-", grid.zg, yp_num, "--")
         axes[1].plot(grid.zg, ypp_exac, "-", grid.zg, ypp_num, "--")
         for ax in axes:
@@ -159,12 +142,12 @@ def test_sinc_differentation(show=False):
         plt.show()
 
     np.testing.assert_allclose(yp_num, yp_exac, atol=1e-12)
-    np.testing.assert_allclose(ypp_num, ypp_exac, atol=1e-10)
+    np.testing.assert_allclose(ypp_num, ypp_exac, atol=1e-12)
 
     return (yp_num, yp_exac)
 
 
-def test_sinc_interpolation(show=False):
+def test_hermite_interpolation(show=False):
     """Test the inperpolation routine of ChebyshevRationalGrid"""
     import numpy as np
 
@@ -174,10 +157,11 @@ def test_sinc_interpolation(show=False):
         return hermval(x, c) * np.exp(-x ** 2 / 2)
 
     N = 200
-    grid = SincGrid(N, C=5)
+    grid = HermiteGrid(N)
 
-    grid_fine = SincGrid(N * 4, C=5)
-    z = grid_fine.zg
+    # grid_fine = HermiteGrid(N*2, C=0.3)
+    # z = grid_fine.zg
+    z = np.linspace(-5.5, 5.5, 2000)
 
     y = psi(grid.zg, np.array(np.ones(4)))
     y_fine = psi(z, np.array(np.ones(4)))
@@ -188,7 +172,7 @@ def test_sinc_interpolation(show=False):
 
         plt.figure(2)
         plt.clf()
-        plt.title("Interpolation with Sinc")
+        plt.title("Interpolation with Hermite")
         plt.plot(z, y_fine, "-")
         plt.plot(z, y_interpolated, "--")
         plt.plot(grid.zg, y, "+")
@@ -196,10 +180,10 @@ def test_sinc_interpolation(show=False):
         plt.ylim(-5, 10)
         plt.show()
 
-    np.testing.assert_allclose(y_fine, y_interpolated, atol=1e-12)
+    np.testing.assert_allclose(y_fine, y_interpolated, atol=1e-8)
     return (y_fine, y_interpolated)
 
 
 if __name__ == "__main__":
-    test_sinc_differentation(show=True)
-    test_sinc_interpolation(show=True)
+    test_hermite_differentation(show=True)
+    test_hermite_interpolation(show=True)

@@ -1,11 +1,11 @@
-from freja.grids.grid import Grid
+from psecas.grids.grid import Grid
 
 
-class ChebyshevRootsGrid(Grid):
+class ChebyshevExtremaGrid(Grid):
     """
-    This grid uses the Chebyshev Interior or Roots grid on
-    z ∈ [zmin, zmax] to discretize the system.
-    Implementation follows Boyd Appendix F.9 on page 571.
+    This grid uses the Chebyshev extrema and endpoints grid on
+    z ∈ [zmin, zmax] to discretize the system. This grid is also known as the
+    Gauss-Lobatto grid. Implementation follows Boyd Appendix F.8 on page 570.
 
     N: The number of grid points
     zmin: The z value at the lower boundary
@@ -26,26 +26,31 @@ class ChebyshevRootsGrid(Grid):
         N = self._N
         self.NN = N + 1
         L = self.L
-        N = self.NN
 
         factor = L / 2
 
-        d1 = np.zeros((N, N))
-        zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
-        zg = zg[::-1]
-        Q = 1 - zg ** 2
+        zg = np.zeros(N + 1)
+        d1 = np.zeros((N + 1, N + 1))
+        for ii in range(N + 1):
+            zg[ii] = np.cos(np.pi * ii / N)
+
+        p = np.ones(N + 1)
+        p[0] = 2
+        p[N] = 2
 
         with np.errstate(divide='ignore'):
-            for jj in range(N):
-                d1[:, jj] = (-1)**(np.arange(N) + jj) * \
-                    np.sqrt(Q[jj] / Q) / (zg - zg[jj])
+            for jj in range(N+1):
+                d1[:, jj] = ((-1) ** (np.arange(N+1) + jj)
+                             * p / (p[jj] * (zg - zg[jj])))
+            d1[np.diag_indices(N+1)] = -zg / (2 * (1 - zg ** 2))
 
-        d1[np.diag_indices(N)] = 0.5 * zg / Q
+        d1[0, 0] = (1 + 2 * N ** 2) / 6
+        d1[N, N] = -(1 + 2 * N ** 2) / 6
 
         d2 = np.dot(d1, d1)
-        self.zg = (zg + 1) * L/2 + self.zmin
+        self.zg = -(zg - 1) * L / 2 + self.zmin
         self.d0 = np.eye(self.NN)
-        self.d1 = d1 / factor
+        self.d1 = -d1 / factor
         self.d2 = d2 / factor ** 2
 
         # Call other objects that depend on the grid
@@ -67,7 +72,7 @@ def test_chebyshev_differentation(show=False):
     N = 20
     zmin = -1
     zmax = 1
-    grid = ChebyshevRootsGrid(N, zmin, zmax)
+    grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
     z = grid.zg
     y = np.exp(z) * np.sin(5 * z)
@@ -79,7 +84,7 @@ def test_chebyshev_differentation(show=False):
 
         plt.figure(1)
         plt.clf()
-        plt.title("Differentation with matrix (ChebyshevRootsGrid)")
+        plt.title("Differentation with matrix (ChebyshevExtremaGrid)")
         plt.plot(z, yp_exac, "-")
         plt.plot(z, yp_num, "--")
         plt.show()
@@ -90,7 +95,7 @@ def test_chebyshev_differentation(show=False):
 
 
 def test_chebyshev_interpolation(show=False):
-    """Test the inperpolation routine of ChebyshevRootsGrid"""
+    """Test the inperpolation routine of ChebyshevExtremaGrid"""
     import numpy as np
 
     def psi(x, c):
@@ -101,9 +106,9 @@ def test_chebyshev_interpolation(show=False):
     N = 40
     zmin = -1.1
     zmax = 1.5
-    grid = ChebyshevRootsGrid(N, zmin, zmax)
+    grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
-    grid_fine = ChebyshevRootsGrid(N * 4, zmin, zmax)
+    grid_fine = ChebyshevExtremaGrid(N * 4, zmin, zmax)
     z = grid_fine.zg
 
     y = np.exp(grid.zg) * np.sin(5 * grid.zg)

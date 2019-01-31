@@ -1,11 +1,11 @@
-from freja.grids.grid import Grid
+from psecas.grids.grid import Grid
 
 
-class LegendreExtremaGrid(Grid):
+class ChebyshevRootsGrid(Grid):
     """
-    This grid uses the Legendre extrema and endpoints grid on
-    z ∈ [zmin, zmax] to discretize the system. This grid is also known as the
-    Gauss-Lobatto grid. Implementation follows Boyd Appendix F.10 on page 572.
+    This grid uses the Chebyshev Interior or Roots grid on
+    z ∈ [zmin, zmax] to discretize the system.
+    Implementation follows Boyd Appendix F.9 on page 571.
 
     N: The number of grid points
     zmin: The z value at the lower boundary
@@ -22,31 +22,28 @@ class LegendreExtremaGrid(Grid):
 
     def make_grid(self):
         import numpy as np
-        from numpy.polynomial.legendre import legder, legroots, legval
 
         N = self._N
         self.NN = N + 1
         L = self.L
+        N = self.NN
 
         factor = L / 2
 
-        d1 = np.zeros((N + 1, N + 1))
-
-        cp = legder([0] * N + [1])
-        zg = np.hstack([-1.0, legroots(cp), 1.0])
-
-        P_N = legval(zg, [0] * N + [1])
+        d1 = np.zeros((N, N))
+        zg = np.cos(np.pi * (2 * np.arange(1, N + 1) - 1) / (2 * N))
+        zg = zg[::-1]
+        Q = 1 - zg ** 2
 
         with np.errstate(divide='ignore'):
-            d1 = P_N[:, None] / (P_N[None, :] * (zg[:, None] - zg[None, :]))
+            for jj in range(N):
+                d1[:, jj] = (-1)**(np.arange(N) + jj) * \
+                    np.sqrt(Q[jj] / Q) / (zg - zg[jj])
 
-        d1[np.diag_indices(N+1)] = 0.0
-        d1[0, 0] = -N * (N + 1) / 4
-        d1[N, N] = +N * (N + 1) / 4
+        d1[np.diag_indices(N)] = 0.5 * zg / Q
 
         d2 = np.dot(d1, d1)
-
-        self.zg = (zg + 1) * L / 2 + self.zmin
+        self.zg = (zg + 1) * L/2 + self.zmin
         self.d0 = np.eye(self.NN)
         self.d1 = d1 / factor
         self.d2 = d2 / factor ** 2
@@ -56,21 +53,21 @@ class LegendreExtremaGrid(Grid):
             callback()
 
     def interpolate(self, z, f):
-        from numpy.polynomial.legendre import legfit, legval
+        from numpy.polynomial.chebyshev import chebfit, chebval
 
-        c, res = legfit(self.zg, f, deg=self.N, full=True)
+        c, res = chebfit(self.zg, f, deg=self.N, full=True)
         # c = chebfit(grid.zg, f, deg=grid.N, full=False)
-        return legval(z, c)
+        return chebval(z, c)
 
 
-def test_legendre_differentation(show=False):
-    """Test the differentation routine of LegendreExtremaGrid"""
+def test_chebyshev_differentation(show=False):
+    """Test the differentation routine of FourierGrid"""
     import numpy as np
 
     N = 20
     zmin = -1
     zmax = 1
-    grid = LegendreExtremaGrid(N, zmin, zmax)
+    grid = ChebyshevRootsGrid(N, zmin, zmax)
 
     z = grid.zg
     y = np.exp(z) * np.sin(5 * z)
@@ -82,7 +79,7 @@ def test_legendre_differentation(show=False):
 
         plt.figure(1)
         plt.clf()
-        plt.title("Differentation with matrix (LegendreExtremaGrid)")
+        plt.title("Differentation with matrix (ChebyshevRootsGrid)")
         plt.plot(z, yp_exac, "-")
         plt.plot(z, yp_num, "--")
         plt.show()
@@ -92,8 +89,8 @@ def test_legendre_differentation(show=False):
     return (yp_num, yp_exac)
 
 
-def test_legendre_interpolation(show=False):
-    """Test the inperpolation routine of LegendreExtremaGrid"""
+def test_chebyshev_interpolation(show=False):
+    """Test the inperpolation routine of ChebyshevRootsGrid"""
     import numpy as np
 
     def psi(x, c):
@@ -104,9 +101,9 @@ def test_legendre_interpolation(show=False):
     N = 40
     zmin = -1.1
     zmax = 1.5
-    grid = LegendreExtremaGrid(N, zmin, zmax)
+    grid = ChebyshevRootsGrid(N, zmin, zmax)
 
-    grid_fine = LegendreExtremaGrid(N * 4, zmin, zmax)
+    grid_fine = ChebyshevRootsGrid(N * 4, zmin, zmax)
     z = grid_fine.zg
 
     y = np.exp(grid.zg) * np.sin(5 * grid.zg)
@@ -118,7 +115,7 @@ def test_legendre_interpolation(show=False):
 
         plt.figure(2)
         plt.clf()
-        plt.title("Interpolation with Legendre")
+        plt.title("Interpolation with Chebyshev")
         plt.plot(z, y_fine, "-")
         plt.plot(z, y_interpolated, "--")
         plt.plot(grid.zg, y, "+")
@@ -129,5 +126,5 @@ def test_legendre_interpolation(show=False):
 
 
 if __name__ == "__main__":
-    (yp_num, yp_exac) = test_legendre_differentation(show=True)
-    (y_fine, y_interpolated) = test_legendre_interpolation(show=True)
+    (yp_num, yp_exac) = test_chebyshev_differentation(show=True)
+    (y_fine, y_interpolated) = test_chebyshev_interpolation(show=True)

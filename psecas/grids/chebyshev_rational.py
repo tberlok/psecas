@@ -1,4 +1,4 @@
-from freja.grids.grid import Grid
+from psecas.grids.grid import Grid
 
 
 class ChebyshevRationalGrid(Grid):
@@ -114,7 +114,7 @@ class ChebyshevRationalGrid(Grid):
 def test_rational_chebyshev_differentation(show=False):
     """Test the differentation routine of ChebyshevRationalGrid"""
     import numpy as np
-    from freja import ChebyshevRationalGrid
+    from psecas import ChebyshevRationalGrid
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval
@@ -169,7 +169,7 @@ def test_rational_chebyshev_differentation(show=False):
 def test_rational_chebyshev_interpolation(show=False):
     """Test the inperpolation routine of ChebyshevRationalGrid"""
     import numpy as np
-    from freja import ChebyshevRationalGrid
+    from psecas import ChebyshevRationalGrid
 
     def psi(x, c):
         from numpy.polynomial.hermite import hermval

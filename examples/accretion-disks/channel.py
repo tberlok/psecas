@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from freja import Solver, ChebyshevRationalGrid
-from freja.systems.channel import Channel
+from psecas import Solver, ChebyshevRationalGrid
+from psecas.systems.channel import Channel
 
 grid = ChebyshevRationalGrid(N=199, z='r')
 system = Channel(grid)
 
-ch = Solver(grid, system)
+ch = Solver(grid, system, do_gen_evp=True)
 
 
 def sorting_strategy(E):

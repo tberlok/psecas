@@ -1,6 +1,6 @@
 def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     import numpy as np
-    from freja import setup
+    from psecas import setup
 
     pylab = setup('ps')
     import matplotlib.pyplot as plt
@@ -33,8 +33,8 @@ def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     )
     axes[0].legend(frameon=False)
 
-    if not pylab and filename is not None:
-        fig.savefig('../figures/' + filename + '.eps')
+    if filename is not None:
+        fig.savefig(filename)
     else:
         plt.show()
 

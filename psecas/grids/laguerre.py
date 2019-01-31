@@ -1,4 +1,4 @@
-from freja.grids.grid import Grid
+from psecas.grids.grid import Grid
 
 
 class LaguerreGrid(Grid):

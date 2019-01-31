@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from freja import Solver, System
-from freja import HermiteGrid, SincGrid, ChebyshevRationalGrid
+from psecas import Solver, System
+from psecas import HermiteGrid, SincGrid, ChebyshevRationalGrid
 
 """
     Illustration of the behaviour of three different grids on the
@@ -52,7 +52,7 @@ for ii, grid in enumerate(grids):
     solver = HermiteSolver(grid, system)
     omega, vec = solver.solve(mode=j)
     phi = np.arctan(vec[2].imag / vec[2].real)
-    vec *= np.exp(-1j * phi)
+    # vec *= np.exp(-1j * phi)
     solver.keep_result(omega, vec / np.max(np.abs(vec)), mode=j)
     msg = type(grid).__name__ + r" $\sigma = ${:1.8f}"
     axes[ii].set_title(msg.format(omega.real), fontsize=10)

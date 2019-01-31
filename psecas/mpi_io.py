@@ -68,7 +68,7 @@ class IO:
             # pickle.dump(info, open(data_folder+'info.p', 'wb'))
 
             # Start a log file
-            f = open(self.data_folder + "freja.log", "w")
+            f = open(self.data_folder + "psecas.log", "w")
 
             f.write("Log file for EVP run\n")
             f.write(
@@ -106,7 +106,7 @@ class IO:
     def log(self, i, time, custom_str):
         from mpi4py.MPI import COMM_WORLD as comm
 
-        f = open(self.data_folder + "freja.log", "a")
+        f = open(self.data_folder + "psecas.log", "a")
         msg = (
             "Solved EVP with "
             + custom_str
@@ -119,7 +119,7 @@ class IO:
     def rank_log(self, string):
         from mpi4py.MPI import COMM_WORLD as comm
 
-        f = open(self.data_folder + "freja.log", "a")
+        f = open(self.data_folder + "psecas.log", "a")
         msg = (
             "Rank {}:".format(comm.rank) + string
         )
@@ -158,7 +158,7 @@ class IO:
             i = datetime.now()
             endtime = i.strftime("%d/%m/%Y at %H:%M:%S")
 
-            f = open(self.data_folder + "freja.log", "a")
+            f = open(self.data_folder + "psecas.log", "a")
             f.write("\nCalculation ended on " + endtime + "\n")
             m, s = divmod(seconds, 60)
             h, m = divmod(m, 60)

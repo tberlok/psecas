@@ -1,6 +1,6 @@
 import numpy as np
-from freja import Solver, ChebyshevRationalGrid, System
-from freja import plot_solution
+from psecas import Solver, ChebyshevRationalGrid, System
+from psecas import plot_solution
 
 """
     The vertical shear instability in protoplanetary accretion disks.
@@ -88,7 +88,7 @@ system.add_equation("-sigma*wx = + 2*Omg*wy - 1j*kx*(h/O0)**2*rh")
 system.add_equation("-sigma*wy = - (2*Omg + shr)*wx - 1/h*domgdz*wz")
 system.add_equation("-sigma*wz = - h/O0**2*dz(rh)", boundary=True)
 
-solver = Solver(grid, system)
+solver = Solver(grid, system, do_gen_evp=True)
 
 
 omega, vec = solver.solve(mode=0, verbose=True)

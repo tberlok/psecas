@@ -67,6 +67,7 @@ class ChebyshevExtremaGrid(Grid):
 
 def test_chebyshev_differentation(show=False):
     """Test the differentation routine of FourierGrid"""
+    from psecas import ChebyshevExtremaGrid
     import numpy as np
 
     N = 20
@@ -96,6 +97,7 @@ def test_chebyshev_differentation(show=False):
 
 def test_chebyshev_interpolation(show=False):
     """Test the inperpolation routine of ChebyshevExtremaGrid"""
+    from psecas import ChebyshevExtremaGrid
     import numpy as np
 
     def psi(x, c):

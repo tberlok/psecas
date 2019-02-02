@@ -50,7 +50,7 @@ jobs:
             . venv/bin/activate
             mkdir test-reports
             export PYTHONPATH=/home/circleci/repo
-            pytest /home/circleci/repo/tests /home/circleci/repo/psecas/grids/* --junitxml=test-reports/junit.xml
+            pytest /home/circleci/repo/tests --junitxml=test-reports/junit.xml
 
       - store_test_results:
           path: test-reports

@@ -1,8 +1,26 @@
 [![CircleCI](https://circleci.com/gh/tberlok/psecas.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/psecas)
+
+Pressure perturbation for the supersonic Kelvin-Helmholtz instability in 
+Cartesian and cylindrical geometry (more information can be found in the code 
+paper)
+<img src="images/modemap_plot_horizontal.png" width="900">
 # Introduction
 
-This github repository contains a collection of methods for solving
-eigenvalue problems (EVPs) using pseudo-spectral methods. These methods are described
+Psecas (Pseudo-Spectral Eigenvalue Calculator with an Automated Solver)
+is a collection of methods for solving eigenvalue problems (EVPs) using 
+pseudo-spectral methods.
+
+Psecas has been used in the publication
+
+Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with smooth initial conditions – Linear theory and simulations*, 
+submitted to Monthly Notices of the Royal Astronomical Society.
+
+where some details on how it all works can be found. The arxiv version of the paper
+can be downloaded [here (link will be provided asap)](insert_link).
+
+
+### How it works
+Pseudo-spectral methods are described
 in e.g. the books
 [Spectral Methods in Matlab](https://people.maths.ox.ac.uk/trefethen/spectral.html)
 by Lloyd N. Trefethen,
@@ -11,13 +29,13 @@ by Bengt Fornberg and
 [Chebyshev and Fourier Spectral Methods](http://depts.washington.edu/ph506/Boyd.pdf)
 by John P. Boyd.
 
-### How it works
-The user writes down a linearized set of equations, the eigenvalue problem,
+
+In Psecas, the user writes down a linearized set of equations, the eigenvalue problem,
 which is automatically discretized on either an infinite, finite or
 periodic domain. The resulting EVP can then be solved to a requested precision.
 
 ### Overview of the code
-The code consist of three main classes
+Psecas consist of three main classes
 
 - The Grid class
 
@@ -42,9 +60,13 @@ The code consist of three main classes
 An overview of various grid types is shown on page 11 in the book by
 [Boyd](http://depts.washington.edu/ph506/Boyd.pdf).
 
-<img src="images/boyd_overview.png" width="300">
+<img src="images/boyd_overview.png" width="300"> 
 
-The code currently has all the grids mentioned on this figure. We use ([a fork](https://github.com/tberlok/dmsuite))
+The code currently has all the grids mentioned on this figure, they
+are illustrated with 9 grid points below:
+<img src="images/gridpoints_illustration.png" width="900">
+
+We use ([a fork](https://github.com/tberlok/dmsuite))
 of a Python version of
 
 J. A. C. Weidemann and S. C. Reddy, A MATLAB Differentiation Matrix Suite,
@@ -57,9 +79,9 @@ the descriptions in the books by
 
 # Examples
 
-We provide a range of examples of using the code to solve linear eigenvalue
+We provide a some examples of using the code to solve linear eigenvalue
 problems in astrophysical fluid dynamics and also include some of the examples
-found in the books mentioned at the top of the page.
+found in the books mentioned above. 
 
 # Installation
 
@@ -73,9 +95,17 @@ at the top-level directory.
 
 # Testing
 
-Before using the code, the tests should be run to make sure that everything is
+Before using the code, the tests should be run to make sure that they are
 working. From the top-level directory
 ```
 $ pytest tests/ 
 ```
+
+# Developers
+
+### Main developer
+Thomas Berlok
+
+### Contributors
+Gopakumar Mohandas (Implementation of the Legendre grid)
 

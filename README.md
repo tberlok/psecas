@@ -18,6 +18,10 @@ submitted to Monthly Notices of the Royal Astronomical Society.
 where some details on how it all works can be found. The arxiv version of the paper
 can be downloaded [here (link will be provided asap)](insert_link).
 
+If you are here for the code verification tests presented in Table 2 in the 
+paper, then you can find more information 
+[here.](https://github.com/tberlok/psecas/tree/master/examples/kelvin-helmholtz/BerlokPfrommer2019)
+
 
 ### How it works
 Pseudo-spectral methods are described

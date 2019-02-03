@@ -68,27 +68,39 @@ class FourierGrid(Grid):
         for callback in self._observers:
             callback()
 
+    def to_coefficients(self, f):
+        """Calculate the (shifted) complex Fourier coefficients"""
+        import numpy as np
+
+        assert len(f) == self.N
+
+        ak = np.fft.fftshift(np.fft.fft(f, norm='ortho'))
+
+        return ak
+
     def interpolate(self, z, f):
         import numpy as np
 
         assert len(f) == self.N
 
-        ak = 2 * np.fft.rfft(f) / self.N
-        n = np.arange(self.N // 2 + 1)
-        # n[self.N:] = 0
+        akshift = self.to_coefficients(f)
+
+        freq = np.fft.fftfreq(self.N)
+        freq_shift = np.fft.fftshift(freq)
+        # n is basically np.arange(-self.N//2, self.N//2) for even N
+        n = freq_shift*self.N
 
         def to_grid(z):
-            cos = np.sum(
-                ak[1:].real
-                * np.cos(2.0 * np.pi * n[1:] * (z - self.dz / 2) / self.L)
-            )
-            sin = -np.sum(
-                ak[1:].imag
-                * np.sin(2.0 * np.pi * n[1:] * (z - self.dz / 2) / self.L)
-            )
-            y = ak[0].real / 2.0 + cos + sin
-            return y
+            y = np.sum(akshift*np.exp(2*np.pi*1j*n*(z-self.dz/2)/self.L))
+            return y/np.sqrt(self.N)
 
         to_grid_v = np.vectorize(to_grid)
 
-        return to_grid_v(z)
+        # Interpolate onto z
+        f_interpolated = to_grid_v(z)
+
+        # Only return real part as original input (f) is real
+        if not np.iscomplexobj(f):
+            f_interpolated = f_interpolated.real
+
+        return f_interpolated

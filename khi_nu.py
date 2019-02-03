@@ -30,20 +30,6 @@ val = np.max(np.abs(y))
 for key in system.variables:
     system.result[key] /= val
 
-# Normalize eigenmodes
-y = np.vstack(
-    [
-        system.result["dvx"].real,
-        system.result["dvx"].imag,
-        system.result["dvz"].real,
-        system.result["dvz"].imag,
-    ]
-)
-
-val = np.max(np.abs(y))
-for key in system.variables:
-    system.result[key] /= val
-
 # Write files for loading into Athena
 write_athena(system, Nz=256, Lz=2.0, path="./athena-solutions/", name="khi_nu")
 

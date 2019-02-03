@@ -18,7 +18,7 @@ comm = MPI.COMM_WORLD
 
     Berlok et al, in prep.
 
-    Another reference for the KHI with anisotric viscosity is
+    Another reference for the KHI with anisotropic viscosity is
 
     Suzuki, K., Ogawa, T., Matsumoto, Y., & Matsumoto, R. (2013).
     Magnetohydrodynamic simulations of the formation of cold fronts in

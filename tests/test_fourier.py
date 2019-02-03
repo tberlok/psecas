@@ -44,8 +44,8 @@ def test_fourier_interpolation(show=False):
     grid_fine = FourierGrid(N * 4, zmin, zmax)
     z = grid_fine.zg
 
-    y = np.sin(5 * 2 * np.pi * grid.zg / grid.L)
-    y_fine = np.sin(5 * 2 * np.pi * z / grid.L)
+    # y = np.sin(5 * 2 * np.pi * grid.zg / grid.L)
+    # y_fine = np.sin(5 * 2 * np.pi * z / grid.L)
 
     y = (
         np.sin(5 * 2 * np.pi * grid.zg / grid.L)

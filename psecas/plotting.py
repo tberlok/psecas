@@ -1,9 +1,6 @@
 def plot_solution(system, filename=None, num=1, smooth=True, limits=None):
     """Quickly plot the 1D eigenmodes stored in the system object"""
     import numpy as np
-    from psecas import setup
-
-    pylab = setup('ps')
     import matplotlib.pyplot as plt
 
     sol = system.result

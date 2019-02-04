@@ -1,8 +1,9 @@
 import numpy as np
 from psecas import Solver, FourierGrid
 from psecas.systems.kh_uniform import KelvinHelmholtzUniform
-from psecas import save_system, write_athena
+from psecas import save_system
 from psecas import plot_solution
+import matplotlib.pyplot as plt
 
 kxmax = 4.54704305
 # omega = 1.7087545
@@ -30,15 +31,37 @@ val = np.max(np.abs(y))
 for key in system.variables:
     system.result[key] /= val
 
-# Write files for loading into Athena
-write_athena(system, Nz=256, Lz=2.0, path="./athena-solutions/", name="khi_nu")
+# Save system pickle object
+save_system(system, "./khi_nu.p")
 
-save_system(system, "./athena-solutions/khi_nu.p")
-
+# Print out some information
 Lx = 2 * np.pi / system.kx
-
 print('')
 print('Eigenvalue is:', omega)
 print('Lx should be:', Lx)
 
-plot_solution(system, filename='./athena-solutions/khi_nu.pdf')
+# Make a plot
+plt.figure(1)
+plt.plot(kxmax, omega.real, "+")
+plot_solution(system, filename='./khi_nu.pdf')
+
+# Write files for loading into Athena
+s = system
+c_dic = {}
+for key in s.variables:
+    c_dic.update({key: s.grid.to_coefficients(s.result[key])})
+
+perturb = []
+for key in ['drho', 'dvx', 'dvz', 'dT', 'dA']:
+
+    perturb.append(c_dic[key].real)
+    perturb.append(c_dic[key].imag)
+
+perturb = np.transpose(perturb)
+np.savetxt(
+    'khi_nu.txt',
+    perturb,
+    delimiter="\t",
+    newline="\n",
+    fmt="%1.16e",
+)

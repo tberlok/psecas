@@ -29,7 +29,7 @@ if True:
 
 # Create initial conditions for Athena simulation
 if True:
-    from psecas import write_athena, save_system
+    from psecas import save_system
 
     kxmax = 5.5775520
     grid = FourierGrid(N=64, zmin=0.0, zmax=2.0)
@@ -53,19 +53,37 @@ if True:
     for key in system.variables:
         system.result[key] /= val
 
-    # Write files for loading into Athena
-    write_athena(system, Nz=256, Lz=2.0, path="./athena-solutions/",
-                 name="khi_mhd_beta5")
+    # Save system pickle object
+    save_system(system, "./khi_mhd_beta5.p")
 
-    save_system(system, "./athena-solutions/khi_mhd_beta5.p")
-
-    plt.figure(1)
-    plt.plot(kxmax, omega.real, "+")
-
+    # Print out some information
     Lx = 2 * np.pi / system.kx
-
     print('')
     print('Eigenvalue is:', omega)
     print('Lx should be:', Lx)
 
-    plot_solution(system, filename='./athena-solutions/khi_mhd_beta5.pdf')
+    # Make a plot
+    plt.figure(1)
+    plt.plot(kxmax, omega.real, "+")
+    plot_solution(system, filename='./khi_mhd_beta5.pdf')
+
+    # Write files for loading into Athena
+    s = system
+    c_dic = {}
+    for key in s.variables:
+        c_dic.update({key: s.grid.to_coefficients(s.result[key])})
+
+    perturb = []
+    for key in ['drho', 'dvx', 'dvz', 'dT', 'dA']:
+
+        perturb.append(c_dic[key].real)
+        perturb.append(c_dic[key].imag)
+
+    perturb = np.transpose(perturb)
+    np.savetxt(
+        'khi_mhd_beta5.txt',
+        perturb,
+        delimiter="\t",
+        newline="\n",
+        fmt="%1.16e",
+    )

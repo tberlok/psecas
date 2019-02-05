@@ -41,7 +41,7 @@ def test_laguerre_solutions(show=False):
     grid2 = LaguerreGrid(N=N, C=1, z='y')
 
     grids = list([grid1, grid2])
-    tols = [1e-8, 1e-14]
+    tols = [1e-8, 1e-12]
 
     # Number of solutions to find
     modes = 10

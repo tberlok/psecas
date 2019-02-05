@@ -9,10 +9,12 @@ See especially equation 17.41 and 17.43 and 17.64a.
 The exact eigenvalues are λ = n where n > 0 is an integer.
 
 The Laguerre polynonimals are superior for this problem because they are
-solutions to the differential equation.
+solutions to the differential equation. With this grid, the first N
+eigenvalues are obtained with just N grid points.
 
-Our interpolation method for Laguerre polynomials is seen to have some issues
-at high z (and/or low N).
+Our interpolation method for Laguerre polynomials is however seen to have
+some issues at high z (and/or low N) and the ChebyshevTLnGrid is therefore
+still recommended.
 """
 
 # Equation 17.43 in Boyd
@@ -27,20 +29,20 @@ class Example(Solver):
     def sorting_strategy(self, E):
         """Sorting strategy. E is a list of eigenvalues"""
         E[E.real > 100.0] = 0
-        E[E.real < 1e-1] = 1e5
+        E[E.real < 1e-1] = -E[E.real < 1e-1]
         index = np.argsort(np.real(E))
         return (E, index)
 
 
 # Create grids
-N = 64
+N = 40
 grid2 = LaguerreGrid(N=N, C=1, z='y')
 grid1 = ChebyshevTLnGrid(N=N, C=32, z='y')
 
 grids = list([grid1, grid2])
 
 # Number of solutions to plot for each grid
-modes = 4
+modes = 10
 
 # Create figure
 plt.figure(1)
@@ -61,7 +63,7 @@ for j, grid in enumerate(grids):
 
     z = np.logspace(np.log10(grid.zmin + 1e-2), np.log10(0.5e2), 4000)
     for mode in range(modes):
-        omega, vec = solver.solve(mode=mode + 8)
+        omega, vec = solver.solve(mode=mode)
         # Plottting
         axes[j, mode].set_title(r"$\sigma = ${:1.5f}".format(omega.real))
         axes[j, mode].semilogx(

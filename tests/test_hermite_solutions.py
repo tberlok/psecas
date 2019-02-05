@@ -1,0 +1,62 @@
+def test_hermite_solution():
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from psecas import Solver, System
+    from psecas import HermiteGrid, SincGrid, ChebyshevRationalGrid
+
+    """
+        Test of the behaviour of three different grids on the
+        infinite domain.
+        See also  the example hermite.py and note that the Chebyshev Rational
+        grid uses roughly twice as many grid points.
+
+        The example can be found in Boyd page 131-133.
+        We consider the eigenvalue problem
+        uₓₓ + (λ - x²) u = 0 with |u| → 0 as |x| → ∞
+        which has exact solutions uⱼ(x) = exp(-x²/2)H₋j(x) where
+        H₋j(x) is the jᵗʰ Hermite polynomial. The exact eigenvalues are
+        λⱼ = 2 j + 1.
+    """
+
+    N = 40
+
+    # Create grids
+    grid1 = ChebyshevRationalGrid(N=2*N - 1, C=2)
+    grid2 = SincGrid(N=N, C=2)
+    grid3 = HermiteGrid(N=N, C=1)
+
+    grids = list([grid1, grid2, grid3])
+    tols = [1e-8, 1e-7, 1e-14]
+
+    class HermiteSolver(Solver):
+        def sorting_strategy(self, E):
+            """Sorting strategy for hermite modes. E is a list of
+               eigenvalues"""
+            E[E.real > 100.0] = 0
+            # Ignore eigenvalues that are zero
+            E[E.real == 0.0] = 1e5
+            # Sort from smallest to largest eigenvalue
+            index = np.argsort(np.real(E))
+            return (E, index)
+
+    plt.figure(1)
+    plt.clf()
+    fig, axes = plt.subplots(num=1, nrows=3, sharex=True)
+
+    for ii, grid in enumerate(grids):
+        system = System(grid, variables="u", eigenvalue="sigma")
+        if isinstance(grid, ChebyshevRationalGrid):
+            boundary = True
+        else:
+            boundary = False
+        system.add_equation("sigma*u = -dz(dz(u)) + z**2*u", boundary=boundary)
+        solver = HermiteSolver(grid, system)
+        for j in range(1, 10):
+            omega, vec = solver.solve(mode=j)
+            np.testing.assert_allclose(2.0*j + 1.0, omega.real, atol=tols[ii],
+                                       rtol=tols[ii])
+
+
+if __name__ == '__main__':
+    err = test_hermite_solution()

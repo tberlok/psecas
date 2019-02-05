@@ -1,6 +1,5 @@
 from .solver import Solver
 from psecas.grids import *
-from .config import setup
 from .plotting import plot_solution, get_2Dmap
 from .mpi_io import IO
 from .utils import golden_section

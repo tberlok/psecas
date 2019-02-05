@@ -1,4 +1,4 @@
-def test_hermite_solution():
+def test_hermite_solutions(show=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -22,7 +22,7 @@ def test_hermite_solution():
     N = 40
 
     # Create grids
-    grid1 = ChebyshevRationalGrid(N=2*N - 1, C=2)
+    grid1 = ChebyshevRationalGrid(N=2 * N - 1, C=2)
     grid2 = SincGrid(N=N, C=2)
     grid3 = HermiteGrid(N=N, C=1)
 
@@ -40,9 +40,10 @@ def test_hermite_solution():
             index = np.argsort(np.real(E))
             return (E, index)
 
-    plt.figure(1)
-    plt.clf()
-    fig, axes = plt.subplots(num=1, nrows=3, sharex=True)
+    if show:
+        plt.figure(1)
+        plt.clf()
+        fig, axes = plt.subplots(num=1, nrows=3, ncols=10, sharex=True)
 
     for ii, grid in enumerate(grids):
         system = System(grid, variables="u", eigenvalue="sigma")
@@ -50,13 +51,39 @@ def test_hermite_solution():
             boundary = True
         else:
             boundary = False
-        system.add_equation("sigma*u = -dz(dz(u)) + z**2*u", boundary=boundary)
+        system.add_equation(
+            "sigma*u = -dz(dz(u)) + z**2*u", boundary=boundary
+        )
         solver = HermiteSolver(grid, system)
-        for j in range(1, 10):
+        for j in range(10):
             omega, vec = solver.solve(mode=j)
-            np.testing.assert_allclose(2.0*j + 1.0, omega.real, atol=tols[ii],
-                                       rtol=tols[ii])
+            np.testing.assert_allclose(
+                2.0 * j + 1.0, omega.real, atol=tols[ii], rtol=tols[ii]
+            )
+
+            if show:
+                solver.keep_result(omega, vec / np.max(np.abs(vec)), mode=j)
+                msg = r" $\sigma = ${:1.8f}"
+                ylabel = type(grid).__name__
+                axes[ii, j].set_title(msg.format(omega.real), fontsize=10)
+                if isinstance(grid, HermiteGrid):
+                    z = np.linspace(
+                        3 * grid.zmin / 5, 3 * grid.zmax / 5, 5000
+                    )
+                else:
+                    z = np.linspace(grid.zmin, grid.zmax, 5000)
+                axes[ii, j].plot(
+                    z, grid.interpolate(z, system.result["u"].real), "C0-"
+                )
+                axes[ii, j].plot(
+                    z, grid.interpolate(z, system.result["u"].imag), "C1-"
+                )
+                axes[ii, j].plot(grid.zg, system.result["u"].real, "C0+")
+                axes[ii, j].plot(grid.zg, system.result["u"].imag, "C1+")
+                axes[ii, j].set_xlim(-15, 15)
+                axes[ii, 0].set_ylabel(ylabel)
+                plt.show()
 
 
 if __name__ == '__main__':
-    err = test_hermite_solution()
+    test_hermite_solutions(show=True)

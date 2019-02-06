@@ -2,7 +2,10 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.3
+
 jobs:
   build:
     docker:
@@ -33,6 +36,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+            pip install pytest-cov
 
       - save_cache:
           paths:
@@ -50,7 +54,7 @@ jobs:
             . venv/bin/activate
             mkdir test-reports
             export PYTHONPATH=/home/circleci/repo
-            pytest /home/circleci/repo/tests --junitxml=test-reports/junit.xml
+            pytest --cov-report=xml --cov=/home/circleci/repo/psecas --junitxml=test-reports/junit.xml /home/circleci/repo/tests 
 
       - store_test_results:
           path: test-reports

@@ -12,11 +12,11 @@ pseudo-spectral methods.
 
 Psecas has been used in the publication
 
-Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with smooth initial conditions – Linear theory and simulations*, 
-submitted to Monthly Notices of the Royal Astronomical Society.
+Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with smooth initial conditions – Linear theory and simulations*,
+to appear in MNRAS
 
 where some details on how it all works can be found. The arxiv version of the paper
-can be downloaded [here (link will be provided asap)](insert_link).
+can be downloaded [here](http://arxiv.org/abs/1902.01403).
 
 If you are here for the code verification tests presented in Table 2 in the 
 paper, then you can find more information 

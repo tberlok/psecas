@@ -2,12 +2,9 @@
 
 This directory contains information which should enable you to initialize 
 simulations with linear solutions obtained with Psecas. The procedure is 
-described in the paper 
-
-[insert here](link)
-
+described [here](http://arxiv.org/abs/1902.01403)
 but please feel free to send an email to me (Thomas Berlok) if you need more
-assistance with creating the initial conditions. 
+practical assistance with creating the initial conditions. 
 
 ## Four verification tests
 

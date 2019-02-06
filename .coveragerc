@@ -1,2 +1,7 @@
 [run]
 source=psecas
+
+omit =
+	./psecas/plotting.py
+	./psecas/serial_io.py
+	./psecas/mpi_io.py

@@ -1,8 +1,8 @@
 [![CircleCI](https://circleci.com/gh/tberlok/psecas.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/psecas)
+[![codecov](https://codecov.io/gh/tberlok/psecas/branch/master/graph/badge.svg)](https://codecov.io/gh/tberlok/psecas)
 
 Pressure perturbation for the supersonic Kelvin-Helmholtz instability in 
-Cartesian and cylindrical geometry (more information can be found in the code 
-paper)
+Cartesian and cylindrical geometry
 <img src="images/modemap_plot_horizontal.png" width="900">
 # Introduction
 

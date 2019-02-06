@@ -13,7 +13,7 @@ def golden_section(f, a, b, tol=1e-5, **kwargs):
     >>> a = 1
     >>> b = 5
     >>> tol = 1e-5
-    >>> (c,d) = gss(f, a, b, tol)
+    >>> (c,d) = golden_section(f, a, b, tol)
     >>> print (c,d)
     (1.9999959837979107, 2.0000050911830893)
     """

@@ -5,7 +5,6 @@
 version: 2.1
 orbs:
   codecov: codecov/codecov@1.0.3
-
 jobs:
   build:
     docker:
@@ -61,3 +60,7 @@ jobs:
 
       - store_artifacts:
           path: test-reports
+
+      - codecov/upload:
+          file: /home/circleci/repo/coverage.xml
+      

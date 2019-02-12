@@ -1,7 +1,6 @@
 def test_hermite_solutions(show=False):
 
     import numpy as np
-    import matplotlib.pyplot as plt
     from psecas import Solver, System
     from psecas import HermiteGrid, SincGrid, ChebyshevRationalGrid
 
@@ -41,6 +40,7 @@ def test_hermite_solutions(show=False):
             return (E, index)
 
     if show:
+        import matplotlib.pyplot as plt
         plt.figure(1)
         plt.clf()
         fig, axes = plt.subplots(num=1, nrows=3, ncols=10, sharex=True)

@@ -1,7 +1,6 @@
 def test_infinite_well(show=False):
 
     import numpy as np
-    import matplotlib.pyplot as plt
     from psecas import Solver, System
     from psecas import (
         ChebyshevExtremaGrid,
@@ -63,6 +62,7 @@ def test_infinite_well(show=False):
     modes = 10
 
     if show:
+        import matplotlib.pyplot as plt
         # Create figure
         plt.figure(1)
         plt.clf()

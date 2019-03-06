@@ -401,6 +401,7 @@ class Solver:
                     )
                 except Exception as e:
                     raise Exception(err_msg1.format(eq, eq_t, var) + str(e))
+                submat = np.array(submat, dtype="complex128")
             else:
                 submat = np.zeros((NN, NN), dtype=np.complex128)
 

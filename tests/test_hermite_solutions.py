@@ -26,7 +26,7 @@ def test_hermite_solutions(show=False):
     grid3 = HermiteGrid(N=N, C=1)
 
     grids = list([grid1, grid2, grid3])
-    tols = [1e-8, 1e-7, 1e-14]
+    tols = [1e-8, 1e-7, 1e-12]
 
     class HermiteSolver(Solver):
         def sorting_strategy(self, E):

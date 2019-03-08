@@ -101,11 +101,26 @@ class ChebyshevTLnGrid(Grid):
         for callback in self._observers:
             callback()
 
+    def to_coefficients(self, f):
+        from numpy.polynomial.chebyshev import chebfit
+
+        # Convert semi-infinite grid to xg = [-1, 1]
+        xg = (self.zg - self.C) / (self.zg + self.C)
+
+        # Get coefficients for standard Chebyshev polynomials
+        c, res = chebfit(xg, f, deg=self.N, full=True)
+
+        return c
+
     def interpolate(self, z, f):
         """See equations 17.37 and 17.38 in Boyd"""
-        from numpy.polynomial.chebyshev import chebfit, chebval
+        from numpy.polynomial.chebyshev import chebval
 
-        xg = (self.zg - self.C) / (self.zg + self.C)
-        c, res = chebfit(xg, f, deg=self.N, full=True)
+        # Get coefficients for standard Chebyshev polynomials
+        c = self.to_coefficients(f)
+
+        # Convert semi-infinite grid to xg = [-1, 1]
         x = (z - self.C) / (z + self.C)
+
+        # Evaluate the Chebyshev polynomial
         return chebval(x, c)

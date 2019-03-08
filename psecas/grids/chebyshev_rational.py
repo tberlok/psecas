@@ -100,12 +100,28 @@ class ChebyshevRationalGrid(Grid):
         for callback in self._observers:
             callback()
 
-    def interpolate(self, z, f):
-        """See equations 17.37 and 17.38 in Boyd"""
-        from numpy.polynomial.chebyshev import chebfit, chebval
+    def to_coefficients(self, f):
+        from numpy.polynomial.chebyshev import chebfit
         import numpy as np
 
+        # Convert infinite grid to xg = [-1, 1]
         xg = self.zg / np.sqrt(self.C ** 2 + self.zg ** 2)
+
+        # Get coefficients for standard Chebyshev polynomials
         c, res = chebfit(xg, f, deg=self.N, full=True)
+
+        return c
+
+    def interpolate(self, z, f):
+        """See equations 17.37 and 17.38 in Boyd"""
+        from numpy.polynomial.chebyshev import chebval
+        import numpy as np
+
+        # Get coefficients for standard Chebyshev polynomials
+        c = self.to_coefficients(f)
+
+        # Convert infinite grid to xg = [-1, 1]
         x = z / np.sqrt(self.C ** 2 + z ** 2)
+
+        # Evaluate the Chebyshev polynomial
         return chebval(x, c)

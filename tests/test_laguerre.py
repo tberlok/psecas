@@ -1,4 +1,4 @@
-def test_lagurre_differentation(show=False):
+def test_laguerre_differentation(show=False):
     """Test the differentation routine of LaguerreGrid"""
     from psecas import LaguerreGrid
     import numpy as np
@@ -29,7 +29,7 @@ def test_lagurre_differentation(show=False):
     return (yp_num, yp_exac)
 
 
-def test_lagurre__interpolation(show=False):
+def test_laguerre_interpolation(show=False):
     """Test the inperpolation routine of LaguerreGrid"""
     from psecas import LaguerreGrid
     import numpy as np
@@ -59,5 +59,5 @@ def test_lagurre__interpolation(show=False):
 
 
 if __name__ == "__main__":
-    test_lagurre_differentation(show=True)
-    test_lagurre__interpolation(show=True)
+    test_laguerre_differentation(show=True)
+    test_laguerre_interpolation(show=True)

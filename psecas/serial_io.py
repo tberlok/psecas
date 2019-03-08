@@ -10,6 +10,13 @@ def load_system(filename):
 
 
 def save_system(system, filename):
+    """Save psecas system object as pickle
+
+    example:
+
+    save_system(system, 'system.p')
+
+    """
     import pickle
 
     # Delete d0, d1 and d2 for storage effieciency

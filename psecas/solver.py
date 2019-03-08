@@ -49,7 +49,7 @@ class Solver:
         # Calculate matrix
         self.get_matrix1()
 
-        if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
+        if ((not any(boundaries)) or all(boundaries)) and (not self.do_gen_evp):
             # Solve a standard EVP
             E, V = eig(self.mat1.toarray())
         else:
@@ -403,6 +403,11 @@ class Solver:
                     raise Exception(err_msg1.format(eq, eq_t, var) + str(e))
                 submat = np.array(submat, dtype="complex128")
             else:
+                submat = np.zeros((NN, NN), dtype=np.complex128)
+
+            # Prevent sparse.lil_matrix from changing the shape of
+            # a numpy array which is all zeros.
+            if np.count_nonzero(submat) == 0:
                 submat = np.zeros((NN, NN), dtype=np.complex128)
 
             mats.append(sparse.lil_matrix(submat))

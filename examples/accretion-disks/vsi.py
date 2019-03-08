@@ -74,7 +74,7 @@ class VerticalShearInstability(System):
 
 
 # Create a grid
-grid = ChebyshevRationalGrid(N=219, C=0.3)
+grid = ChebyshevRationalGrid(N=200, C=0.2)
 # grid = ChebyshevExtremaGrid(N=199, zmin=-5, zmax=5)
 
 # Create the system

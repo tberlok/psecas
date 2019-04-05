@@ -2,6 +2,7 @@ class Solver:
     """docstring for Solver"""
 
     def __init__(self, grid, system, do_gen_evp=False):
+        import numpy as np
 
         # Grid object
         self.grid = grid
@@ -12,6 +13,14 @@ class Solver:
         # do_gen_evp (default False) do the full generalized evp even though
         # boundaries suggest that an evp is sufficient
         self.do_gen_evp = do_gen_evp
+
+        # Check that variable names are unique, i.e., that variables
+        # are not a substring of another variable
+        msg = """eigenmode variable names are not allowed to be substrings
+                 of other eigenmode variables names"""
+        for var1 in system.variables:
+            tmp = np.sum([var.find(var1) for var in system.variables])
+            assert tmp == 1 - system.dim, msg
 
     def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):
         """
@@ -256,6 +265,7 @@ class Solver:
         Calculate the matrix M₂ neded in the solve method.
         """
         from scipy import sparse
+        import numpy as np
 
         dim = self.system.dim
         grid = self.grid
@@ -280,7 +290,11 @@ class Solver:
                                                         boundaries[j])
 
         # Assemble everything
+        # import IPython
+        # IPython.embed()
         self.mat1 = sparse.bmat(rows, format='csr')
+        # if (np.imag(self.mat1)).count_nonzero() == 0:
+        #     self.mat1 = np.real(self.mat1)
 
     def get_matrix2(self, verbose=False):
         """
@@ -314,6 +328,8 @@ class Solver:
 
         from scipy import sparse
         self.mat2 = sparse.csr_matrix(mat2)
+        # if (np.imag(self.mat2)).count_nonzero() == 0:
+        #     self.mat2 = np.real(self.mat2)
 
     def _var_replace(self, eq, var, new):
         """
@@ -383,7 +399,7 @@ class Solver:
                 try:
                     err_msg1 = (
                         "During the parsing of:\n\n{}\n\n"
-                        "Freja tried to evaluate\n\n{}\n\n"
+                        "Psecas tried to evaluate\n\n{}\n\n"
                         "while attempting to evaluate the terms with: {}"
                         "\nThis caused the following error to occur:\n\n"
                     )

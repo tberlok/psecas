@@ -38,9 +38,12 @@ class IO:
             info = {"experiment": experiment}
 
             # Save git commit number
-            git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])
-            git_commit = git_commit.strip().decode("utf-8")
-            info.update({"git_commit": git_commit})
+            try:
+                git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])
+                git_commit = git_commit.strip().decode("utf-8")
+                info.update({"git_commit": git_commit})
+            except:
+                pass
 
             # Save the hostname
             hostname = subprocess.check_output(["hostname"])

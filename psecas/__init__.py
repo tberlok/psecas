@@ -1,6 +1,6 @@
 from .solver import Solver
 from psecas.grids import *
-from .plotting import plot_solution, get_2Dmap
+from .plotting import plot_solution, get_2Dmap, get_2D_cylindrical_map
 from .mpi_io import IO
 from .utils import golden_section
 from .serial_io import load_system, save_system, write_athena

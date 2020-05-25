@@ -40,7 +40,7 @@ class HeatFluxDrivenBuoyancyInstability:
 
         # Extra information for boundary conditions
         self.extra_binfo = [[None, None], ['Neumann', 'Neumann'], ['Neumann', 'Neumann'],
-                            ['Dirichlet', 'Dirichlet'], ['Dirichlet', 'Dirichlet']]
+                            [None, None], ['Dirichlet', 'Dirichlet']]
 
         # Create initial background
         self.make_background()

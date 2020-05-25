@@ -476,7 +476,8 @@ class Solver:
         """
         N = self.grid.N
         if boundary:
-            submat[0, :] = 0
+            if binfo[0] is not None:
+                submat[0, :] = 0
             if binfo[0] == 'Dirichlet':
                 if eq_n == var_n:
                     submat[0, 0] = 1
@@ -486,7 +487,8 @@ class Solver:
             else:
                 raise RuntimeError('unknown boundary type')
 
-            submat[N, :] = 0
+            if binfo[1] is not None:
+                submat[N, :] = 0
             if binfo[1] == 'Dirichlet':
                 if eq_n == var_n:
                     submat[N, N] = 1

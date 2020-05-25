@@ -22,8 +22,6 @@ class Solver:
             tmp = np.sum([var.find(var1) for var in system.variables])
             assert tmp == 1 - system.dim, msg
 
-
-
         # This ensures backwards compatibility with old way of simply setting
         # True/False in boundary flag.
         # TODO: Boundary conditions need a major overhaul.
@@ -36,6 +34,13 @@ class Solver:
                 else:
                     extra_binfo.append([None, None])
             system.extra_binfo = extra_binfo
+
+        else:
+            # In the current implementation, we always have to solve
+            # the generalized evp when using a Neumann condition
+            for info in system.extra_binfo:
+                if 'Neumann' in info:
+                    self.do_gen_evp = True
 
 
     def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):

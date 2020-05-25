@@ -26,7 +26,6 @@ class Solver:
         # True/False in boundary flag.
         # TODO: Boundary conditions need a major overhaul.
         if not hasattr(system, 'extra_binfo'):
-            print('dafasdf')
             extra_binfo = []
             for boundary in system.boundaries:
                 if boundary:
@@ -346,7 +345,7 @@ class Solver:
         if any(boundaries):
             for j, equation in enumerate(equations):
                 if boundaries[j]:
-                    self._set_boundary(j + 1, sys.extra_binfo)
+                    self._set_boundary(j + 1, sys.extra_binfo[j])
 
         from scipy import sparse
         self.mat2 = sparse.csr_matrix(mat2)

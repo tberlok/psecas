@@ -346,7 +346,7 @@ class Solver:
         if any(boundaries):
             for j, equation in enumerate(equations):
                 if boundaries[j]:
-                    self._set_boundary(j + 1)
+                    self._set_boundary(j + 1, sys.extra_binfo)
 
         from scipy import sparse
         self.mat2 = sparse.csr_matrix(mat2)
@@ -478,29 +478,31 @@ class Solver:
         if boundary:
             if binfo[0] is not None:
                 submat[0, :] = 0
-            if binfo[0] == 'Dirichlet':
-                if eq_n == var_n:
-                    submat[0, 0] = 1
-            elif binfo[0] == 'Neumann':
-                if eq_n == var_n:
-                    submat[0, :] = grid.d1[0, :]
-            else:
-                raise RuntimeError('unknown boundary type')
+                if binfo[0] == 'Dirichlet':
+                    if eq_n == var_n:
+                        submat[0, 0] = 1
+                elif binfo[0] == 'Neumann':
+                    if eq_n == var_n:
+                        submat[0, :] = grid.d1[0, :]
+                else:
+                    raise RuntimeError('unknown boundary type')
 
             if binfo[1] is not None:
                 submat[N, :] = 0
-            if binfo[1] == 'Dirichlet':
-                if eq_n == var_n:
-                    submat[N, N] = 1
-            elif binfo[1] == 'Neumann':
-                if eq_n == var_n:
-                    submat[N, :] = grid.d1[N, :]
-            else:
-                raise RuntimeError('unknown boundary type')
+                if binfo[1] == 'Dirichlet':
+                    if eq_n == var_n:
+                        submat[N, N] = 1
+                elif binfo[1] == 'Neumann':
+                    if eq_n == var_n:
+                        submat[N, :] = grid.d1[N, :]
+                else:
+                    raise RuntimeError('unknown boundary type')
 
         return submat
 
-    def _set_boundary(self, var_n):
+    def _set_boundary(self, var_n, binfo):
         NN = self.grid.NN
-        self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
-        self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0
+        if binfo[0] is not None:
+            self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
+        if binfo[1] is not None:
+            self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0

@@ -22,6 +22,22 @@ class Solver:
             tmp = np.sum([var.find(var1) for var in system.variables])
             assert tmp == 1 - system.dim, msg
 
+
+
+        # This ensures backwards compatibility with old way of simply setting
+        # True/False in boundary flag.
+        # TODO: Boundary conditions need a major overhaul.
+        if not hasattr(system, 'extra_binfo'):
+            print('dafasdf')
+            extra_binfo = []
+            for boundary in system.boundaries:
+                if boundary:
+                    extra_binfo.append(['Dirichlet', 'Dirichlet'])
+                else:
+                    extra_binfo.append([None, None])
+            system.extra_binfo = extra_binfo
+
+
     def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
@@ -271,6 +287,7 @@ class Solver:
         grid = self.grid
         equations = self.system.equations
         boundaries = self.system.boundaries
+        extra_binfo = self.system.extra_binfo
 
         # Construct all submatrices as sparse matrices
         rows = []
@@ -287,7 +304,7 @@ class Solver:
                 elif any(boundaries):
                     rows[j][i] = self._modify_submatrix(rows[j][i],
                                                         j + 1, i + 1,
-                                                        boundaries[j])
+                                                        boundaries[j], extra_binfo[j])
 
         # Assemble everything
         # import IPython
@@ -447,7 +464,7 @@ class Solver:
             (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
         ] = submat
 
-    def _modify_submatrix(self, submat, eq_n, var_n, boundary):
+    def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo):
         """
         Set submatrix corresponding to the term proportional to var_n
         (variable number) in eq_n (equation number).
@@ -455,10 +472,24 @@ class Solver:
         N = self.grid.N
         if boundary:
             submat[0, :] = 0
+            if binfo[0] == 'Dirichlet':
+                if eq_n == var_n:
+                    submat[0, 0] = 1
+            elif binfo[0] == 'Neumann':
+                if eq_n == var_n:
+                    submat[0, :] = grid.d1[0, :]
+            else:
+                raise RuntimeError('unknown boundary type')
+
             submat[N, :] = 0
-            if eq_n == var_n:
-                submat[0, 0] = 1
-                submat[N, N] = 1
+            if binfo[1] == 'Dirichlet':
+                if eq_n == var_n:
+                    submat[N, N] = 1
+            elif binfo[1] == 'Neumann':
+                if eq_n == var_n:
+                    submat[N, :] = grid.d1[N, :]
+            else:
+                raise RuntimeError('unknown boundary type')
 
         return submat
 

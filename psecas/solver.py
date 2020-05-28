@@ -338,8 +338,7 @@ class Solver:
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
             for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1,
-                                    False)
+                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1)
         self.mat2 = mat2
 
         if any(boundaries):
@@ -451,27 +450,30 @@ class Solver:
 
         return mats
 
-    def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
+    def _set_submatrix(self, mat1, submat, eq_n, var_n):
         """
         Set submatrix corresponding to the term proportional to var_n
         (variable number) in eq_n (equation number).
         """
         NN = self.grid.NN
         N = self.grid.N
-        if boundary:
-            submat[0, :] = 0
-            submat[N, :] = 0
-            if eq_n == var_n:
-                submat[0, 0] = 1
-                submat[N, N] = 1
+
         mat1[
             (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
         ] = submat
 
     def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo, verbose=False):
         """
-        Set submatrix corresponding to the term proportional to var_n
-        (variable number) in eq_n (equation number).
+        This modifies the submatrix to incorporate boundary conditions.
+    
+        Dirichlet is value set to zero at boundary.
+        Neumann is derivative set to zero boundary.
+
+        Finally, one can set a string such as
+
+        'r**2*dr(dr(Aphi)) + r*dr(Aphi) - Aphi = 0'
+
+        The Boundary condition on a variable cannot depend on the other independent variables.
         """
         import numpy as np
 
@@ -528,6 +530,9 @@ class Solver:
         return submat
 
     def _set_boundary(self, var_n, binfo):
+        """
+        Set boundary conditions in the RHS matrix, M₂.
+        """
         NN = self.grid.NN
         if binfo[0] is not None:
             self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0

@@ -55,9 +55,17 @@ class LegendreExtremaGrid(Grid):
         for callback in self._observers:
             callback()
 
-    def interpolate(self, z, f):
-        from numpy.polynomial.legendre import legfit, legval
+    def to_coefficients(self, f):
+        from numpy.polynomial.legendre import legfit
 
         c, res = legfit(self.zg, f, deg=self.N, full=True)
-        # c = chebfit(grid.zg, f, deg=grid.N, full=False)
+
+        return c
+
+    def interpolate(self, z, f):
+        from numpy.polynomial.legendre import legval
+
+        # Get coefficients for Legendre polynomials
+        c = self.to_coefficients(f)
+
         return legval(z, c)

@@ -124,5 +124,5 @@ Psecas consist of three main classes
 Thomas Berlok
 
 ### Contributors
-Gopakumar Mohandas (Implementation of the Legendre grid)
+Gopakumar Mohandas (Implementation of the Legendre grid, VSI and Hall-MRI examples, guidance and encouragement)
 

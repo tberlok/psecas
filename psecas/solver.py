@@ -468,34 +468,62 @@ class Solver:
             (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
         ] = submat
 
-    def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo):
+    def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo, verbose=False):
         """
         Set submatrix corresponding to the term proportional to var_n
         (variable number) in eq_n (equation number).
         """
+        import numpy as np
+
+        # This is a nasty trick
+        globals().update(self.system.__dict__)
+        grid = self.system.grid
+
         N = self.grid.N
         if boundary:
-            if binfo[0] is not None:
-                submat[0, :] = 0
-                if binfo[0] == 'Dirichlet':
+            for index, bound in zip([0, N], binfo):
+                if bound is not None:
+                    submat[index, :] = 0
                     if eq_n == var_n:
-                        submat[0, 0] = 1
-                elif binfo[0] == 'Neumann':
-                    if eq_n == var_n:
-                        submat[0, :] = grid.d1[0, :]
-                else:
-                    raise RuntimeError('unknown boundary type')
-
-            if binfo[1] is not None:
-                submat[N, :] = 0
-                if binfo[1] == 'Dirichlet':
-                    if eq_n == var_n:
-                        submat[N, N] = 1
-                elif binfo[1] == 'Neumann':
-                    if eq_n == var_n:
-                        submat[N, :] = grid.d1[N, :]
-                else:
-                    raise RuntimeError('unknown boundary type')
+                        if bound == 'Dirichlet':
+                            submat[index, index] = 1
+                        elif bound == 'Neumann':
+                            submat[index, :] = grid.d1[index, :]
+                        else:
+                            assert '=' in bound, 'equal sign missing in boundary expression'
+                            assert int(bound.split("=")[1]) == 0, 'rhs of boundary expressions must be zero'
+                            var = self.system.variables[var_n-1]
+                            bound_t = bound.split("=")[0]
+                            der = "d" + grid.z + "("
+                            mask = np.zeros(self.grid.NN)
+                            mask[index] = 1
+                            bound_t = bound_t.replace(der + der + var + "))", "grid.d2[{}, :]".format(index))
+                            bound_t = bound_t.replace(der + var + ")", "grid.d1[{}, :]".format(index))
+                            bound_t = self._var_replace(bound_t, var, "mask")
+                            bound_t = self._var_replace(bound_t, grid.z, "grid.zg[{}]".format(index))
+                            if verbose:
+                                print("\nEvaluating expression:", bound_t)
+                            try:
+                                err_msg1 = (
+                                    "During the parsing of:\n\n{}\n\n"
+                                    "Psecas tried to evaluate\n\n{}\n\n"
+                                    "while attempting to evaluate the boundary on: {}"
+                                    "\nThis caused the following error to occur:\n\n"
+                                )
+                                # Evaluate the expression
+                                submat[index, :] = eval(bound_t)
+                            except NameError as e:
+                                strerror, = e.args
+                                err_msg2 = (
+                                    "\n\nThis is likely because the missing variable has"
+                                    "\nnot been defined in your systems class or its\n"
+                                    "make_background method."
+                                )
+                                raise NameError(
+                                    err_msg1.format(bound, bound_t, var) + strerror + err_msg2
+                                )
+                            except Exception as e:
+                                raise Exception(err_msg1.format(bound, bound_t, var) + str(e))
 
         return submat
 

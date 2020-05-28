@@ -22,6 +22,26 @@ class Solver:
             tmp = np.sum([var.find(var1) for var in system.variables])
             assert tmp == 1 - system.dim, msg
 
+        # This ensures backwards compatibility with old way of simply setting
+        # True/False in boundary flag.
+        # TODO: Boundary conditions need a major overhaul.
+        if not hasattr(system, 'extra_binfo'):
+            extra_binfo = []
+            for boundary in system.boundaries:
+                if boundary:
+                    extra_binfo.append(['Dirichlet', 'Dirichlet'])
+                else:
+                    extra_binfo.append([None, None])
+            system.extra_binfo = extra_binfo
+
+        else:
+            # In the current implementation, we always have to solve
+            # the generalized evp when using a Neumann condition
+            for info in system.extra_binfo:
+                if 'Neumann' in info:
+                    self.do_gen_evp = True
+
+
     def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):
         """
         Construct and solve the (generalized) eigenvalue problem (EVP)
@@ -271,6 +291,7 @@ class Solver:
         grid = self.grid
         equations = self.system.equations
         boundaries = self.system.boundaries
+        extra_binfo = self.system.extra_binfo
 
         # Construct all submatrices as sparse matrices
         rows = []
@@ -287,7 +308,7 @@ class Solver:
                 elif any(boundaries):
                     rows[j][i] = self._modify_submatrix(rows[j][i],
                                                         j + 1, i + 1,
-                                                        boundaries[j])
+                                                        boundaries[j], extra_binfo[j])
 
         # Assemble everything
         # import IPython
@@ -317,14 +338,13 @@ class Solver:
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
             for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1,
-                                    False)
+                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1)
         self.mat2 = mat2
 
         if any(boundaries):
             for j, equation in enumerate(equations):
                 if boundaries[j]:
-                    self._set_boundary(j + 1)
+                    self._set_boundary(j + 1, sys.extra_binfo[j])
 
         from scipy import sparse
         self.mat2 = sparse.csr_matrix(mat2)
@@ -430,39 +450,91 @@ class Solver:
 
         return mats
 
-    def _set_submatrix(self, mat1, submat, eq_n, var_n, boundary):
+    def _set_submatrix(self, mat1, submat, eq_n, var_n):
         """
         Set submatrix corresponding to the term proportional to var_n
         (variable number) in eq_n (equation number).
         """
         NN = self.grid.NN
         N = self.grid.N
-        if boundary:
-            submat[0, :] = 0
-            submat[N, :] = 0
-            if eq_n == var_n:
-                submat[0, 0] = 1
-                submat[N, N] = 1
+
         mat1[
             (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
         ] = submat
 
-    def _modify_submatrix(self, submat, eq_n, var_n, boundary):
+    def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo, verbose=False):
         """
-        Set submatrix corresponding to the term proportional to var_n
-        (variable number) in eq_n (equation number).
+        This modifies the submatrix to incorporate boundary conditions.
+    
+        Dirichlet is value set to zero at boundary.
+        Neumann is derivative set to zero boundary.
+
+        Finally, one can set a string such as
+
+        'r**2*dr(dr(Aphi)) + r*dr(Aphi) - Aphi = 0'
+
+        The Boundary condition on a variable cannot depend on the other independent variables.
         """
+        import numpy as np
+
+        # This is a nasty trick
+        globals().update(self.system.__dict__)
+        grid = self.system.grid
+
         N = self.grid.N
         if boundary:
-            submat[0, :] = 0
-            submat[N, :] = 0
-            if eq_n == var_n:
-                submat[0, 0] = 1
-                submat[N, N] = 1
+            for index, bound in zip([0, N], binfo):
+                if bound is not None:
+                    submat[index, :] = 0
+                    if eq_n == var_n:
+                        if bound == 'Dirichlet':
+                            submat[index, index] = 1
+                        elif bound == 'Neumann':
+                            submat[index, :] = grid.d1[index, :]
+                        else:
+                            assert '=' in bound, 'equal sign missing in boundary expression'
+                            assert int(bound.split("=")[1]) == 0, 'rhs of boundary expressions must be zero'
+                            var = self.system.variables[var_n-1]
+                            bound_t = bound.split("=")[0]
+                            der = "d" + grid.z + "("
+                            mask = np.zeros(self.grid.NN)
+                            mask[index] = 1
+                            bound_t = bound_t.replace(der + der + var + "))", "grid.d2[{}, :]".format(index))
+                            bound_t = bound_t.replace(der + var + ")", "grid.d1[{}, :]".format(index))
+                            bound_t = self._var_replace(bound_t, var, "mask")
+                            bound_t = self._var_replace(bound_t, grid.z, "grid.zg[{}]".format(index))
+                            if verbose:
+                                print("\nEvaluating expression:", bound_t)
+                            try:
+                                err_msg1 = (
+                                    "During the parsing of:\n\n{}\n\n"
+                                    "Psecas tried to evaluate\n\n{}\n\n"
+                                    "while attempting to evaluate the boundary on: {}"
+                                    "\nThis caused the following error to occur:\n\n"
+                                )
+                                # Evaluate the expression
+                                submat[index, :] = eval(bound_t)
+                            except NameError as e:
+                                strerror, = e.args
+                                err_msg2 = (
+                                    "\n\nThis is likely because the missing variable has"
+                                    "\nnot been defined in your systems class or its\n"
+                                    "make_background method."
+                                )
+                                raise NameError(
+                                    err_msg1.format(bound, bound_t, var) + strerror + err_msg2
+                                )
+                            except Exception as e:
+                                raise Exception(err_msg1.format(bound, bound_t, var) + str(e))
 
         return submat
 
-    def _set_boundary(self, var_n):
+    def _set_boundary(self, var_n, binfo):
+        """
+        Set boundary conditions in the RHS matrix, M₂.
+        """
         NN = self.grid.NN
-        self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
-        self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0
+        if binfo[0] is not None:
+            self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
+        if binfo[1] is not None:
+            self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0

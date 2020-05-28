@@ -30,7 +30,7 @@ system = HeatFluxDrivenBuoyancyInstability(grid, beta, Kn, kx)
 
 solver = Solver(grid, system)
 
-mode = 0
+mode = 1
 omega, vec = solver.solve(mode=mode)
 
 plot_solution(system, smooth=True)

@@ -6,7 +6,10 @@ def test_fourier_differentation(show=False):
     N = 256
     zmin = 0
     zmax = 2
-    grid = FourierGrid(N, zmin, zmax)
+    grid = FourierGrid(128, -20, 30)
+    grid.zmin = zmin
+    grid.zmax = zmax
+    grid.N = N
 
     z = grid.zg
     y = np.tanh((z - 1.5) / 0.05) - np.tanh((z - 0.5) / 0.05) + 1.0
@@ -15,6 +18,8 @@ def test_fourier_differentation(show=False):
         + np.tanh((z - 0.5) / 0.05) ** 2 / 0.05
     )
     yp_num = np.matmul(grid.d1, y)
+
+    np.testing.assert_allclose(yp_num, grid.der(y), atol=1e-16)
 
     if show:
         import matplotlib.pyplot as plt

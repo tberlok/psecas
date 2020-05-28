@@ -12,6 +12,8 @@ def test_differentation(show=False):
     yp_num = np.matmul(grid.d1, y)
     ypp_num = np.matmul(grid.d2, y)
 
+    np.testing.assert_allclose(ypp_num, grid.dder(y), atol=1e-16)
+
     if show:
         import matplotlib.pyplot as plt
 

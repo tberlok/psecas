@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 
     The linearized equations for this setup are derived in
 
-    Berlok, T. et al, in prep
+    Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability 
+    with smooth initial conditions – Linear theory and simulations*, MNRAS,
+    485, 908
 
     and the equilibrium has been previously been used for simulations in
 

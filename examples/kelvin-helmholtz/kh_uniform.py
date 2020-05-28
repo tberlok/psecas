@@ -16,7 +16,9 @@ comm = MPI.COMM_WORLD
 
     More details about this specific setup can be found in
 
-    Berlok et al, in prep.
+    Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability 
+    with smooth initial conditions – Linear theory and simulations*, MNRAS,
+    485, 908
 
     Another reference for the KHI with anisotropic viscosity is
 

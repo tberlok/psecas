@@ -7,7 +7,9 @@ class KelvinHelmholtzUniform:
 
        More details about this specific setup can be found in
 
-       Berlok et al, in prep.
+       Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with
+       smooth initial conditions – Linear theory and simulations*,
+       [MNRAS, 485, 908](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz379/5308845)
 
        Another reference for the KHI with anisotric viscosity is
 

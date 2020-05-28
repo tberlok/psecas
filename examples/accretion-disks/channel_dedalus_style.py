@@ -53,7 +53,10 @@ for mode in range(modes):
     axes[mode].set_title(
         r"$\sigma = ${:1.4f}".format(omega.real), fontsize=10
     )
-    axes[mode].plot(grid.zg, system.result['f'].real)
-    axes[mode].plot(grid.zg, system.result['f'].imag)
+    zfine = np.linspace(-4, 4, 5000)
+    axes[mode].plot(zfine, grid.interpolate(zfine, system.result['f'].real))
+    # axes[mode].plot(zfine, grid.interpolate(zfine, system.result['f'].imag))
+    axes[mode].plot(grid.zg, system.result['f'].real, '.')
+    # axes[mode].plot(grid.zg, system.result['f'].imag, '.')
     axes[mode].set_xlim(-4, 4)
 plt.show()

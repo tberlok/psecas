@@ -26,6 +26,8 @@ def test_sinc_differentation(show=False):
 
     N = 200
     grid = SincGrid(100, C=1)
+
+    assert grid.zg[0] < grid.zg[-1]
     # These are just simple tests of grid methods
     grid.C = 5
     grid.N = N

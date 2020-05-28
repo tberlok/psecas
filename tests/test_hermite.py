@@ -30,6 +30,8 @@ def test_hermite_differentation(show=False):
     grid.C = 1
     assert grid.zmin < grid.zmax
 
+    assert grid.zg[0] < grid.zg[-1]
+
     c = np.ones(6)
     y = psi(grid.zg, c)
     yp_exac = dpsi(grid.zg, c)

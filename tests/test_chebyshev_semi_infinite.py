@@ -5,8 +5,12 @@ def test_differentation(show=False):
 
     N = 200
     grid = ChebyshevTLnGrid(N, C=3)
+    assert grid.zg[0] < grid.zg[-1]
+
     grid.N = N
+    assert grid.N == N
     grid.C = 3
+    assert grid.C == 3
 
     y = np.exp(-grid.zg)
     yp_exac = -y

@@ -8,6 +8,10 @@ def test_laguerre_differentation(show=False):
     grid.C = 3
     grid.N = N
     assert grid.zmin < grid.zmax
+    assert grid.N == N
+    assert grid.C == 3
+
+    assert grid.zg[0] < grid.zg[-1]
 
     y = np.exp(-grid.zg)
     yp_exac = -y

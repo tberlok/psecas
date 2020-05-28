@@ -8,6 +8,8 @@ def test_chebyshev_differentation(show=False):
     zmax = 1
     grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
+    assert grid.zg[0] < grid.zg[-1]
+
     z = grid.zg
     y = np.exp(z) * np.sin(5 * z)
     yp_exac = np.exp(z) * (np.sin(5 * z) + 5 * np.cos(5 * z))

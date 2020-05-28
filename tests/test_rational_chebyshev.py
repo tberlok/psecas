@@ -26,6 +26,8 @@ def test_rational_chebyshev_differentation(show=False):
     N = 100
     grid = ChebyshevRationalGrid(N, C=4)
 
+    assert grid.zg[0] < grid.zg[-1]
+
     c = np.ones(4)
     y = psi(grid.zg, c)
     yp_exac = dpsi(grid.zg, c)

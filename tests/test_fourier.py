@@ -7,9 +7,17 @@ def test_fourier_differentation(show=False):
     zmin = 0
     zmax = 2
     grid = FourierGrid(128, -20, 30)
+    
+    # Use the setter methods
     grid.zmin = zmin
     grid.zmax = zmax
     grid.N = N
+
+    assert grid.zmin == zmin
+    assert grid.zmax == zmax
+    assert grid.N == N
+
+    assert grid.zg[0] < grid.zg[-1]
 
     z = grid.zg
     y = np.tanh((z - 1.5) / 0.05) - np.tanh((z - 0.5) / 0.05) + 1.0

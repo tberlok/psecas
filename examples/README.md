@@ -12,8 +12,7 @@ Pressure perturbation for the supersonic Kelvin-Helmholtz instability in Cartesi
 
 ### Unstable eigenmodes of a magnetized stream
 
-<img src="../images/cylinder_modes.png" width="360">
-<img src="../images/pinch_mode_beta1_v2.png" width="490">
+<img src="https://user-images.githubusercontent.com/10655136/83187004-bcb80c00-a12d-11ea-89e4-acae37531d91.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/10655136/83187007-bd50a280-a12d-11ea-9a7d-e78201c1ec98.png" width="45%"></img>
 <img src="../images/circular_mode_cartesian_m_4.png" width="900">
 
 

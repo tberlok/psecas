@@ -11,7 +11,7 @@ Psecas (Pseudo-Spectral Eigenvalue Calculator with an Automated Solver)
 is a collection of methods for solving eigenvalue problems (EVPs) using
 pseudo-spectral methods. Psecas was developed for solving the kind of eigenvalue problem that often arises when a linear stability calculation is performed in astrophysical fluid dynamics. The code was introduced [in a MNRAS paper](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz379/5308845) where details on how it all works can be found. The arxiv version of the paper can be downloaded [here](http://arxiv.org/abs/1902.01403).
 
-A collection of example calculations can found
+A collection of example calculations and a gallery can be found
 [here.](https://github.com/tberlok/psecas/tree/master/examples)
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the

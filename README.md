@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/tberlok/psecas.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/psecas)
+[![Build Status](https://travis-ci.com/tberlok/psecas.svg?branch=master)](https://travis-ci.com/tberlok/psecas)
 [![codecov](https://codecov.io/gh/tberlok/psecas/branch/master/graph/badge.svg)](https://codecov.io/gh/tberlok/psecas)
 
 <!-- Pressure perturbation for the supersonic Kelvin-Helmholtz instability in

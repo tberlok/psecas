@@ -25,7 +25,11 @@ def test_sinc_differentation(show=False):
         return yp
 
     N = 200
-    grid = SincGrid(N, C=5)
+    grid = SincGrid(100, C=1)
+    # These are just simple tests of grid methods
+    grid.C = 5
+    grid.N = N
+    assert grid.zmin < grid.zmax
 
     c = np.ones(4)
     y = psi(grid.zg, c)

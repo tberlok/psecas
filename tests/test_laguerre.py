@@ -4,7 +4,10 @@ def test_laguerre_differentation(show=False):
     import numpy as np
 
     N = 90
-    grid = LaguerreGrid(N, C=3)
+    grid = LaguerreGrid(40, C=1)
+    grid.C = 3
+    grid.N = N
+    assert grid.zmin < grid.zmax
 
     y = np.exp(-grid.zg)
     yp_exac = -y

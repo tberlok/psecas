@@ -7,6 +7,11 @@ def test_mti_solution(show=False, verbose=False):
     grid = ChebyshevExtremaGrid(N=64, zmin=0, zmax=1)
 
     system = MagnetoThermalInstability(grid, beta=1e5, Kn0=200, kx=4 * np.pi)
+    system.beta = 1e5
+    system.Kn0 = 200
+
+    assert system.Kn0 == 200
+    assert system.beta == 1e5
 
     solver = Solver(grid, system)
 
@@ -15,6 +20,8 @@ def test_mti_solution(show=False, verbose=False):
     omega, vec, err = solver.iterate_solver(
         Ns, mode=mode, tol=1e-8, verbose=verbose
     )
+
+    system.get_bx_and_by()
 
     if show:
         from psecas import plot_solution

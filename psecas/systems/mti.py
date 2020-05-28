@@ -11,7 +11,7 @@ class MagnetoThermalInstability:
        T. Berlok et al, in prep.
     """
 
-    def __init__(self, grid, beta, Kn0, kx, only_interior=True):
+    def __init__(self, grid, beta, Kn0, kx):
         # Problem parameters
 
         self._beta = beta
@@ -46,7 +46,6 @@ class MagnetoThermalInstability:
 
         # Boundary conditions
         self.boundaries = [True, False, False, False, False]
-        self.only_interior = only_interior
 
         # Create initial background
         self.make_background()
@@ -124,7 +123,7 @@ class MagnetoThermalInstability:
         Returns symbolic expressions (as a function of z) """
         import sympy as sym
         import numpy as np
-        from sympy import exp
+        from sympy import exp, lambdify
 
         z = sym.symbols("z")
 
@@ -132,53 +131,19 @@ class MagnetoThermalInstability:
 
         globals().update(self.__dict__)
 
-        p = []
-        rho = []
-        dpdz = []
-        dlnTdz = []
-        dlnrhodz = []
-        drhonudz = []
-
         # Define Background Functions
-        for z1 in zg:
-            if self.only_interior:
-                rho_sym = rho0 * (1 - z / (3 * H0)) ** 2
-                p_sym = p0 * (1 - z / (3 * H0)) ** 3
-            else:
-                if z1 <= Lz / 4:
-                    rho_sym = rho0 * exp(-(z - Lz / 4) / H0)
-                    p_sym = p0 * exp(-(z - Lz / 4) / H0)
-                elif z1 > (Lz / 4) and z1 < (3 / 4 * Lz):
-                    rho_sym = rho0 * (1 - (z - Lz / 4) / (3 * H0)) ** 2
-                    p_sym = p0 * (1 - (z - Lz / 4) / (3 * H0)) ** 3
-                else:
-                    rho_sym = (
-                        rho0
-                        * (1 - Lz / (6 * H0)) ** 2
-                        * exp(-(z - 3 * Lz / 4) / H0)
-                    )
-                    p_sym = (
-                        p0
-                        * (1 - Lz / (6 * H0)) ** 3
-                        * exp(-(z - 3 * Lz / 4) / H0)
-                    )
+        rho_sym = rho0 * (1 - z / (3 * H0)) ** 2
+        p_sym = p0 * (1 - z / (3 * H0)) ** 3
 
-            T_sym = p_sym / rho_sym
-            nu_sym = nu0 * T_sym ** (5 / 2)
+        T_sym = p_sym / rho_sym
+        nu_sym = nu0 * T_sym ** (5 / 2)
 
-            p.append(p_sym.subs(z, z1))
-            rho.append(rho_sym.subs(z, z1))
-            dpdz.append((sym.diff(p_sym, z)).subs(z, z1))
-            dlnrhodz.append((sym.diff(rho_sym, z) / rho_sym).subs(z, z1))
-            dlnTdz.append((sym.diff(T_sym, z) / T_sym).subs(z, z1))
-            drhonudz.append((sym.diff(rho_sym * nu_sym, z)).subs(z, z1))
-
-        self.p = np.array(p, dtype=np.complex128)
-        self.rho = np.array(rho, dtype=np.complex128)
-        self.dpdz = np.array(dpdz, dtype=np.complex128)
-        self.dlnrhodz = np.array(dlnrhodz, dtype=np.complex128)
-        self.dlnTdz = np.array(dlnTdz, dtype=np.complex128)
-        self.drhonudz = np.array(drhonudz, dtype=np.complex128)
+        self.p = lambdify(z, p_sym)(zg)
+        self.rho = lambdify(z, rho_sym)(zg)
+        self.dpdz = lambdify(z, sym.diff(p_sym, z))(zg)
+        self.dlnrhodz = lambdify(z, sym.diff(rho_sym, z) / rho_sym)(zg)
+        self.dlnTdz = lambdify(z, sym.diff(T_sym, z) / T_sym)(zg)
+        self.drhonudz = lambdify(z, sym.diff(rho_sym * nu_sym, z))(zg)
 
         self.T = self.p / self.rho
         self.chi = chi0 * self.T ** (5 / 2)

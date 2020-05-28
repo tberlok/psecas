@@ -308,7 +308,9 @@ class Solver:
                 elif any(boundaries):
                     rows[j][i] = self._modify_submatrix(rows[j][i],
                                                         j + 1, i + 1,
-                                                        boundaries[j], extra_binfo[j])
+                                                        boundaries[j], 
+                                                        extra_binfo[j], 
+                                                        verbose)
 
         # Assemble everything
         # import IPython

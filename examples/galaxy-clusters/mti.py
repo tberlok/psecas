@@ -28,7 +28,7 @@ kx = 2 * np.pi
 # kxmax for beta = 1e3 and Kn0 = 2000
 # kx = 7.982608527915205
 
-system = MagnetoThermalInstability(grid, beta, Kn0, kx, only_interior=True)
+system = MagnetoThermalInstability(grid, beta, Kn0, kx)
 system.boundaries = [False, True, False, True, True]
 
 # No viscosity for now

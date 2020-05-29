@@ -57,9 +57,28 @@ class ChebyshevExtremaGrid(Grid):
         for callback in self._observers:
             callback()
 
-    def interpolate(self, z, f):
-        from numpy.polynomial.chebyshev import chebfit, chebval
+    def to_coefficients(self, f):
+        from numpy.polynomial.chebyshev import chebfit
+        import numpy as np
 
-        c, res = chebfit(self.zg, f, deg=self.N, full=True)
-        # c = chebfit(grid.zg, f, deg=grid.N, full=False)
-        return chebval(z, c)
+        # Convert grid to standard xg = [-1, 1]
+        xg = (self.zg - self.zmin)/self.L * 2. - 1.
+
+        # Get coefficients for standard Chebyshev polynomials
+        c, res = chebfit(xg, f, deg=self.N, full=True)
+
+        return c
+
+    def interpolate(self, z, f):
+        from numpy.polynomial.chebyshev import chebval
+        import numpy as np
+
+        msg = "Can't interpolate outside solution domain"
+        assert np.array([z]).min() >= self.zmin, msg
+        assert np.array([z]).max() <= self.zmax, msg
+
+        c = self.to_coefficients(f)
+
+        # Convert z-values to standard xg = [-1, 1]
+        x = (z - self.zmin)/self.L * 2. - 1.
+        return chebval(x, c)

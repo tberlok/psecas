@@ -27,13 +27,6 @@ kx = 250
 
 system = HeatFluxDrivenBuoyancyInstability(grid, beta, Kn, kx)
 
-# Boundary conditions
-# system.boundaries = [False, True, True, True, True]
-
-# Extra information for boundary conditions
-# system.extra_binfo = [[None, None], ['dz(dA) = 0', 'dz(dA) = 0'], ['dz(dvx) = 0', 'dz(dvx) = 0'],
-#                         ['dvz = 0', 'dvz = 0'], ['dT = 0', 'dT = 0']]
-
 solver = Solver(grid, system, True)
 
 mode = 2

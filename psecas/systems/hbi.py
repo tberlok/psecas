@@ -8,9 +8,6 @@ class HeatFluxDrivenBuoyancyInstability:
        H. N. Latter, M. W. Kunz, 2012, MNRAS, 423, 1964
        The HBI in a quasi-global model of the intracluster medium
 
-       The boundary conditions are not exactly the same as in this paper,
-       i.e., we do not impose a boundary condition on the magnetic field.
-       Improving this is left for future work.
     """
 
     def __init__(self, grid, beta, Kn, kx):
@@ -36,11 +33,15 @@ class HeatFluxDrivenBuoyancyInstability:
         ]
 
         # Boundary conditions
-        self.boundaries = [False, True, True, False, True]
+        self.boundaries = [False, True, True, True, True]
 
         # Extra information for boundary conditions
-        self.extra_binfo = [[None, None], ['Dirichlet', 'Neumann'], [None, 'Neumann'],
-                            [None, None], ['Dirichlet', 'Neumann']]
+        self.extra_binfo = [[None, None], ['Neumann', 'Neumann'], ['Neumann', 'Neumann'],
+                            ['Dirichlet', 'Dirichlet'], ['Dirichlet', 'Dirichlet']]
+
+        # system.extra_binfo = [[None, None], ['dz(dA) = 0', 'dz(dA) = 0'],
+        #                       ['dz(dvx) = 0', 'dz(dvx) = 0'],
+        #                       ['dvz = 0', 'dvz = 0'], ['dT = 0', 'dT = 0']]
 
         # Create initial background
         self.make_background()
@@ -56,18 +57,18 @@ class HeatFluxDrivenBuoyancyInstability:
         eq2 = "sigma*dA = -dvx"
         eq3 = (
             "sigma*dvx = -1j*kx*T*(drho + dT)"
-            + "+2/(beta*rho)*(dA + dz(dz(dA)))"
-            + "+2/Re*T**(5/2)/rho*(2/3*dz(dvz) -1/3*1j*kx*dvx)"
+            + "+2/(beta*rho)*( kx**2*dA - dz(dz(dA)) )"
+            + "-1j*kx*T**(5/2)/(3*rho*Re)*( 2*dz(dvz) - 1j*kx*dvx )"
         )
         eq4 = (
-            "sigma*dvz = -T*dz(drho) -T*dz(dT) -T*dlnpdz*dT"
-            + "+2/Re*T**(5/2)/rho*(5/2*dlnTdz*(2/3*dz(dvz)-1/3*1j*kx*dvx)"
-            + "+2/3*dz(dz(dvz)) -1/3*1j*kx*dz(dvx))"
+            "sigma*dvz = - T*dz(drho) - T*dz(dT) - T*dlnpdz*dT"
+            + "+2/(3*rho*Re)*T**(5/2)*(5/2*dlnTdz*(2*dz(dvz) - 1j*kx*dvx)"
+            + "+ 2*dz(dz(dvz)) - 1j*kx*dz(dvx))"
         )
         eq5 = (
             "3/2*sigma*dT = -1j*kx*dvx -dz(dvz) -3/2*dlnTdz*dvz"
-            + "+1/(p*Pe)*(7*T**(5/2)*dTdz*dz(dT) +35/4*dTdz**2*T**(3/2)*dT"
-            + "+T**(7/2)*dz(dz(dT)) +7/2*T**(5/2)*d2Tdz*dT +1j*kx*q*dz(dA))"
+            + " + 1/(p*Pe)*( 7*T**(5/2)*dTdz*dz(dT) + 35/4*dTdz**2*T**(3/2)*dT"
+            + " + T**(7/2)*dz(dz(dT)) + 7/2*T**(5/2)*d2Tdz*dT + 1j*kx*q*dz(dA) )"
         )
 
         self.equations = [eq1, eq2, eq3, eq4, eq5]
@@ -98,8 +99,8 @@ class HeatFluxDrivenBuoyancyInstability:
 
         G = 2.0
 
-        self.Pe = 1 / 24 * G / self.Kn
-        self.Re = 1 / 0.48 / self.Kn
+        self.Pe = 1/24 * G / self.Kn
+        self.Re = 1/0.48 * G / self.Kn
 
         zeta = 2.5 ** (7 / 2) - 1
 

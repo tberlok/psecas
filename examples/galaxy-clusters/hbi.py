@@ -12,26 +12,35 @@ from psecas import plot_solution
     H. N. Latter, M. W. Kunz, 2012, MNRAS, 423, 1964
     The HBI in a quasi-global model of the intracluster medium
 
-    The boundary conditions are not exactly the same as in this paper,
-    i.e., we do not impose a boundary condition on the magnetic field.
-    Improving this is left for future work.
+    The script gets the unstable solution shown in figure 3 in the paper.
+    Changing mode between 0, 1, 2 and 3 gives the solution shown in the four panels.
 """
 
 N = 64
 zmin = 0
-zmax = 2
+zmax = 1
 grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
 beta = 1e5
-Kn = 1 / 1500
-kx = 2 * np.pi
+Kn = 1 / 1500.
+kx = 250
 
 system = HeatFluxDrivenBuoyancyInstability(grid, beta, Kn, kx)
 
-solver = Solver(grid, system)
+# Boundary conditions
+# system.boundaries = [False, True, True, True, True]
 
-mode = 1
-omega, vec = solver.solve(mode=mode)
+# Extra information for boundary conditions
+# system.extra_binfo = [[None, None], ['dz(dA) = 0', 'dz(dA) = 0'], ['dz(dvx) = 0', 'dz(dvx) = 0'],
+#                         ['dvz = 0', 'dvz = 0'], ['dT = 0', 'dT = 0']]
+
+solver = Solver(grid, system, True)
+
+mode = 2
+Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))
+omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
+phi = np.arctan(vec[2].imag / vec[2].real)
+solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
 
 plot_solution(system, smooth=True)
 
@@ -46,7 +55,7 @@ if True:
     plt.clf()
     fig, axes = plt.subplots(num=2, sharex=True, sharey=True, ncols=4)
     xmin = 0
-    xmax = 2 * np.pi / kx
+    xmax = grid.zmax/10
     Nx = 512
     Nz = 1024
     extent = [xmin, xmax, system.grid.zmin, system.grid.zmax]
@@ -79,6 +88,6 @@ if True:
     ampl = 5e-2
     A = ampl * dA + np.tile(xg, (Nz, 1))
     axes[0].contour(
-        xx, zz, A, 16, colors="k", linestyles="solid", linewidths=1
+        xx, zz, A, 32, colors="k", linestyles="solid", linewidths=0.5
     )
     plt.show()

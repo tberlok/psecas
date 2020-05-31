@@ -89,5 +89,10 @@ class HermiteGrid(Grid):
         # c, res = hermfit(self.zg, f, deg=self.N, full=True)
         # return hermval(z, c)
         from scipy.interpolate import barycentric_interpolate
+        import numpy as np
+
+        msg = "Can't interpolate outside grid domain"
+        assert np.array([z]).min() >= self.zmin, msg
+        assert np.array([z]).max() <= self.zmax, msg
 
         return barycentric_interpolate(self.zg, f, z)

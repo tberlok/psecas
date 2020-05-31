@@ -66,8 +66,8 @@ class SincGrid(Grid):
         import numpy as np
         from scipy.linalg import toeplitz
 
-        N = self.N
-        self.NN = N
+        self.NN = self.N + 1
+        N = self.NN
 
         zg = self.dz * (0.5 - N / 2 + np.arange(N))
         n = np.arange(N)
@@ -99,7 +99,11 @@ class SincGrid(Grid):
         """
         import numpy as np
 
-        assert len(f) == self.N
+        msg = "Can't interpolate outside solution domain"
+        assert np.array([z]).min() >= self.zmin, msg
+        assert np.array([z]).max() <= self.zmax, msg
+
+        assert len(f) == self.NN
 
         def to_grid(z):
             return np.sum(f * np.sinc((z - self.zg) / self.dz))

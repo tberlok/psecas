@@ -68,7 +68,7 @@ class ChebyshevRootsGrid(Grid):
         from numpy.polynomial.chebyshev import chebval
         import numpy as np
 
-        msg = "Can't interpolate outside solution domain"
+        msg = "Can't interpolate outside grid domain"
         assert np.array([z]).min() >= self.zmin, msg
         assert np.array([z]).max() <= self.zmax, msg
 

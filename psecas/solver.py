@@ -10,15 +10,9 @@ class Solver:
         # System object with linearized equations, parameters and equilibrium.
         self.system = system
 
-        # do_gen_evp (default False) do the full generalized evp even though
-        # boundaries suggest that an evp is sufficient
+        # do_gen_evp, if True, do the full generalized evp even though
+        # an evp might be sufficient (default False)
         self.do_gen_evp = do_gen_evp
-
-        # Check if we need to solve a generalized evp
-        if not self.do_gen_evp:
-            # Boundaries are not all True, and not all False
-            if not all(self.system.boundaries) and any(self.system.boundaries):
-                self.do_gen_evp = True
 
         # Check that variable names are unique, i.e., that variables
         # are not a substring of another variable
@@ -28,7 +22,7 @@ class Solver:
             tmp = np.sum([var.find(var1) for var in system.variables])
             assert tmp == 1 - system.dim, msg
 
-        # This ensures backwards compatibility with old way of simply setting
+        # Code below ensures backwards compatibility with old way of simply setting
         # True/False in boundary flag.
         if not hasattr(system, 'extra_binfo'):
             extra_binfo = []
@@ -39,14 +33,51 @@ class Solver:
                     extra_binfo.append([None, None])
             system.extra_binfo = extra_binfo
 
-        else:
+
+        # Check if we need to solve a generalized evp
+        self.check_if_evp_or_gevp(verbose=False)
+
+    def check_if_evp_or_gevp(self, verbose=False):
+        """
+        This function determines whether we need to solve a generalized
+        evp, or whether we can make do with a standard evp
+        """
+        if not self.do_gen_evp:
             # In the current implementation, we always have to solve
             # the generalized evp unless all boundary conditions are Dirichlet
             # or not set
-            for info in system.extra_binfo:
-                if info is not None and info != 'Dirichlet':
-                    self.do_gen_evp = True
+            for info in self.system.extra_binfo:
+                for bound in info:
+                    if bound is not None and bound != 'Dirichlet':
+                        self.do_gen_evp = True
+                        if verbose:
+                            print('solve generalized evp due to binfo')
+                        return
 
+        if not self.do_gen_evp:
+            # Boundaries are not all True, and not all False
+            if not all(self.system.boundaries) and any(self.system.boundaries):
+                self.do_gen_evp = True
+                if verbose:
+                    print('solve generalized evp due to system boundaries')
+
+        if not self.do_gen_evp:
+            # If mat2 is not the identity matrix, then we have to solve a generalized evp
+            from scipy import sparse
+            self.get_matrix1()
+            self.get_matrix2()
+            mat2_is_identity = (self.mat2 - sparse.eye(self.mat1.shape[0])).count_nonzero() == 0
+            if not mat2_is_identity:
+                self.do_gen_evp = True
+                if verbose:
+                    print('solve generalized evp due to non-identity in mat2')
+                diag = (self.mat2 - sparse.diags(self.mat2.diagonal())).count_nonzero() == 0
+                single_val = self.mat2.diagonal().max() == self.mat2.diagonal().min()
+                if diag and single_val:
+                    msg = """Psecas will solve a generalized EVP but it appears that rewriting the
+                    LHS of your equations could reduce the calculation to a standard EVP."""
+                    print(msg)
+        return
 
     def solve(self, useOPinv=True, verbose=False, mode=0, saveall=False):
         """
@@ -78,33 +109,13 @@ class Solver:
         fastest and so on.
         """
         from scipy.linalg import eig
-        from scipy import sparse
 
-        boundaries = self.system.boundaries
-
-        # Calculate left and right-hand matrices
+        # Calculate right-hand matrix
         self.get_matrix1()
-        self.get_matrix2()
-
-        # If mat2 is not the identity matrix, then we have to solve a generalized evp
-        if not self.do_gen_evp:
-            mat2_is_identity = (self.mat2 - sparse.eye(self.mat1.shape[0])).count_nonzero() == 0
-            if not mat2_is_identity:
-                self.do_gen_evp = True
-                # Recompute matrix 1 and 2, now with boundary conditions explicitly enabled.
-                # This loop is only entered on the first call
-                self.get_matrix1()
-                self.get_matrix2()
-                diag = (self.mat2 - sparse.diags(self.mat2.diagonal())).count_nonzero() == 0
-                single_val = self.mat2.diagonal().max() == self.mat2.diagonal().min()
-                if diag and single_val:
-                    msg = """Psecas will solve a generalized EVP but it appears that rewriting the
-                    LHS of your equations could reduce the calculation to a standard EVP."""
-                    print(msg)
-
 
         # Solve a generalized EVP
         if self.do_gen_evp:
+            self.get_matrix2()
             E, V = eig(self.mat1.toarray(), self.mat2.toarray())
         # Solve a standard EVP
         else:
@@ -161,33 +172,14 @@ class Solver:
         fastest and so on.
         """
         import numpy as np
-        from scipy import sparse
         from scipy.sparse.linalg import eigs
 
-        boundaries = self.system.boundaries
-
-        # Calculate matrix
+        # Calculate right-hand matrix
         self.get_matrix1()
-        self.get_matrix2()
-
-        # If mat2 is not the identity matrix, then we have to solve a generalized evp
-        if not self.do_gen_evp:
-            mat2_is_identity = (self.mat2 - sparse.eye(self.mat1.shape[0])).count_nonzero() == 0
-            if not mat2_is_identity:
-                self.do_gen_evp = True
-                # Recompute matrix 1 and 2, now with boundary conditions explicitly enabled.
-                # This loop is only entered on the first call
-                self.get_matrix1()
-                self.get_matrix2()
-                diag = (self.mat2 - sparse.diags(self.mat2.diagonal())).count_nonzero() == 0
-                single_val = self.mat2.diagonal().max() == self.mat2.diagonal().min()
-                if diag and single_val:
-                    msg = """Psecas will solve a generalized EVP but it appears that rewriting the
-                    LHS of your equations could reduce the calculation to a standard EVP."""
-                    print(msg)
 
         # Solve a generalized EVP
         if self.do_gen_evp:
+            self.get_matrix2()
             if useOPinv:
                 from numpy.linalg import inv
                 OPinv = inv((self.mat1 - guess * self.mat2).toarray())
@@ -322,7 +314,7 @@ class Solver:
 
     def get_matrix1(self, verbose=False):
         """
-        Calculate the matrix M₂ neded in the solve method.
+        Calculate the matrix M₁ neded in the solve method.
         """
         from scipy import sparse
         import numpy as np

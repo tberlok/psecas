@@ -18,7 +18,7 @@ still recommended.
 """
 
 # Equation 17.43 in Boyd
-equation = "-sigma*w = y*dy(dy(w)) + dy(w) + (-1/2 - 1/4*y)*w"
+equation = "sigma*w = y*dy(dy(w)) + dy(w) + (-1/2 - 1/4*y)*w"
 
 # Equation 17.64a in Boyd (changed the sign of λ in Boyd's equation)
 # equation = "-sigma*w = y*dy(dy(w)) + (1 - 1/4*y)*w"

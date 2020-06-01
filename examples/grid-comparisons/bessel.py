@@ -41,6 +41,9 @@ good agreement with the exact solution, in particular for the extrema grids.
 do_gen_evp = False
 equation = "sigma*f = -dr(dr(f)) -2/r*dr(f) +l*(l+1)/r**2*f"
 
+# Solving a generalized evp gives same result but is much slower
+# equation = "r**2*sigma*f = -r**2*dr(dr(f)) -2*r*dr(f) +l*(l+1)*f"
+
 
 # Overwrite the default sorting method in the Solver class
 class Example(Solver):

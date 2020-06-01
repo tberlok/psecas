@@ -64,7 +64,7 @@ system.extra_binfo = [[None, None],
                       ['Dirichlet', 'Dirichlet']]
 
 
-solver = Solver(grid, system, do_gen_evp=True)
+solver = Solver(grid, system)
 
 mode = 0
 Ns = np.arange(1, 32) * 32 - 1

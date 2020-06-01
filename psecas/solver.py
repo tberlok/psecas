@@ -14,6 +14,12 @@ class Solver:
         # boundaries suggest that an evp is sufficient
         self.do_gen_evp = do_gen_evp
 
+        # Check if we need to solve a generalized evp
+        if not self.do_gen_evp:
+            # Boundaries are not all True, and not all False
+            if not all(self.system.boundaries) and any(self.system.boundaries):
+                self.do_gen_evp = True
+
         # Check that variable names are unique, i.e., that variables
         # are not a substring of another variable
         msg = """eigenmode variable names are not allowed to be substrings
@@ -24,7 +30,6 @@ class Solver:
 
         # This ensures backwards compatibility with old way of simply setting
         # True/False in boundary flag.
-        # TODO: Boundary conditions need a major overhaul.
         if not hasattr(system, 'extra_binfo'):
             extra_binfo = []
             for boundary in system.boundaries:
@@ -36,9 +41,10 @@ class Solver:
 
         else:
             # In the current implementation, we always have to solve
-            # the generalized evp when using a Neumann condition
+            # the generalized evp unless all boundary conditions are Dirichlet
+            # or not set
             for info in system.extra_binfo:
-                if 'Neumann' in info:
+                if info is not None and info != 'Dirichlet':
                     self.do_gen_evp = True
 
 
@@ -72,19 +78,37 @@ class Solver:
         fastest and so on.
         """
         from scipy.linalg import eig
+        from scipy import sparse
 
         boundaries = self.system.boundaries
 
-        # Calculate matrix
+        # Calculate left and right-hand matrices
         self.get_matrix1()
+        self.get_matrix2()
 
-        if ((not any(boundaries)) or all(boundaries)) and (not self.do_gen_evp):
-            # Solve a standard EVP
-            E, V = eig(self.mat1.toarray())
-        else:
-            # Solve a generalized EVP
-            self.get_matrix2()
+        # If mat2 is not the identity matrix, then we have to solve a generalized evp
+        if not self.do_gen_evp:
+            mat2_is_identity = (self.mat2 - sparse.eye(self.mat1.shape[0])).count_nonzero() == 0
+            if not mat2_is_identity:
+                self.do_gen_evp = True
+                # Recompute matrix 1 and 2, now with boundary conditions explicitly enabled.
+                # This loop is only entered on the first call
+                self.get_matrix1()
+                self.get_matrix2()
+                diag = (self.mat2 - sparse.diags(self.mat2.diagonal())).count_nonzero() == 0
+                single_val = self.mat2.diagonal().max() == self.mat2.diagonal().min()
+                if diag and single_val:
+                    msg = """Psecas will solve a generalized EVP but it appears that rewriting the
+                    LHS of your equations could reduce the calculation to a standard EVP."""
+                    print(msg)
+
+
+        # Solve a generalized EVP
+        if self.do_gen_evp:
             E, V = eig(self.mat1.toarray(), self.mat2.toarray())
+        # Solve a standard EVP
+        else:
+            E, V = eig(self.mat1.toarray())
 
         # Sort the eigenvalues
         E, index = self.sorting_strategy(E)
@@ -137,36 +161,52 @@ class Solver:
         fastest and so on.
         """
         import numpy as np
+        from scipy import sparse
         from scipy.sparse.linalg import eigs
 
         boundaries = self.system.boundaries
 
         # Calculate matrix
         self.get_matrix1()
+        self.get_matrix2()
 
-        if useOPinv:
-            # from numpy.linalg import pinv as inv
-            from numpy.linalg import inv
-
-            if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
-                OPinv = inv(
-                    self.mat1 - guess * np.eye(self.mat1.shape[0])
-                )
-            else:
+        # If mat2 is not the identity matrix, then we have to solve a generalized evp
+        if not self.do_gen_evp:
+            mat2_is_identity = (self.mat2 - sparse.eye(self.mat1.shape[0])).count_nonzero() == 0
+            if not mat2_is_identity:
+                self.do_gen_evp = True
+                # Recompute matrix 1 and 2, now with boundary conditions explicitly enabled.
+                # This loop is only entered on the first call
+                self.get_matrix1()
                 self.get_matrix2()
+                diag = (self.mat2 - sparse.diags(self.mat2.diagonal())).count_nonzero() == 0
+                single_val = self.mat2.diagonal().max() == self.mat2.diagonal().min()
+                if diag and single_val:
+                    msg = """Psecas will solve a generalized EVP but it appears that rewriting the
+                    LHS of your equations could reduce the calculation to a standard EVP."""
+                    print(msg)
+
+        # Solve a generalized EVP
+        if self.do_gen_evp:
+            if useOPinv:
+                from numpy.linalg import inv
                 OPinv = inv((self.mat1 - guess * self.mat2).toarray())
-
-            sigma, v = eigs(self.mat1, k=1, sigma=guess, OPinv=OPinv)
-        else:
-            if not any(boundaries) or all(boundaries) and not self.do_gen_evp:
-                sigma, v = eigs(self.mat1, k=1, sigma=guess)
-            else:
-                self.get_matrix2()
+                sigma, v = eigs(self.mat1, k=1, sigma=guess, OPinv=OPinv)
+            else:    
                 sigma, v = eigs(self.mat1, M=self.mat2, k=1, sigma=guess)
+        else:
+            if useOPinv:
+                from numpy.linalg import inv
+                OPinv = inv(self.mat1 - guess * np.eye(self.mat1.shape[0]))
+                sigma, v = eigs(self.mat1, k=1, sigma=guess, OPinv=OPinv)
+            else:
+                sigma, v = eigs(self.mat1, k=1, sigma=guess)
+                
 
         # Convert result from eigs to have same format as result from eig
         sigma = sigma[0]
         v = np.squeeze(v)
+
         if verbose:
             print("N:{}, only 1 eigenvalue:{}".format(self.grid.N, sigma))
 
@@ -313,45 +353,44 @@ class Solver:
                                                         verbose)
 
         # Assemble everything
-        # import IPython
-        # IPython.embed()
         self.mat1 = sparse.bmat(rows, format='csr')
-        # if (np.imag(self.mat1)).count_nonzero() == 0:
-        #     self.mat1 = np.real(self.mat1)
 
     def get_matrix2(self, verbose=False):
         """
         Calculate the matrix M₂ neded in the solve method.
         """
+        from scipy import sparse
         import numpy as np
 
         dim = self.system.dim
-        NN = self.grid.NN
+        N = self.grid.N
         sys = self.system
         equations = sys.equations
         variables = sys.variables
         boundaries = sys.boundaries
+        extra_binfo = sys.extra_binfo
 
-        mat2 = np.zeros((dim * NN, dim * NN), dtype="complex128")
-
+        # Evaluate LHS of equation
+        rows = []
         for j, equation in enumerate(equations):
-            # Evaluate LHS of equation
             equation = equation.split("=")[0]
             equation = self._var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
-            for i, variable in enumerate(variables):
-                self._set_submatrix(mat2, mats[i].toarray(), j + 1, i + 1)
-        self.mat2 = mat2
+            rows.append(mats)
 
-        if any(boundaries):
-            for j, equation in enumerate(equations):
-                if boundaries[j]:
-                    self._set_boundary(j + 1, sys.extra_binfo[j])
+        # Modify according to boundary conditions
+        for j in range(dim):
+            for i in range(dim):
+                if all((boundaries)) and not self.do_gen_evp:
+                    rows[j][i] = rows[j][i][1:grid.N, 1:grid.N]
+                elif any(boundaries):
+                    if extra_binfo[j][0] is not None:
+                        rows[j][i][0, 0] = 0
+                    if extra_binfo[j][1] is not None:
+                        rows[j][i][N, N] = 0
 
-        from scipy import sparse
-        self.mat2 = sparse.csr_matrix(mat2)
-        # if (np.imag(self.mat2)).count_nonzero() == 0:
-        #     self.mat2 = np.real(self.mat2)
+        # Assemble everything
+        self.mat2 = sparse.bmat(rows, format='csr')
 
     def _var_replace(self, eq, var, new):
         """
@@ -452,24 +491,12 @@ class Solver:
 
         return mats
 
-    def _set_submatrix(self, mat1, submat, eq_n, var_n):
-        """
-        Set submatrix corresponding to the term proportional to var_n
-        (variable number) in eq_n (equation number).
-        """
-        NN = self.grid.NN
-        N = self.grid.N
-
-        mat1[
-            (eq_n - 1) * NN : eq_n * NN, (var_n - 1) * NN : var_n * NN
-        ] = submat
-
     def _modify_submatrix(self, submat, eq_n, var_n, boundary, binfo, verbose=False):
         """
         This modifies the submatrix to incorporate boundary conditions.
     
         Dirichlet is value set to zero at boundary.
-        Neumann is derivative set to zero boundary.
+        Neumann is derivative set to zero at boundary.
 
         Finally, one can set a string such as
 
@@ -530,13 +557,3 @@ class Solver:
                                 raise Exception(err_msg1.format(bound, bound_t, var) + str(e))
 
         return submat
-
-    def _set_boundary(self, var_n, binfo):
-        """
-        Set boundary conditions in the RHS matrix, M₂.
-        """
-        NN = self.grid.NN
-        if binfo[0] is not None:
-            self.mat2[(var_n - 1) * NN, (var_n - 1) * NN] = 0.0
-        if binfo[1] is not None:
-            self.mat2[var_n * NN - 1, var_n * NN - 1] = 0.0

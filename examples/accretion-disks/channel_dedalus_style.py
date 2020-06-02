@@ -33,7 +33,7 @@ class ChannelSolver(Solver):
 
 
 # Create a solver object
-solver = ChannelSolver(grid, system, do_gen_evp=True)
+solver = ChannelSolver(grid, system)
 
 plt.figure(1)
 plt.clf()

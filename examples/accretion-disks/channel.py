@@ -6,7 +6,7 @@ from psecas.systems.channel import Channel
 grid = ChebyshevRationalGrid(N=199, z='r')
 system = Channel(grid)
 
-ch = Solver(grid, system, do_gen_evp=True)
+ch = Solver(grid, system)
 
 
 def sorting_strategy(E):

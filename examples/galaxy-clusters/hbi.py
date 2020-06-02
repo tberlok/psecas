@@ -27,7 +27,7 @@ kx = 250
 
 system = HeatFluxDrivenBuoyancyInstability(grid, beta, Kn, kx)
 
-solver = Solver(grid, system, True)
+solver = Solver(grid, system)
 
 mode = 2
 Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))

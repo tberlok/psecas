@@ -86,5 +86,10 @@ class LaguerreGrid(Grid):
     def interpolate(self, z, f):
         """"""
         from scipy.interpolate import barycentric_interpolate
+        import numpy as np
+
+        msg = "Can't interpolate outside grid domain"
+        assert np.array([z]).min() >= self.zmin, msg
+        assert np.array([z]).max() <= self.zmax, msg
 
         return barycentric_interpolate(self.zg, f, z)

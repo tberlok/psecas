@@ -5,8 +5,6 @@ class System:
     """
 
     def __init__(self, grid, variables, eigenvalue):
-        self.equations = []
-        self.boundaries = []
 
         self.grid = grid
         # Bind grid to the make_background method.
@@ -18,6 +16,10 @@ class System:
             self.variables = list([variables])
         else:
             self.variables = list(variables)
+
+        self.equations = ['' for ii in range(len(self.variables))]
+        self.boundaries = [False for ii in range(len(self.variables))]
+        self.extra_binfo = [[None, None] for ii in range(len(self.variables))]
 
         self.labels = variables
 
@@ -31,8 +33,31 @@ class System:
         return len(self.equations)
 
     def add_equation(self, eq, boundary=False):
-        self.equations.append(eq)
-        self.boundaries.append(boundary)
+        found = False
+        for ii, var in enumerate(self.variables):
+            if var in eq.split('=')[0]:
+                if found:
+                    raise RuntimeError('Only one variable may appear on the LHS.')
+                else:
+                    found = True
+                self.equations[ii] = eq
+                if boundary:
+                    self.boundaries[ii] = True
+                    self.extra_binfo[ii] = ['Dirichlet', 'Dirichlet']
+                else:
+                    self.boundaries[ii] = False
+                    self.extra_binfo[ii] = [None, None]
+
+    def add_boundary(self, var, lower, upper):
+        msg = 'Cannot set boundary on {}, as it is not found in system.variables'
+        assert var in self.variables, msg.format(var)
+        
+        for ii, var2 in enumerate(self.variables):
+            if var == var2:
+                self.extra_binfo[ii] = [lower, upper]
+                self.boundaries[ii] = True
+                return
+
 
     def make_background(self):
         """

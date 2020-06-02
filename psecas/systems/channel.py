@@ -1,5 +1,16 @@
 class Channel:
-    """Linearized equations for channel mode."""
+    """The linearized equations for channel mode, equation 17 in
+
+    *MRI channel flows in vertically stratified models of accretion discs*,
+    https://doi.org/10.1111/j.1365-2966.2010.16759.x,
+    by Henrik N. Latter, Sebastien Fromang, Oliver Gressel
+
+    is 
+
+        F'' + K² h F = 0
+
+    and is solved  by employing a Neumann boundary condition on F.
+    """
 
     def __init__(self, grid):
         # Problem parameters
@@ -8,12 +19,15 @@ class Channel:
         self.grid.bind_to(self.make_background)
 
         # Variables to solve for
-        self.variables = ["f"]
+        self.variables = ["F"]
 
-        self.labels = [r"$f(z)$"]
+        self.labels = [r"$F(z)$"]
 
         # Boundary conditions
         self.boundaries = [True]
+
+        # Extra info
+        self.extra_binfo = [['Neumann', 'Neumann']]
 
         # Create initial background
         self.make_background()
@@ -22,10 +36,10 @@ class Channel:
         self.dim = len(self.variables)
 
         # String used for eigenvalue (do not use lambda!)
-        self.eigenvalue = "sigma"
+        self.eigenvalue = "K2"
 
         # Equations
-        eq1 = "-h*sigma*f = 1*dr(dr(f)) +r*dr(f)"
+        eq1 = "-h*K2*F = dz(dz(F))"
 
         self.equations = [eq1]
 

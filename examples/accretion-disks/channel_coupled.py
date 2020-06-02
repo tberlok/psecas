@@ -57,13 +57,10 @@ class ChannelSolver(Solver):
 
 
 # Create a solver object
-solver = ChannelSolver(grid, system, do_gen_evp=True)
+solver = ChannelSolver(grid, system)
 
 # Get the 10 fastest growing modes
 modes = 11
-plt.figure(2)
-plt.clf()
-fig2, axes2 = plt.subplots(num=2, ncols=2, nrows=modes, sharex=True)
 
 plt.figure(1)
 plt.clf()

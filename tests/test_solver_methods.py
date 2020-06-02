@@ -31,6 +31,11 @@ def test_solver_methods(verbose=False):
 
     np.testing.assert_allclose(1.7814514515967603, sigma, atol=1e-8)
 
+    # Compare with solve without using OPinv
+    solver.solve(useOPinv=False, saveall=True)
+    np.testing.assert_allclose(solver.E[mode], sigma, atol=1e-8)
+
+
 
 if __name__ == '__main__':
     test_solver_methods(True)

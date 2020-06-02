@@ -64,6 +64,11 @@ class LegendreExtremaGrid(Grid):
 
     def interpolate(self, z, f):
         from numpy.polynomial.legendre import legval
+        import numpy as np
+
+        msg = "Can't interpolate outside grid domain"
+        assert np.array([z]).min() >= self.zmin, msg
+        assert np.array([z]).max() <= self.zmax, msg
 
         # Get coefficients for Legendre polynomials
         c = self.to_coefficients(f)

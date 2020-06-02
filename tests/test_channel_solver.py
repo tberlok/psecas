@@ -1,11 +1,23 @@
 def test_channel(show=False, verbose=False):
     """Test eigenvalue solver using ChebyshevRationalGrid"""
     import numpy as np
-    from psecas import Solver, ChebyshevRationalGrid
-    from psecas.systems.channel import Channel
+    from psecas import Solver, ChebyshevRationalGrid, System
 
-    grid = ChebyshevRationalGrid(N=199, z='r')
-    system = Channel(grid)
+    grid = ChebyshevRationalGrid(N=199, z='z')
+
+    class Channel(System):
+        def make_background(self):
+            import numpy as np
+
+            zg = self.grid.zg
+            self.h = np.exp(-zg ** 2 / 2)
+
+
+    # Create the Channel system
+    system = Channel(grid, variables='G', eigenvalue='K2')
+
+    # Add the first (and only) equation
+    system.add_equation("-h*K2*G = dz(dz(G)) +z*dz(G)", boundary=True)
     solver = Solver(grid, system, do_gen_evp=True)
 
     # Number of modes to test
@@ -38,8 +50,8 @@ def test_channel(show=False, verbose=False):
             axes[mode].set_title(
                 r"$\sigma = ${:1.4f}".format(omega.real), fontsize=10
             )
-            axes[mode].plot(grid.zg, system.result['f'].real)
-            axes[mode].plot(grid.zg, system.result['f'].imag)
+            axes[mode].plot(grid.zg, system.result['G'].real)
+            axes[mode].plot(grid.zg, system.result['G'].imag)
             axes[mode].set_xlim(-4, 4)
 
     if show:

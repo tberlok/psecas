@@ -33,16 +33,15 @@ def test_mri_solution(show=False, verbose=False):
     system.add_equation("-r*r*sigma*Aphi = + r*r*vr - eta*(r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi) + lh*va*1j*kz*r*r*bphi")
     system.add_equation("-r*r*sigma*bphi = - 1j*kz*r*r*vphi - 1j*kz*q*r**(2-q)*Aphi - eta*(r*r*dr(dr(bphi)) + r*dr(bphi) - bphi - kz**2*r*r*bphi) - lh*va*1j*kz*(r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi)")
 
-    system.boundaries = [False, True, True, True, True, True]
+    # The boundary conditions
     Aphi_bound = 'r**2*dr(dr(Aphi)) + r*dr(Aphi) - Aphi = 0'
-    system.extra_binfo = [[None, None], 
-                          ['Dirichlet', 'Dirichlet'], 
-                          ['Dirichlet', 'Dirichlet'],
-                          ['Neumann', 'Neumann'], 
-                          [Aphi_bound, Aphi_bound],
-                          ['Dirichlet', 'Dirichlet']]
+    system.add_boundary('vr', 'Dirichlet', 'Dirichlet')
+    system.add_boundary('vphi', 'Dirichlet', 'Dirichlet')
+    system.add_boundary('vz', 'Neumann', 'Neumann')
+    system.add_boundary('Aphi', Aphi_bound, Aphi_bound)
+    system.add_boundary('bphi', 'Dirichlet', 'Dirichlet')
 
-    solver = Solver(grid, system, do_gen_evp=True)
+    solver = Solver(grid, system)
 
 
     mode = 0

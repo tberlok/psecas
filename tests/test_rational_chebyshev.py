@@ -68,7 +68,7 @@ def test_rational_chebyshev_interpolation(show=False):
     N = 95
     grid = ChebyshevRationalGrid(N, C=4)
 
-    grid_fine = ChebyshevRationalGrid(N * 4, C=4)
+    grid_fine = ChebyshevRationalGrid(N * 4, C=1)
     z = grid_fine.zg
 
     y = psi(grid.zg, np.array(np.ones(4)))

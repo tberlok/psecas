@@ -73,8 +73,7 @@ def test_sinc_interpolation(show=False):
     N = 200
     grid = SincGrid(N, C=5)
 
-    grid_fine = SincGrid(N * 4, C=5)
-    z = grid_fine.zg
+    z = np.linspace(grid.zmin, grid.zmax, N*10)
 
     y = psi(grid.zg, np.array(np.ones(4)))
     y_fine = psi(z, np.array(np.ones(4)))
@@ -89,7 +88,7 @@ def test_sinc_interpolation(show=False):
         plt.plot(z, y_fine, "-")
         plt.plot(z, y_interpolated, "--")
         plt.plot(grid.zg, y, "+")
-        plt.xlim(-15, 15)
+        # plt.xlim(-15, 15)
         plt.ylim(-5, 10)
         plt.show()
 

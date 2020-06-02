@@ -48,11 +48,11 @@ system = HallMRI(grid, kz, variables=variables, eigenvalue='sigma')
 
 # The linearized equations
 system.add_equation("-r*sigma*rho = r*dr(vr) + vr + 1j*kz*r*vz")
-system.add_equation("-r*r*sigma*vr = - 2*r**(2-q)*vphi + h**2*r*r*dr(rho) + va**2*(r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi)")
+system.add_equation("-r*r*sigma*vr = - 2*r**(2-q)*vphi + h**2*r*r*dr(rho) + va**2*(DrAphi)")
 system.add_equation("-sigma*vphi = + (2-q)*r**(-q)*vr - va**2*1j*kz*bphi")
 system.add_equation("-sigma*vz = h**2*1j*kz*rho")
-system.add_equation("-r*r*sigma*Aphi = + r*r*vr - eta*(r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi) + lh*va*1j*kz*r*r*bphi")
-system.add_equation("-r*r*sigma*bphi = - 1j*kz*r*r*vphi - 1j*kz*q*r**(2-q)*Aphi - eta*(r*r*dr(dr(bphi)) + r*dr(bphi) - bphi - kz**2*r*r*bphi) - lh*va*1j*kz*(r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi)")
+system.add_equation("-r*r*sigma*Aphi = + r*r*vr - eta*(DrAphi) + lh*va*1j*kz*r*r*bphi")
+system.add_equation("-r*r*sigma*bphi = - 1j*kz*r*r*vphi - 1j*kz*q*r**(2-q)*Aphi - eta*(Drbphi) - lh*va*1j*kz*(DrAphi)")
 
 # The boundary conditions
 Aphi_bound = 'r**2*dr(dr(Aphi)) + r*dr(Aphi) - Aphi = 0'
@@ -62,13 +62,8 @@ system.add_boundary('vz', 'Neumann', 'Neumann')
 system.add_boundary('Aphi', Aphi_bound, Aphi_bound)
 system.add_boundary('bphi', 'Dirichlet', 'Dirichlet')
 
-# system.boundaries = [False, True, True, True, True, True]
-# system.extra_binfo = [[None, None], 
-#                       ['Dirichlet', 'Dirichlet'], 
-#                       ['Dirichlet', 'Dirichlet'],
-#                       ['Neumann', 'Neumann'], 
-#                       [Aphi_bound, Aphi_bound],
-#                       ['Dirichlet', 'Dirichlet']]
+system.add_substitution('DrAphi = r*r*dr(dr(Aphi)) + r*dr(Aphi) - Aphi - kz**2*r*r*Aphi')
+system.add_substitution('Drbphi = r*r*dr(dr(bphi)) + r*dr(bphi) - bphi - kz**2*r*r*bphi')
 
 
 solver = Solver(grid, system)

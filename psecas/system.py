@@ -21,6 +21,8 @@ class System:
         self.boundaries = [False for ii in range(len(self.variables))]
         self.extra_binfo = [[None, None] for ii in range(len(self.variables))]
 
+        self.substitutions = []
+
         self.labels = variables
 
         self.eigenvalue = eigenvalue
@@ -51,13 +53,20 @@ class System:
     def add_boundary(self, var, lower, upper):
         msg = 'Cannot set boundary on {}, as it is not found in system.variables'
         assert var in self.variables, msg.format(var)
-        
+
         for ii, var2 in enumerate(self.variables):
             if var == var2:
                 self.extra_binfo[ii] = [lower, upper]
                 self.boundaries[ii] = True
                 return
 
+    def add_substitution(self, substitution):
+        """Add equation substitution.
+           There is not any symbolic manipulation,
+           substitution will be done using simple text replacement.
+        """
+        assert '=' in substitution, 'should contain an equal sign'
+        self.substitutions.append(substitution)
 
     def make_background(self):
         """

@@ -318,6 +318,7 @@ class Solver:
         """
         from scipy import sparse
         import numpy as np
+        from .string_methods import var_replace
 
         dim = self.system.dim
         grid = self.grid
@@ -353,6 +354,7 @@ class Solver:
         """
         from scipy import sparse
         import numpy as np
+        from .string_methods import var_replace
 
         dim = self.system.dim
         N = self.grid.N
@@ -366,7 +368,7 @@ class Solver:
         rows = []
         for j, equation in enumerate(equations):
             equation = equation.split("=")[0]
-            equation = self._var_replace(equation, sys.eigenvalue, "1.0")
+            equation = var_replace(equation, sys.eigenvalue, "1.0")
             mats = self._find_submatrices(equation, verbose)
             rows.append(mats)
 
@@ -384,43 +386,11 @@ class Solver:
         # Assemble everything
         self.mat2 = sparse.bmat(rows, format='csr')
 
-    def _var_replace(self, eq, var, new):
-        """
-        Replace all instances of string var with string new.
-        This function differs from the default string replace method in
-        that it only makes the replace if var is not contained inside a
-        word.
-
-        Example:
-        eq = "-1j*kx*v*drho -drhodz*dvz -1.0*dz(dvz) - drho"
-        var_replace(eq, 'drho', 'foo')
-        returns '-1j*kx*v*foo -drhodz*dvz -1.0*dz(dvz) - foo'
-        where drhodz has not been replaced.
-        """
-        pos = 0
-        while pos != -1:
-            pos = eq.find(var, pos)
-            if pos != -1:
-                substitute = True
-                # Check if character to the left is a letter
-                if pos > 0:
-                    if eq[pos - 1].isalpha():
-                        substitute = False
-                # Check if character to the right is a letter
-                if pos + len(var) < len(eq):
-                    if eq[pos + len(var)].isalpha():
-                        substitute = False
-                if substitute:
-                    eq = eq[:pos] + new + eq[pos + len(var) :]
-                # Increment pos to prevent the function from repeatedly
-                # finding the same occurrence of var
-                else:
-                    pos += len(var)
-        return eq
 
     def _find_submatrices(self, eq, verbose=False):
         import numpy as np
         from scipy import sparse
+        from .string_methods import var_replace
 
         # This is a nasty trick
         globals().update(self.system.__dict__)
@@ -436,17 +406,23 @@ class Solver:
             if var in eq:
                 variables_t = list(np.copy(self.system.variables))
                 eq_t = eq
+                # Apply equation substitutions
+                if hasattr(self.system, 'substitutions'):
+                    for substitution in self.system.substitutions:
+                        sub_split = substitution.split('=')
+                        eq_t = var_replace(eq_t, sub_split[0].strip(), sub_split[1])
+                        print(eq_t)
                 der = "d" + grid.z + "("
                 eq_t = eq_t.replace(der + der + var + "))", "grid.d2.T")
                 eq_t = eq_t.replace(der + var + ")", "grid.d1.T")
-                eq_t = self._var_replace(eq_t, var, "grid.d0.T")
-                eq_t = self._var_replace(eq_t, grid.z, "grid.zg")
+                eq_t = var_replace(eq_t, var, "grid.d0.T")
+                eq_t = var_replace(eq_t, grid.z, "grid.zg")
 
                 variables_t.remove(var)
                 for var2 in variables_t:
                     eq_t = eq_t.replace(der + der + var2 + "))", "0.0")
                     eq_t = eq_t.replace(der + var2 + ")", "0.0")
-                    eq_t = self._var_replace(eq_t, var2, "0.0")
+                    eq_t = var_replace(eq_t, var2, "0.0")
                 if verbose:
                     print("\nEvaluating expression:", eq_t)
                 try:
@@ -497,6 +473,7 @@ class Solver:
         The Boundary condition on a variable cannot depend on the other independent variables.
         """
         import numpy as np
+        from .string_methods import var_replace
 
         # This is a nasty trick
         globals().update(self.system.__dict__)
@@ -517,13 +494,20 @@ class Solver:
                             assert int(bound.split("=")[1]) == 0, 'rhs of boundary expressions must be zero'
                             var = self.system.variables[var_n-1]
                             bound_t = bound.split("=")[0]
+
+                            # Apply equation substitutions
+                            if hasattr(self.system, 'substitutions'):
+                                for substitution in self.system.substitutions:
+                                    sub_split = substitution.split('=')
+                                    bound_t = var_replace(bound_t, sub_split[0].strip(), sub_split[1])
+
                             der = "d" + grid.z + "("
                             mask = np.zeros(self.grid.NN)
                             mask[index] = 1
                             bound_t = bound_t.replace(der + der + var + "))", "grid.d2[{}, :]".format(index))
                             bound_t = bound_t.replace(der + var + ")", "grid.d1[{}, :]".format(index))
-                            bound_t = self._var_replace(bound_t, var, "mask")
-                            bound_t = self._var_replace(bound_t, grid.z, "grid.zg[{}]".format(index))
+                            bound_t = var_replace(bound_t, var, "mask")
+                            bound_t = var_replace(bound_t, grid.z, "grid.zg[{}]".format(index))
                             if verbose:
                                 print("\nEvaluating expression:", bound_t)
                             try:

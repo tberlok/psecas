@@ -12,7 +12,10 @@ from psecas import plot_solution
 
     See the following paper for more details:
 
-    T. Berlok et al, in prep.
+    Suppressed heat conductivity in the intracluster medium:
+    implications for the magneto-thermal instability,
+    Thomas Berlok, Eliot Quataert, Martin E. Pessah, Christoph Pfrommer
+    https://arxiv.org/abs/2007.00018
 """
 
 N = 64

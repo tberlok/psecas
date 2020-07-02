@@ -24,6 +24,9 @@ smooth initial conditions – Linear theory and simulations*,
 [MNRAS, 485, 908](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz379/5308845)
  - Berlok, T. & Pfrommer, C. (2019). *The impact of magnetic fields on cold streams feeding galaxies*,
  [MNRAS, 489, 3368](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz2347/5554001)
+ - Berlok, T., Quataert, E., Pessah, M. & Pfrommer, C. (2019). *Suppressed heat conductivity in the intracluster medium:
+    implications for the magneto-thermal instability*,
+ [submitted to MNRAS](https://arxiv.org/abs/2007.00018)
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the first
 paper, then you can find more information

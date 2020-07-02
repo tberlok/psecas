@@ -2,7 +2,7 @@
 # Examples and gallery
 
 Here we provide examples of using Psecas to solve linear eigenvalue
-problems in astrophysical fluid dynamics. In addition, we include 
+problems in astrophysical fluid dynamics. In addition, we include
 examples found in the book by Boyd.
 
 Below we show images from calculations performed with Psecas.
@@ -52,9 +52,12 @@ One can compare these figures with figure 3 in the paper by Latter & Kunz.
 <img src="https://user-images.githubusercontent.com/10655136/83247634-14915a00-a1a4-11ea-9d13-b05c5787c090.png" width="900"></img>
 
 #### Magneto-thermal instability
-Psecas has been used to obtain quasi-global solutions for the magneto-thermal instability
-(Berlok et al, in prep). Here we show temperature variationas and perturbed magnetic field lines
-(left) and the eigenmode structure (right).
+Psecas has been used to obtain quasi-global solutions for the magneto-thermal instability.
+Here we show temperature variationas and perturbed magnetic field lines
+(left) and the eigenmode structure (right). More details in the paper
+[*Suppressed heat conductivity in the intracluster medium:
+implications for the magneto-thermal instability*](https://arxiv.org/abs/2007.00018)
+by Thomas Berlok, Eliot Quataert, Martin E. Pessah & Christoph Pfrommer.
 
 <img src="https://user-images.githubusercontent.com/10655136/83247622-10fdd300-a1a4-11ea-8f09-ad7c84390734.png" width="45%"></img><img src="https://user-images.githubusercontent.com/10655136/83259571-98554180-a1b8-11ea-95c2-303b31b7a71e.png" width="45%"></img>
 

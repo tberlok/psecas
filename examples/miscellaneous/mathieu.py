@@ -21,6 +21,7 @@ grid = FourierGrid(64, zmin=0, zmax=2*np.pi, z='x')
 
 # Create the system
 system = System(grid, variables='u', eigenvalue='sigma')
+system.q = 1
 
 # Add the first (and only) equation
 system.add_equation("sigma*u = 2*q*np.cos(2*x)*u - dx(dx(u))")

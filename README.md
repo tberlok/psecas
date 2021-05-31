@@ -26,7 +26,7 @@ smooth initial conditions – Linear theory and simulations*,
  [MNRAS, 489, 3368](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz2347/5554001)
  - Berlok, T., Quataert, E., Pessah, M. & Pfrommer, C. (2019). *Suppressed heat conductivity in the intracluster medium:
     implications for the magneto-thermal instability*,
- [submitted to MNRAS](https://arxiv.org/abs/2007.00018)
+ [MNRAS, 504, 3435](https://academic.oup.com/mnras/advance-article/doi/10.1093/mnras/stab832/6179880?guestAccessKey=9dee0390-22b3-47b2-bc46-0276475d749e)
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the first
 paper, then you can find more information

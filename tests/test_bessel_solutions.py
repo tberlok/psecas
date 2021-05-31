@@ -96,11 +96,11 @@ def test_bessel_solutions(show=False):
         )
 
         # Test statements
+        print(grid)
         np.testing.assert_allclose(
             grid.interpolate(r, system.result['f'].real / amp),
             spherical_jn(50, kappa_ref * r),
-            atol=tols[jj],
-            rtol=tols[jj],
+            atol=tols[jj]
         )
 
         np.testing.assert_allclose(
@@ -112,7 +112,7 @@ def test_bessel_solutions(show=False):
             axes[jj, 0].plot(r, grid.interpolate(r, system.result['f'].imag))
             axes[jj, 0].set_title(
                 type(grid).__name__
-                + ", $\kappa$-error={:1.3e}".format(kappa.real - kappa_ref)
+                + r", $\kappa$-error={:1.3e}".format(kappa.real - kappa_ref)
             )
 
             axes[jj, 1].plot(

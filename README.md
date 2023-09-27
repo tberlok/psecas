@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/tberlok/psecas.svg?style=svg&circle-token=067ada3c41e0a21e2ef785e3f7a88d481ca1ed43)](https://circleci.com/gh/tberlok/psecas)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/tberlok/psecas/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/tberlok/psecas/tree/master)
 [![Build Status](https://travis-ci.com/tberlok/psecas.svg?branch=master)](https://travis-ci.com/tberlok/psecas)
 [![codecov](https://codecov.io/gh/tberlok/psecas/branch/master/graph/badge.svg)](https://codecov.io/gh/tberlok/psecas)
 

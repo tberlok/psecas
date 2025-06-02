@@ -2,6 +2,8 @@ import numpy as np
 from psecas import Solver, ChebyshevExtremaGrid
 from psecas.systems.mti import MagnetoThermalInstability
 from psecas import plot_solution
+import matplotlib.pyplot as plt
+from psecas import get_2Dmap
 
 """
     The linear solution for the magnetothermal instability (MTI)
@@ -25,7 +27,7 @@ grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
 beta = 1e6
 Kn0 = 2000
-kx = 2 * np.pi * 20
+kx = 2 * np.pi * 10
 # kxmax for beta = 1e5 and Kn0 = 200
 # kx = 28.42043898247281
 # kxmax for beta = 1e3 and Kn0 = 2000
@@ -40,29 +42,90 @@ system.boundaries = [False, True, False, True, True]
 
 solver = Solver(grid, system)
 
-mode = 20
-Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))
-omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
-phi = np.arctan(vec[2].imag / vec[2].real)
-solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
+plt.rc('image', origin='lower', aspect='equal', interpolation='nearest',
+       cmap='hot')
 
-# Normalize eigenmodes
-y = np.vstack(
-    [
-        system.result['dvx'].real,
-        system.result['dvx'].imag,
-        system.result['dvz'].real,
-        system.result['dvz'].imag,
-    ]
+plt.rc ('font', family = 'serif', serif = 'cm')
+plt.rc ('text', usetex = True)
+plt.rc ('text.latex', preamble = [
+  r'\usepackage[T1]{fontenc}',
+  r'\usepackage[english]{babel}',
+  r'\usepackage[utf8]{inputenc}',
+  r'\usepackage{lmodern}',
+  r'\usepackage{microtype}',
+  r'\usepackage{amsmath}',
+  r'\usepackage{bm}'])
+
+dpi = plt.rcParams['figure.dpi']
+textwidth = 510.0
+width = textwidth/dpi
+height = width*1
+plt.rc('figure', figsize=(width, height))
+
+plt.rc('image', origin='lower', cmap='RdBu')
+plt.figure(20)
+plt.clf()
+fig, axes = plt.subplots(
+    num=20, sharex=True, sharey=True, nrows=4, ncols=4
 )
 
-val = np.max(np.abs(y))
-for key in system.variables:
-    system.result[key] /= val
+Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))
+# for nx in range(1, 21):
+for jj, nx in enumerate([1, 5, 10, 15]):
+    solver.system.kx = nx * 2 * np.pi
+    omega, vec = solver.solve(mode=0, verbose=True, saveall=True)
+    axes[0, jj].set_title(r'$n={}$'.format(nx))
+    for ii, mode in enumerate([0, 1, 2, 8]):
+    # for mode in range(0, 10):
+        # omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
+        vec = solver.v[:, mode]
+        phi = np.arctan(vec[2].imag / vec[2].real)
+        solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
 
-plot_solution(system, smooth=True)
+        # Normalize eigenmodes
+        y = np.vstack(
+            [
+                system.result['dvx'].real,
+                system.result['dvx'].imag,
+                system.result['dvz'].real,
+                system.result['dvz'].imag,
+            ]
+        )
 
-if True:
+        val = np.max(np.abs(y))
+        for key in system.variables:
+            system.result[key] /= val
+
+        # plot_solution(system, filename='mti_beta1e6_Kni2000_nx_{}_mode_{}.pdf'.format(nx, mode), smooth=True)
+
+        xmin = 0
+        xmax = 1 # 2 * np.pi / kx
+        Nx = 512
+        Nz = 512
+        extent = [xmin, xmax, system.grid.zmin, system.grid.zmax]
+
+        dvz = get_2Dmap(system, 'dvz', xmin, xmax, Nx, Nz)
+
+        axes[ii, jj].imshow(dvz, extent=extent)
+
+for jj in range(4):
+    for ii in range(4):
+        axes[ii, jj].set_xticklabels(("", "","","","",""))
+        axes[ii, jj].set_yticklabels(("", "","","","",""))
+        axes[ii, jj].tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+        axes[ii, jj].tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False)
+        axes[ii, jj].tick_params(direction='in')
+        # axes[ii, jj].yaxis.set_visible(False)
+        # axes[ii, jj].set_xlabel(r'$x/H$')
+
+for ii, mode in enumerate([0, 1, 2, 8]):
+    axes[ii, 0].set_ylabel(r'$m={}$'.format(mode))
+
+plt.tight_layout(h_pad=0.05, w_pad=0.05)
+plt.savefig('vz_modes.pdf')
+# plt.show()
+
+if False:
     # Plot 2D maps of the perturbations
     import matplotlib.pyplot as plt
     from psecas import get_2Dmap
@@ -202,40 +265,77 @@ if False:
 
     # Write directly to the Athena directory
     write_athena(
-        system, Nz=256, Lz=1.0, path='/Users/berlok/codes/athena/bin/'
+        system, Nz=256, Lz=1.0, path='/Users/berlok/codes/athena/bin/',
+        name='MTIbeta1e5_n7_'
     )
     save_system(system, '/Users/berlok/codes/athena/bin/mti-evp.p')
 
-if False:
+if True:
     import matplotlib.pyplot as plt
 
-    steps = 20
-    grid.N = 128
-    kx_vec = 2 * np.pi * np.linspace(0.01, 20, steps)
+    steps = 200
+    modes = 10
+    grid.N = 64
+    kx_vec = 2 * np.pi * np.linspace(0.5, 30, steps)
     omega_vec = []
-    for kx in kx_vec:
+    bbdv_vec = np.zeros((steps, 10))
+    divV_vec = np.zeros((steps, 10))
+    for ii, kx in enumerate(kx_vec):
         system.kx = kx
-        (omega, v) = solver.solve()
-        omega_vec.append(omega)
+        omega, vec = solver.solve(mode=mode, verbose=True, saveall=True)
+        omega_vec.append(solver.E[:modes])
         print(kx/(2*np.pi), omega)
+        for mode in range(modes):
+        # for mode in range(0, modes):
+            # omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
+            vec = solver.v[:, mode]
+            phi = np.arctan(vec[2].imag / vec[2].real)
+            solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
+            s = system
+            bbdv = 1j * s.kx * s.result['dvx']
+            divV = 1j * s.kx * s.result['dvx'] + s.grid.der(s.result['dvz'])
+            bbdv_vec[ii, mode] = np.max(np.abs(bbdv))
+            divV_vec[ii, mode] = np.max(np.abs(divV))
     omega_vec = np.array(omega_vec)
+
     plt.figure(4)
     plt.clf()
-    plt.plot(kx_vec/(2*np.pi), omega_vec)
-    plt.show()
+    for m in range(modes):
+        plt.plot(kx_vec/(2*np.pi), omega_vec[:, m].real, label=r'$m={}$'.format(m))
+    plt.legend(frameon=False, ncol=2)
+    plt.xlabel(r'$k_\parallel H/2\pi$')
+    plt.ylabel(r'$\sigma/\omega_\mathrm{dyn}$')
+    # plt.show()
+
+
+    plt.figure(5)
+    plt.clf()
+    for m in range(modes):
+        plt.semilogy(kx_vec/(2*np.pi), divV_vec[:, m]/bbdv_vec[:, m], label=r'$m={}$'.format(m))
+    # plt.xlim(0.5, 30)
+    plt.legend(frameon=False, ncol=2)
+    plt.xlabel(r'$k_\parallel H/2\pi$')
+    plt.ylabel(r'$\mathrm{max}(\nabla \cdot v)/\mathrm{max}(b b \mathrm{:}\nabla v)$')
+    plt.savefig('compressibility.pdf')
 
 if False:
     from psecas import golden_section
 
     def f(kx, **kwargs):
-        system.kx = kx
-        omega, vec, err = solver.iterate_solver(
-            Ns, mode=mode, verbose=False, tol=1e-4
-        )
-
+        # system = MagnetoThermalInstability(grid, beta, Kn0, kx)
+        # print(system.kx)
+        # system.boundaries = [False, True, False, True, True]
+        # omega, vec, err = solver.iterate_solver(
+        #     Ns, mode=mode, verbose=False, tol=1e-4, verbose=True
+        # )
+        solver.system.kx = kx
+        omega, vec = solver.solve(mode=0, verbose=True)
         return -omega.real
 
-    (a, b) = golden_section(f, 18, 30, tol=1e-3)
+    (a, b) = golden_section(f, 1*np.pi, 2*np.pi*20, tol=1e-3)
     print(a, b, (a + b) / 2, -f((a + b) / 2))
     kxmax = (a + b) / 2
     Lx = 2 * np.pi / kxmax
+    plt.figure(4)
+    plt.plot(kxmax/(2*np.pi), -f((a + b) / 2), 'x')
+    plt.savefig('quasi-global_growth_rates.pdf')

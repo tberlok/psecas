@@ -12,25 +12,33 @@ import matplotlib.pyplot as plt
     The equilibrium changes sign at z=0 and is therefore not periodic.
 """
 
-grid = ChebyshevRationalGrid(N=32, C=0.4)
+a = 0.05
 
-u0 = 1.0
-delta = 1.0
-kx = 5.1540899
-kx = 3.5128310
+grid = ChebyshevRationalGrid(N=32, C=8*a)
 
-system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta, kx)
+u0 = 2.0
+delta = 0.0
+kx = 2*np.pi
+
+system = KelvinHelmholtzHydroOnlySlab(grid, u0, delta, kx, a=a)
 system.boundaries = [True, True, True, True]
 
 solver = Solver(grid, system)
 
-Ns = np.arange(1, 32) * 32 - 1
-omega, vec, err = solver.iterate_solver(Ns, mode=0, verbose=True)
+Ns = np.arange(1, 32) * 128 - 1
+omega, vec, err = solver.iterate_solver(Ns, mode=0, tol=1e-6,
+                                        verbose=True)
+print(f"Converged: {solver.system.result['converged']}")
+
+if not solver.system.result['converged']:
+    raise RuntimeError(f"Not converged! err={err}")
+else:
+    print(f'Converged with omega={omega}, err={err}')
 
 xmin = 0
 xmax = 2 * np.pi / kx
-zmin = -4
-zmax = 4
+zmin = np.max([-4, solver.grid.zg.min()])
+zmax = np.min([4, solver.grid.zg.max()])
 
 Nx = 256
 Nz = 1024
@@ -52,7 +60,7 @@ y = np.vstack(
     ]
 )
 
-limits = [-2, 2]
+limits = [zmin, zmax]
 
 plot_solution(system, num=1, limits=limits, smooth=True)
 plt.xlim(limits[0], limits[1])

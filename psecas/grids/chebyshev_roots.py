@@ -77,3 +77,15 @@ class ChebyshevRootsGrid(Grid):
         # Convert z-values to standard xg = [-1, 1]
         x = (z - self.zmin)/self.L * 2. - 1.
         return chebval(x, c)
+
+
+    def to_grid(self, f):
+        from numpy.polynomial.chebyshev import chebval
+        import numpy as np
+        z = self.zg
+
+        c = self.to_coefficients(f)
+
+        # Convert z-values to standard xg = [-1, 1]
+        x = (z - self.zmin)/self.L * 2. - 1.
+        return chebval(x, c)

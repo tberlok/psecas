@@ -1,5 +1,5 @@
 import numpy as np
-from psecas import Solver, ChebyshevExtremaGrid
+from psecas import Solver, ChebyshevExtremaGrid, FourierGrid
 from psecas.systems.mti import MagnetoThermalInstability
 from psecas import plot_solution
 
@@ -22,10 +22,11 @@ N = 64
 zmin = 0
 zmax = 1
 grid = ChebyshevExtremaGrid(N, zmin, zmax)
+grid = FourierGrid(N, zmin, zmax)
 
 beta = 1e6
 Kn0 = 2000
-kx = 2 * np.pi * 20
+kx = 2 * np.pi * 10
 # kxmax for beta = 1e5 and Kn0 = 200
 # kx = 28.42043898247281
 # kxmax for beta = 1e3 and Kn0 = 2000
@@ -33,6 +34,7 @@ kx = 2 * np.pi * 20
 
 system = MagnetoThermalInstability(grid, beta, Kn0, kx)
 system.boundaries = [False, True, False, True, True]
+system.boundaries = [False, False, False, False, False]
 
 # No viscosity for now
 # system.nu0 = 0
@@ -40,7 +42,7 @@ system.boundaries = [False, True, False, True, True]
 
 solver = Solver(grid, system)
 
-mode = 20
+mode = 0
 Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))
 omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
 phi = np.arctan(vec[2].imag / vec[2].real)

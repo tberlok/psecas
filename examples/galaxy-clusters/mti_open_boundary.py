@@ -25,14 +25,36 @@ grid = ChebyshevExtremaGrid(N, zmin, zmax)
 
 beta = 1e6
 Kn0 = 2000
-kx = 2 * np.pi * 20
+kx = 2 * np.pi
 # kxmax for beta = 1e5 and Kn0 = 200
 # kx = 28.42043898247281
 # kxmax for beta = 1e3 and Kn0 = 2000
 # kx = 7.982608527915205
 
+# system = MagnetoThermalInstability(grid, beta, Kn0, kx)
+# system.boundaries = [False, False, False, True, False]
+
+# # Extra information for boundary conditions
+# # ["drho", "dA", "dvx", "dvz", "dT"]
+# system.extra_binfo = [[None, None], [None, None], [None, None],
+#                     ['Neumann', 'Neumann'], [None, None]]
+
+
+# system = MagnetoThermalInstability(grid, beta, Kn0, kx)
+# system.boundaries = [True, False, False, False, False]
+
+# Extra information for boundary conditions
+# ["drho", "dA", "dvx", "dvz", "dT"]
+# system.extra_binfo = [[None, None], [None, None], [None, None],
+#                     ['Neumann', 'Neumann'], [None, None]]
+
 system = MagnetoThermalInstability(grid, beta, Kn0, kx)
-system.boundaries = [False, True, False, True, True]
+system.boundaries = [True, True, False, True, False]
+
+# Extra information for boundary conditions
+# ["drho", "dA", "dvx", "dvz", "dT"]
+system.extra_binfo = [['Dirichlet', 'Dirichlet'], ['dz(dz(dA)) = 0', 'dz(dz(dA)) = 0'], [None, None],
+                    ['Neumann', 'Neumann'], [None, None]]
 
 # No viscosity for now
 # system.nu0 = 0
@@ -40,9 +62,10 @@ system.boundaries = [False, True, False, True, True]
 
 solver = Solver(grid, system)
 
-mode = 20
+mode = 0
 Ns = np.hstack((np.arange(2, 5) * 16, np.arange(3, 12) * 32))
 omega, vec, err = solver.iterate_solver(Ns, mode=mode, verbose=True, tol=1e-5)
+# omega, vec = solver.solve(mode=mode)
 phi = np.arctan(vec[2].imag / vec[2].real)
 solver.keep_result(omega, vec * np.exp(-1j * phi), mode=mode)
 
@@ -60,7 +83,28 @@ val = np.max(np.abs(y))
 for key in system.variables:
     system.result[key] /= val
 
+
+
 plot_solution(system, smooth=True)
+
+if True:
+    import matplotlib.pyplot as plt
+    divV = 1j*kx*system.result['dvx'] + grid.der(system.result['dvz'])
+    dp_overp = system.result['drho'] + system.result['dT']
+    plt.figure(5)
+    plt.plot(grid.zg, divV.real)
+    plt.plot(grid.zg, divV.imag, '--')
+
+    def maxabs(y):
+        return np.max(np.abs(y))
+
+    system.get_bx_and_by()
+    v = np.sqrt(np.abs(system.result['dvx'])**2 + np.abs(system.result['dvz'])**2)
+    print(maxabs(dp_overp)/maxabs(v))
+    print(maxabs(divV)/maxabs(v))
+    print(maxabs(system.result['drho'])/maxabs(v))
+    print(maxabs(system.result['dT'])/maxabs(v))
+    print(maxabs(system.result['dbz']/np.sqrt(system.beta))/maxabs(v))
 
 if True:
     # Plot 2D maps of the perturbations
@@ -74,7 +118,7 @@ if True:
         num=2, sharex=True, sharey=True, nrows=2, ncols=3
     )
     xmin = 0
-    xmax = 1 # 2 * np.pi / kx
+    xmax = 2 * np.pi / kx
     Nx = 512
     Nz = 512
     extent = [xmin, xmax, system.grid.zmin, system.grid.zmax]
@@ -105,7 +149,7 @@ if True:
 
     plt.figure(3)
     plt.clf()
-    fig, axes = plt.subplots(num=3, ncols=3, sharey=True, constrained_layout=True)
+    fig, axes = plt.subplots(num=3, ncols=3, sharey=True)
     s = system
 
     bbdv = 1j * s.kx * s.result['dvx']
@@ -113,19 +157,16 @@ if True:
     pa = s.rho * s.nu * (3*bbdv - divV)
 
     pa = get_2Dmap(system, pa, xmin, xmax, Nx, Nz)
-    im = axes[0].imshow(pa, extent=extent)
+    axes[0].imshow(pa, extent=extent)
     axes[0].set_title(r'$\Delta p$')
-    fig.colorbar(im, ax=axes[0], shrink=0.4)
 
     bbdv = get_2Dmap(system, bbdv, xmin, xmax, Nx, Nz)
-    im = axes[1].imshow(bbdv, extent=extent)
+    axes[1].imshow(bbdv, extent=extent)
     axes[1].set_title(r'$bb:\nabla v$')
-    fig.colorbar(im, ax=axes[1], shrink=0.4)
 
     divV = get_2Dmap(system, divV, xmin, xmax, Nx, Nz)
-    im = axes[2].imshow(divV, extent=extent)
+    axes[2].imshow(divV, extent=extent)
     axes[2].set_title(r'$\nabla \cdot v$')
-    fig.colorbar(im, ax=axes[2], shrink=0.4)
 
     # Construct total vector potential
     dA = get_2Dmap(system, 'dA', xmin, xmax, Nx, Nz)
@@ -137,11 +178,11 @@ if True:
     ampl = 1e-2
     A = ampl * dA - np.tile(zg, (Nx, 1)).T
     axes[0].contour(xx, zz, A, 32, colors='tab:gray', linestyles='solid')
-    t = 1
-    sigma = s.result['sigma'].real
-    B2 = (s.B0 + s.B0 * dbx * np.exp(sigma * t)) ** 2 + (
-        s.B0 * dbz * np.exp(sigma * t)
-    ) ** 2
+    # t = 1
+    # sigma = s.result['sigma'].real
+    # B2 = (s.B0 + s.B0 * dbx * np.exp(sigma * t)) ** 2 + (
+    #     s.B0 * dbz * np.exp(sigma * t)
+    # ) ** 2
     # axes[1].imshow(B2, extent=extent)
     # axes[1].set_title(r'$B^2$')
 
@@ -210,18 +251,17 @@ if False:
     import matplotlib.pyplot as plt
 
     steps = 20
-    grid.N = 128
+    grid.N = 32
     kx_vec = 2 * np.pi * np.linspace(0.01, 20, steps)
     omega_vec = []
     for kx in kx_vec:
         system.kx = kx
         (omega, v) = solver.solve()
         omega_vec.append(omega)
-        print(kx/(2*np.pi), omega)
+        print(kx, omega)
     omega_vec = np.array(omega_vec)
     plt.figure(4)
-    plt.clf()
-    plt.plot(kx_vec/(2*np.pi), omega_vec)
+    plt.plot(kx_vec, omega_vec)
     plt.show()
 
 if False:

@@ -13,7 +13,7 @@ class KelvinHelmholtzHydroOnlySlab:
         self.kx = kx
 
         self.gamma = 5.0 / 3
-        self.p0 = 1.0
+        self.p0 = 1.0e2  # 1.0e16
         self.rho0 = 1.0
 
         self.grid = grid
@@ -29,8 +29,8 @@ class KelvinHelmholtzHydroOnlySlab:
 
         self.labels = [
             r"$\delta \rho/\rho$",
-            r"$\delta v_x/c_0$",
-            r"$\delta v_z/c_0$",
+            r"$\delta v_x$",
+            r"$\delta v_z$",
             r"$\delta T/T$",
         ]
 
@@ -85,8 +85,8 @@ class KelvinHelmholtzHydroOnlySlab:
         globals().update(self.__dict__)
 
         # Define Background Functions
-        v_sym = u0 * (tanh(z / a))
-        rho_sym = rho0 + rho0 * (1 + tanh(-z / a)) * delta / 2
+        v_sym = (1 + tanh(z / a)) * u0 / 2
+        rho_sym = rho0 + rho0 * (1 + tanh(z / a)) * delta / 2
 
         dvdz_sym = diff(v_sym, z)
         d2vdz_sym = diff(dvdz_sym, z)

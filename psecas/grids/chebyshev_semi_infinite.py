@@ -101,12 +101,15 @@ class ChebyshevTLnGrid(Grid):
         for callback in self._observers:
             callback()
 
-    def to_coefficients(self, f):
+    def to_coefficients(self, f, zg=None):
         """Convert from grid values to coefficients"""
         from numpy.polynomial.chebyshev import chebfit
 
         # Convert semi-infinite grid to xg = [-1, 1]
-        xg = (self.zg - self.C) / (self.zg + self.C)
+        if zg is None:
+            xg = (self.zg - self.C) / (self.zg + self.C)
+        else:
+            xg = (zg - self.C) / (zg + self.C)
 
         # Get coefficients for standard Chebyshev polynomials
         c, res = chebfit(xg, f, deg=self.N, full=True)

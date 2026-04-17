@@ -30,7 +30,7 @@ smooth initial conditions – Linear theory and simulations*,
  [MNRAS, 504, 3435](https://academic.oup.com/mnras/advance-article/doi/10.1093/mnras/stab832/6179880?guestAccessKey=9dee0390-22b3-47b2-bc46-0276475d749e)
  - Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Quenching of Tearing Mode Instability by Transverse Magnetic Fields in Reconnection Current Sheets*, [submitted 2024](https://arxiv.org/abs/2407.09996).
  - Gabriel L. Ferreira-Santos, Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Unveiling a New β-Scaling of the Tearing Instability in Weakly Collisional Plasmas*, [submitted 2025](https://arxiv.org/abs/2503.12702).
- - Vicentin, G.H., Kowal, G., de Gouveia Dal Pino, E.M. & Lazarian, A. *Do plasmoids induce fast magnetic reconnection in well-resolved current sheets in 2D MHD simulations?*, [submitted 2025](https://arxiv.org/abs/2510.01060)
+ - Vicentin, G.H., Kowal, G., de Gouveia Dal Pino, E.M. & Lazarian, A. *Do plasmoids induce fast magnetic reconnection in well-resolved current sheets in 2D MHD simulations?*, [The Astrophysical Journal, Volume 1001, Number 2](https://iopscience.iop.org/article/10.3847/1538-4357/ae5815)
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the first
 paper, then you can find more information

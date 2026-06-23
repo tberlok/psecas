@@ -18,20 +18,20 @@ A collection of example calculations and a gallery can be found
 
 So far Psecas has been used in the following publications
 
- - Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with
+ 1. Berlok, T. & Pfrommer, C. (2019). *On the Kelvin-Helmholtz instability with
 smooth initial conditions – Linear theory and simulations*,
 [MNRAS, 485, 908](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz379/5308845)
- - Berlok, T. & Pfrommer, C. (2019). *The impact of magnetic fields on cold streams feeding galaxies*,
+ 1. Berlok, T. & Pfrommer, C. (2019). *The impact of magnetic fields on cold streams feeding galaxies*,
  [MNRAS, 489, 3368](https://academic.oup.com/mnras/advance-article-abstract/doi/10.1093/mnras/stz2347/5554001)
- - Berlok, T., Pakmor, R. & Pfrommer, C. (2020). *Braginskii viscosity on an unstructured, moving mesh accelerated with super-time-stepping*,
+ 1. Berlok, T., Pakmor, R. & Pfrommer, C. (2020). *Braginskii viscosity on an unstructured, moving mesh accelerated with super-time-stepping*,
 [MNRAS, 491, 2919.](https://ui.adsabs.harvard.edu/link_gateway/2020MNRAS.491.2919B/PUB_PDF)
- - Berlok, T., Quataert, E., Pessah, M. & Pfrommer, C. (2021). *Suppressed heat conductivity in the intracluster medium:
+ 1. Berlok, T., Quataert, E., Pessah, M. & Pfrommer, C. (2021). *Suppressed heat conductivity in the intracluster medium:
     implications for the magneto-thermal instability*,
  [MNRAS, 504, 3435](https://academic.oup.com/mnras/advance-article/doi/10.1093/mnras/stab832/6179880?guestAccessKey=9dee0390-22b3-47b2-bc46-0276475d749e)
- - Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Quenching of Tearing Mode Instability by Transverse Magnetic Fields in Reconnection Current Sheets*, [submitted 2024](https://arxiv.org/abs/2407.09996).
- - Gabriel L. Ferreira-Santos, Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Unveiling a New β-Scaling of the Tearing Instability in Weakly Collisional Plasmas*, October 2024, [The Astrophysical Journal, Volume 993, Number 1](https://iopscience.iop.org/article/10.3847/1538-4357/ae046e).
- - Vicentin, G.H., Kowal, G., de Gouveia Dal Pino, E.M. & Lazarian, A. *Do plasmoids induce fast magnetic reconnection in well-resolved current sheets in 2D MHD simulations?*, April 2026, [The Astrophysical Journal, Volume 1001, Number 2](https://iopscience.iop.org/article/10.3847/1538-4357/ae5815)
- - Grzegorz Kowal, Gabriel L. Ferreira-Santos, Diego A. Falceta-Gonçalves, *Tearing Instability in Gyrotropic MHD: Effects of Equilibrium Pressure Anisotropy*, June 2026, [https://arxiv.org/abs/2606.22535](https://arxiv.org/abs/2606.22535)
+ 1. Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Quenching of Tearing Mode Instability by Transverse Magnetic Fields in Reconnection Current Sheets*, [submitted 2024](https://arxiv.org/abs/2407.09996).
+ 1. Gabriel L. Ferreira-Santos, Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Unveiling a New β-Scaling of the Tearing Instability in Weakly Collisional Plasmas*, October 2024, [The Astrophysical Journal, Volume 993, Number 1](https://iopscience.iop.org/article/10.3847/1538-4357/ae046e).
+ 1. Vicentin, G.H., Kowal, G., de Gouveia Dal Pino, E.M. & Lazarian, A. *Do plasmoids induce fast magnetic reconnection in well-resolved current sheets in 2D MHD simulations?*, April 2026, [The Astrophysical Journal, Volume 1001, Number 2](https://iopscience.iop.org/article/10.3847/1538-4357/ae5815)
+ 1. Grzegorz Kowal, Gabriel L. Ferreira-Santos, Diego A. Falceta-Gonçalves, *Tearing Instability in Gyrotropic MHD: Effects of Equilibrium Pressure Anisotropy*, June 2026, [https://arxiv.org/abs/2606.22535](https://arxiv.org/abs/2606.22535)
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the first
 paper, then you can find more information

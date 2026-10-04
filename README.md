@@ -32,6 +32,7 @@ smooth initial conditions – Linear theory and simulations*,
  1. Gabriel L. Ferreira-Santos, Grzegorz Kowal & Diego A. Falceta-Gonçalves. *Unveiling a New β-Scaling of the Tearing Instability in Weakly Collisional Plasmas*, October 2024, [The Astrophysical Journal, Volume 993, Number 1](https://iopscience.iop.org/article/10.3847/1538-4357/ae046e).
  1. Vicentin, G.H., Kowal, G., de Gouveia Dal Pino, E.M. & Lazarian, A. *Do plasmoids induce fast magnetic reconnection in well-resolved current sheets in 2D MHD simulations?*, April 2026, [The Astrophysical Journal, Volume 1001, Number 2](https://iopscience.iop.org/article/10.3847/1538-4357/ae5815)
  1. Grzegorz Kowal, Gabriel L. Ferreira-Santos, Diego A. Falceta-Gonçalves, *Tearing Instability in Gyrotropic MHD: Effects of Equilibrium Pressure Anisotropy*, June 2026, [https://arxiv.org/abs/2606.22535](https://arxiv.org/abs/2606.22535)
+ 1. Kowal, Grzegorz ; Falceta-Gonçalves, Diego A. *Normal-Field Evolution and the Breakdown of Classical Tearing in Current Sheets*, Sep 2026 [https://ui.adsabs.harvard.edu/abs/2026arXiv261000641K/abstract][https://ui.adsabs.harvard.edu/abs/2026arXiv261000641K/abstract] 
 
 If you are here for the Kelvin-Helmholtz instability verification tests presented in Table 2 in the first
 paper, then you can find more information
